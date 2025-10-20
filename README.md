@@ -12,12 +12,21 @@ We track our work on the [project board](https://github.com/orgs/developmentseed
 We have a simple chainlit frontend to show what the agent does.
 Get [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 
-```bash
+```sh
 cp .env.example .env
 # Set your API key in .env
 uv run python scripts/embed_datasets.py
 uv run chainlit run app.py -w
 ```
+
+To run the FastAPI application:
+
+```sh
+uv run fastapi dev src/atlas_assistant/api/app.py
+```
+
+If you go to http://127.0.0.1:8000/docs you'll see OpenAPI documentation for our server.
+Most endpoints are behind authentication.
 
 ## Development
 
