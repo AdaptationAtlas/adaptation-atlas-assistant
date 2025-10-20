@@ -31,7 +31,7 @@ async def run_agent(settings: Settings) -> Callable[[str], Any]:
 
 def pytest_addoption(parser: Parser) -> None:
     parser.addoption(
-        "--agent",
+        "--integration",
         action="store_true",
         default=False,
         help="run tests that exercise the LLM-backed agent",
@@ -39,9 +39,9 @@ def pytest_addoption(parser: Parser) -> None:
 
 
 def pytest_collection_modifyitems(config: Config, items: Any) -> None:
-    if config.getoption("--agent"):
+    if config.getoption("--integration"):
         return
-    skip_agent = pytest.mark.skip(reason="need --agent option to run")
+    skip_agent = pytest.mark.skip(reason="need --integration option to run")
     for item in items:
-        if "agent" in item.keywords:
+        if "integration" in item.keywords:
             item.add_marker(skip_agent)
