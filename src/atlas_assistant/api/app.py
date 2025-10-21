@@ -20,17 +20,24 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 users = {
     "dev": "$argon2id$v=19$m=65536,t=3,p=4$EuwRCc+93QWvcdQdgi8u7A$3b/SR/8kFOubZPzcPwRgJNxK6tcFQsR8ZmqQtRIXTaU",
 }
+"""A very naive user database, just for development."""
 
 
 class Token(BaseModel):
+    """The return type for the token endpoint."""
+
     access_token: str
     token_type: str
 
 
 class User(BaseModel):
+    """An extremely simple user model."""
+
     username: str
+    """The username"""
 
     def create_access_token(self) -> str:
+        """Creates an access token for this user."""
         return jwt.encode(
             {"sub": self.username},
             settings.jwt_key.get_secret_value(),
@@ -39,6 +46,7 @@ class User(BaseModel):
 
 
 def authenticate_user(username: str, password: str) -> User | None:
+    """Checks a user's password against our naive user 'database'."""
     hashed_password = users.get(username)
     if hashed_password and password_hash.verify(password, hashed_password):
         return User(username=username)
@@ -47,6 +55,7 @@ def authenticate_user(username: str, password: str) -> User | None:
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
+    """Returns the current user, as decoded from a JWT token."""
     payload = jwt.decode(
         token, settings.jwt_key.get_secret_value(), algorithms=[algorithm]
     )
@@ -61,13 +70,15 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
         )
 
 
-@app.get("/me")
-async def me(current_user: Annotated[User, Depends(get_current_user)]):
+@app.get("/me", tags=["auth"])
+async def me(current_user: Annotated[User, Depends(get_current_user)]) -> User:
+    """Returns information about the currently logged-in user."""
     return current_user
 
 
-@app.post("/token")
+@app.post("/token", tags=["auth"])
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+    """Logs in a user with a username and password."""
     user = authenticate_user(form_data.username, form_data.password)
     if user:
         return Token(access_token=user.create_access_token(), token_type="bearer")
