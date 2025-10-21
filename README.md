@@ -38,7 +38,7 @@ We have some tests that exercise the agent, which requires access to the LLM mod
 To run those:
 
 ```sh
-uv run pytest --agent
+uv run pytest --integration
 ```
 
 To run linters and formatters:

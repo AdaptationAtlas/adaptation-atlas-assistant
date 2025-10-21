@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-pytestmark = pytest.mark.agent
+pytestmark = pytest.mark.integration
 
 
 async def test_agent(run_agent: Callable[[str], Any]):

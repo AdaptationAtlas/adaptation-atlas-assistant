@@ -33,7 +33,7 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-markers = "agent: Test the langchain-based agent using an external LLM model"
+markers = "integration: Run integration tests, which require an LLM API key"
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B", "SIM", "I"]
