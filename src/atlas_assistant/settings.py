@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     mistral_api_key: SecretStr | None = None
     chat_model_size: Literal["large"] | Literal["medium"] | Literal["small"] = "small"
     chat_model_temperature: float = 0.0
+    jwt_key: SecretStr
+
     model_config = SettingsConfigDict(env_file=".env")
 
     def get_chat_model(self) -> ChatMistralAI:

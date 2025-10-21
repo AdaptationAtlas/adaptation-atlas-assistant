@@ -7,7 +7,9 @@ from pwdlib import PasswordHash
 from pydantic import BaseModel
 from starlette import status
 
-key = "de852f3339eb4835a58ced5edca83d64ac1d20bbcfe15d0e8e672618963e2b8a"
+from ..settings import get_settings
+
+settings = get_settings()
 algorithm = "HS256"
 password_hash = PasswordHash.recommended()
 
@@ -29,7 +31,11 @@ class User(BaseModel):
     username: str
 
     def create_access_token(self) -> str:
-        return jwt.encode({"sub": self.username}, key, algorithm=algorithm)
+        return jwt.encode(
+            {"sub": self.username},
+            settings.jwt_key.get_secret_value(),
+            algorithm=algorithm,
+        )
 
 
 def authenticate_user(username: str, password: str) -> User | None:
@@ -41,7 +47,9 @@ def authenticate_user(username: str, password: str) -> User | None:
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
-    payload = jwt.decode(token, key, algorithms=[algorithm])
+    payload = jwt.decode(
+        token, settings.jwt_key.get_secret_value(), algorithms=[algorithm]
+    )
     username: str | None = payload.get("sub")
     if username in users:
         return User(username=username)
