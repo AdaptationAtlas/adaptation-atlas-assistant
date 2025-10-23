@@ -226,6 +226,7 @@ src/frontend/*.ntvs*
 src/frontend/*.njsproj
 src/frontend/*.sln
 src/frontend/*.sw?
+src/frontend/.vite/*
 # Logs
 src/frontend/logs
 src/frontend/*.log
