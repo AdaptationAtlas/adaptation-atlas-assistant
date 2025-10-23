@@ -29,6 +29,21 @@
 /* Sidebar */
 .sidebar {
   width: 320px;
+  height: 100%;
+  position: relative;
+  margin-left: -32px;
+  transition: margin-left 0.35s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.sidebar.collapsed {
+  margin-left: 0;
+}
+
+.sidebarPanel {
+  flex: 1;
   background-color: #f3f4f6;
   border-right: 1px solid #d2d6db;
   border-top-left-radius: 12px;
@@ -36,16 +51,12 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  margin-left: -32px;
-  transition: width 0.3s ease, margin-left 0.3s ease;
-  flex-shrink: 0;
+  transition: transform 0.35s ease;
+  z-index: 2;
 }
 
-.sidebar.collapsed {
-  width: 0;
-  margin-left: -32px;
-  overflow: hidden;
-  padding: 0;
+.sidebar.collapsed .sidebarPanel {
+  transform: translateX(-105%);
 }
 
 .sidebarHeader {
@@ -59,6 +70,16 @@
   color: #4d5761;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.sidebarContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.sidebar.collapsed .sidebarContent {
+  display: none;
 }
 
 .sidebarDivider {
@@ -129,6 +150,45 @@
   width: 20px;
   height: 20px;
   color: #4d5761;
+}
+
+.collapsedToggle {
+  position: absolute;
+  top: 24px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4d5761;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 0.25s ease, transform 0.35s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.sidebar.collapsed .collapsedToggle {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.collapsedIcon {
+  transition: transform 0.35s ease;
+}
+
+.sidebar.collapsed .collapsedIcon {
+  transform: rotate(180deg);
 }
 
 /* Main Content */

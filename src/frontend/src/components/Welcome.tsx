@@ -63,35 +63,48 @@ export function Welcome() {
 
       {/* Prompt Builder Sidebar */}
       <div className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ''}`}>
-        <div className={styles.sidebarHeader}>
-          <span className={styles.sidebarTitle}>PROMPT BUILDER</span>
+        <div className={styles.sidebarPanel}>
+          <div className={styles.sidebarHeader}>
+            <span className={styles.sidebarTitle}>PROMPT BUILDER</span>
+          </div>
+
+          <div className={styles.sidebarContent}>
+            <div className={styles.sidebarDivider} />
+
+            {sidebarSections.map(section => (
+              <div key={section.id}>
+                <button
+                  className={styles.sidebarSection}
+                  onClick={() => toggleSection(section.id)}
+                >
+                  <CaretRightIcon
+                    className={`${styles.caretIcon} ${
+                      activeSections.includes(section.id) ? styles.expanded : ''
+                    }`}
+                  />
+                  <span className={styles.sectionLabel}>{section.label}</span>
+                </button>
+                <div className={styles.sidebarDivider} />
+              </div>
+            ))}
+          </div>
+
+          <button
+            className={styles.collapseBtn}
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <ChevronLeftIcon className={styles.collapseIcon} />
+          </button>
         </div>
 
-        <div className={styles.sidebarDivider} />
-
-        {sidebarSections.map(section => (
-          <div key={section.id}>
-            <button
-              className={styles.sidebarSection}
-              onClick={() => toggleSection(section.id)}
-            >
-              <CaretRightIcon
-                className={`${styles.caretIcon} ${
-                  activeSections.includes(section.id) ? styles.expanded : ''
-                }`}
-              />
-              <span className={styles.sectionLabel}>{section.label}</span>
-            </button>
-            <div className={styles.sidebarDivider} />
-          </div>
-        ))}
-
         <button
-          className={styles.collapseBtn}
+          className={styles.collapsedToggle}
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <ChevronLeftIcon className={styles.collapseIcon} />
+          <span className={styles.sidebarTitle}>PROMPT BUILDER</span>
+          <ChevronLeftIcon className={`${styles.collapseIcon} ${styles.collapsedIcon}`} />
         </button>
       </div>
 
