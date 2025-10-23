@@ -3,9 +3,9 @@ import { PromptBox } from './PromptBox';
 import {
   CaretRightIcon,
   ChevronLeftIcon,
-  MagicWandIcon,
-  LogoIcon
+  MagicWandIcon
 } from '../assets/icons';
+import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Welcome.module.css';
 
 const examplePrompts = [
@@ -54,7 +54,7 @@ export function Welcome() {
       {/* Left gradient sidebar */}
       <div className={styles.leftBar}>
         <div className={styles.logoContainer}>
-          <LogoIcon className={styles.logo} />
+          <img src={AtlasLogo} alt="Atlas Logo" className={styles.logo} />
         </div>
         <div className={styles.userAvatar}>
           <span>B</span>
