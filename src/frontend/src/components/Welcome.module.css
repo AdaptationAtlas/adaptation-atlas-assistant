@@ -11,20 +11,6 @@
   flex-shrink: 0;
 }
 
-.logoContainer {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-  margin-bottom: auto;
-}
-
-.logo {
-  width: 37px;
-  height: 32px;
-}
 
 .userAvatar {
   width: 40px;
