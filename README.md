@@ -25,7 +25,7 @@ To run the FastAPI application:
 uv run fastapi dev src/atlas_assistant/api/app.py
 ```
 
-If you go to http://127.0.0.1:8000/docs you'll see OpenAPI documentation for our server.
+Navigate to http://127.0.0.1:8000/docs to see OpenAPI documentation for the local server.
 Most endpoints are behind authentication.
 
 ## Development
