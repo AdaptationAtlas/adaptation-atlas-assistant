@@ -50,7 +50,7 @@ export function Welcome() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="relative flex h-screen w-full overflow-hidden bg-white">
       {/* Left gradient sidebar */}
       <div className={styles.leftBar}>
         <div className={styles.logoContainer}>
