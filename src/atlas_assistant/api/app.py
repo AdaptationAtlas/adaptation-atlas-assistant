@@ -55,7 +55,7 @@ def authenticate_user(username: str, password: str) -> User | None:
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
-    """Returns the current user, as decoded from a JWT token."""
+    """Returns the current user, as decoded from a JWT."""
     payload = jwt.decode(
         token, settings.jwt_key.get_secret_value(), algorithms=[algorithm]
     )
