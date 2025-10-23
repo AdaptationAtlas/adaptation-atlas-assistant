@@ -38,7 +38,7 @@ export function PromptBox({ className = '', onSubmit, context }: PromptBoxProps)
           onChange={(e) => setValue(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          onKeyPress={handleKeyPress}
+          onKeyUp={handleKeyPress}
           rows={1}
         />
 
