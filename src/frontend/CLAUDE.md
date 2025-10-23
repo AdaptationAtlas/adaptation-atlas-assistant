@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Adaptation Atlas Co-Pilot Frontend - A React 19 + TypeScript + Vite application providing the user interface for the climate adaptation AI assistant. Built with modern React features including the React Compiler for optimization, CSS Modules for styling, and a component-based architecture.
+Adaptation Atlas Co-Pilot Frontend - A React 19 + TypeScript + Vite application providing the user interface for the climate adaptation AI assistant. Built with modern React features including the React Compiler for optimization, CSS Modules for scoped styling, Tailwind CSS utilities, and a component-based architecture.
 
 ## Essential Commands
 
@@ -53,6 +53,7 @@ The application uses a three-column layout:
 **CSS Architecture:**
 - Global design tokens in `index.css` (color variables, typography)
 - Component-specific CSS Modules (`.module.css` files)
+- Tailwind CSS 4 utilities loaded once in `src/App.css` via `@import "tailwindcss";`
 - IBM Plex Sans font family throughout
 
 **Color System:**
@@ -62,6 +63,11 @@ The application uses a three-column layout:
 --gradient: linear-gradient(#1d5022, #74b95a)
 --neutral-[50-900]: Gray scale from #f9fafb to #111927
 ```
+
+**Tailwind Usage:**
+- Vite config registers the Tailwind CSS plugin (`@tailwindcss/vite`) so utility classes are available in JSX.
+- Use Tailwind utilities for rapid layout/spacing tweaks; fall back to CSS Modules for complex component styling.
+- Extend or override design tokens by adding new CSS variables in `index.css` and referencing them through Tailwind's `var(--token)` pattern when needed.
 
 ### Icon Components
 
@@ -104,6 +110,7 @@ import styles from './Component.module.css';
    - Import and integrate in parent component
 
 2. **Styling Changes**:
+   - Utility tweaks: Apply Tailwind classes directly in components
    - Component-specific: Edit `.module.css` files
    - Global/theme: Update CSS variables in `index.css`
    - Icons: Modify SVG paths in `icons.tsx`
@@ -155,6 +162,7 @@ import styles from './Component.module.css';
 ## Build Optimization
 
 - **Vite**: Fast HMR, optimized dependency pre-bundling
+- **Tailwind CSS plugin**: `@tailwindcss/vite` integrates utility generation into the Vite build
 - **React Compiler**: Automatic component optimization via Babel plugin
 - **Production Build**: TypeScript check → Vite bundling → Output to `dist/`
 - **CSS**: Modules for scoping, PostCSS for processing
