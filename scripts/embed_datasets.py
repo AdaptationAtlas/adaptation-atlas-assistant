@@ -1,7 +1,3 @@
-"""
-https://onewri.sharepoint.com/:x:/s/LandandCarbonWatch/ESllWse7dmFAnobmcA4IMXABbyDYhta0p81qnPH3-XUsBw
-"""
-
 import json
 from pathlib import Path
 
