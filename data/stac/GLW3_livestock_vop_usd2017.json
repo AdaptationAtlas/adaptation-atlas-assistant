@@ -1,0 +1,143 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "GLW3_livestock_vop_usd2017",
+  "properties": {
+    "title": "GLW3 Livestock VOP USD2017 Parquet",
+    "atlas:processing_level": "intermediate",
+    "atlas:hazard": null,
+    "atlas:statistic": null,
+    "atlas:ssp": null,
+    "atlas:model": null,
+    "atlas:commodity": [
+      "cattle",
+      "poultry",
+      "goats",
+      "pigs",
+      "sheep"
+    ],
+    "atlas:unit": "usd2017",
+    "atlas:resolution": {
+      "temporal": null,
+      "spatial": [
+        "admin0-1-2",
+        "admin0",
+        "admin1",
+        "admin2"
+      ]
+    },
+    "sci:doi": "10.1073/pnas.1308149110",
+    "sci:citation": "Herrero, M., Havl\u00edk, P., Valin, H., Notenbaert, A., Rufino, M. C., Thornton, P. K., Bl\u00fcmmel, M., Weiss, F., Grace, D., & Obersteiner, M. (2013). Biomass use, production, feed efficiencies, and greenhouse gas emissions from global livestock systems. Proceedings of the National Academy of Sciences of the United States of America, 110(52), 20888\u201320893",
+    "datetime": "2010-01-01T00:00:00Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.1073/pnas.1308149110"
+    },
+    {
+      "rel": "root",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/catalog.json",
+      "type": "application/json",
+      "title": "Africa Agriculture Adaptation Atlas Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/exposure_catalog/GLW3_livestock/collection.json",
+      "type": "application/json",
+      "title": "GLW3 Livestock"
+    },
+    {
+      "rel": "parent",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/exposure_catalog/GLW3_livestock/collection.json",
+      "type": "application/json",
+      "title": "GLW3 Livestock"
+    }
+  ],
+  "assets": {
+    "/exposure/livestock/processed/livestock_vop_usd17_adm.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/livestock/processed/livestock_vop_usd17_adm.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "Livestock VOP USD2017 admin0-1-2",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas//exposure/livestock/processed/livestock_vop_usd17_adm.parquet"
+        }
+      }
+    },
+    "/exposure/livestock/processed/livestock_vop_usd17_adm0.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/livestock/processed/livestock_vop_usd17_adm0.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "Livestock VOP USD2017 admin0",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas//exposure/livestock/processed/livestock_vop_usd17_adm0.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "/exposure/livestock/processed/livestock_vop_usd17_adm1.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/livestock/processed/livestock_vop_usd17_adm1.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "Livestock VOP USD2017 admin1",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas//exposure/livestock/processed/livestock_vop_usd17_adm1.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "/exposure/livestock/processed/livestock_vop_usd17_adm2.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/livestock/processed/livestock_vop_usd17_adm2.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "Livestock VOP USD2017 admin2",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas//exposure/livestock/processed/livestock_vop_usd17_adm2.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    }
+  },
+  "bbox": [
+    -25.34999769553542,
+    -46.95000144466758,
+    57.80000354349613,
+    39.99999985098839
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json"
+  ],
+  "collection": "GLW3_livestock"
+}

@@ -1,0 +1,140 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "intersected_moderatehazard_risk_seasonal_parquet",
+  "properties": {
+    "title": "Intersected seasonal moderate hazard x risk parquets",
+    "atlas:hazard level": "moderate",
+    "atlas:processing_level": "intermediate",
+    "atlas:hazard": null,
+    "atlas:statistic": null,
+    "atlas:ssp": [
+      "historical",
+      "ssp245",
+      "ssp585"
+    ],
+    "atlas:model": "CMIP6 ensemble",
+    "atlas:commodity": null,
+    "atlas:unit": null,
+    "atlas:resolution": {
+      "temporal": [
+        "20 years"
+      ],
+      "spatial": [
+        "admin0",
+        "admin1",
+        "admin2"
+      ]
+    },
+    "start_datetime": "1995-01-01T00:00:00Z",
+    "end_datetime": "2060-01-01T00:00:00Z",
+    "datetime": null
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/catalog.json",
+      "type": "application/json",
+      "title": "Africa Agriculture Adaptation Atlas Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/hazard_catalog/hazard_risk_seasonal/moderate_hazard_risk_sn/collection.json",
+      "type": "application/json",
+      "title": "Seasonal Moderate Hazard x Risk"
+    },
+    {
+      "rel": "parent",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/hazard_catalog/hazard_risk_seasonal/moderate_hazard_risk_sn/collection.json",
+      "type": "application/json",
+      "title": "Seasonal Moderate Hazard x Risk"
+    }
+  ],
+  "assets": {
+    "haz_risk_int_adm0_moderate.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk/jagermeyr/haz_risk_int_adm0_moderate.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "haz_risk_int_adm0_moderate moderate.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk/jagermeyr/haz_risk_int_adm0_moderate.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "haz_risk_int_adm1_moderate.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk/jagermeyr/haz_risk_int_adm1_moderate.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "haz_risk_int_adm1_moderate moderate.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk/jagermeyr/haz_risk_int_adm1_moderate.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "haz_risk_int_adm2_moderate.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk/jagermeyr/haz_risk_int_adm2_moderate.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "haz_risk_int_adm2_moderate moderate.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk/jagermeyr/haz_risk_int_adm2_moderate.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "haz_risk_int_adm_moderate.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk/jagermeyr/haz_risk_int_adm_moderate.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "haz_risk_int_adm_moderate moderate.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk/jagermeyr/haz_risk_int_adm_moderate.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    }
+  },
+  "bbox": [
+    -25.34999769553542,
+    -46.95000144466758,
+    57.80000354349613,
+    39.99999985098839
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+  ],
+  "collection": "moderate_hazard_risk_sn"
+}
