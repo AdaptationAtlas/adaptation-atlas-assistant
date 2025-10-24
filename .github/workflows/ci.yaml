@@ -15,5 +15,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - name: prek
         run: uv run prek --all-files
+      - name: Generate JWT key
+        run: echo JWT_KEY=$(openssl rand -hex 32) >> .env
       - name: Test
         run: uv run pytest
