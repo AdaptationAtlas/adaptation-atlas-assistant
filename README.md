@@ -56,8 +56,19 @@ To run linters and formatters:
 uv run pre-commit run --all-files
 ```
 
+To run **pre-commit** automatically:
+
+```sh
+uv run pre-commit install
+```
+
 If you get sick of adding `uv run` to everything:
 
 ```sh
 source .venv/bin/activate
 ```
+
+## Contributing
+
+We use Github [issues](https://github.com/AdaptationAtlas/adaptation-atlas-assistant/issues) to report bugs and open feature requests, and Github [pull requests](https://github.com/AdaptationAtlas/adaptation-atlas-assistant/pulls) to propose code changes.
+When you open a pull request, please use the [conventional commit specification](https://www.conventionalcommits.org/en/v1.0.0/) for your title.
