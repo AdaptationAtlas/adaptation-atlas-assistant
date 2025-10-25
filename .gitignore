@@ -210,5 +210,5 @@ __marimo__/
 .chainlit/
 .files/
 
-data/atlas-assistant-docs-mistral-index/
+**/data/atlas-assistant-docs-mistral-index/
 .zed
