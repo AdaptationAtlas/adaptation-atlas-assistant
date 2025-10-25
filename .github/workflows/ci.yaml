@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.5"
       - name: prek
         run: uv run prek --all-files
       - name: Generate JWT key

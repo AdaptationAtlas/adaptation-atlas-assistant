@@ -1,0 +1,24 @@
+services:
+  api:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    command: ["uv", "run", "uvicorn", "src.atlas_assistant.api:app", "--reload", "--reload-exclude", "*data*", "--host", "0.0.0.0"]
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/chainlit:/app/chainlit
+      - ./backend/data:/app/data
+
+  chat:
+    build:
+      context: ./backend
+    command: ["uv", "run", "chainlit", "run", "chainlit/app.py", "--port=8501", "--host=0.0.0.0", "-w"]
+    ports:
+      - 8501:8501
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/chainlit:/app/chainlit
+      - ./backend/.env:/app/.env
