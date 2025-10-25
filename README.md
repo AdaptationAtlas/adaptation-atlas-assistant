@@ -5,7 +5,7 @@
 We're building a standalone app that will generate visualizations and text summaries of Atlas data from a user's natural language prompt.
 These visualizations and summaries will be modeled after the stories already in-use on the [Adaptation Atlas](https://adaptationatlas.cgiar.org/).
 
-We track our work on the [project board](https://github.com/orgs/developmentseed/projects/158).
+We track our work on the [project board](https://github.com/orgs/AdaptationAtlas/projects/6).
 
 ## Usage
 
