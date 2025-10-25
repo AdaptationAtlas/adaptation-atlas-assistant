@@ -1,0 +1,163 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "mapspam2017_vop_parquet",
+  "properties": {
+    "title": "MapSpam 2017 VOP Parquet",
+    "atlas:processing_level": "intermediate",
+    "atlas:hazard": null,
+    "atlas:statistic": null,
+    "atlas:ssp": "historic",
+    "atlas:model": "MapSpamV2r3",
+    "atlas:commodity": null,
+    "atlas:unit": "int$2005",
+    "atlas:resolution": {
+      "temporal": null,
+      "spatial": [
+        "admin 0",
+        "admin 1",
+        "admin 2"
+      ]
+    },
+    "start_datetime": "2016-01-01T00:00:00Z",
+    "end_datetime": "2018-12-31T00:00:00Z",
+    "table:columns": [
+      {
+        "name": "admin0_name",
+        "col_type": "string"
+      },
+      {
+        "name": "value",
+        "col_type": "double"
+      },
+      {
+        "name": "crop",
+        "col_type": "string"
+      },
+      {
+        "name": "exposure",
+        "col_type": "string"
+      },
+      {
+        "name": "admin1_name",
+        "col_type": "string"
+      },
+      {
+        "name": "admin2_name",
+        "col_type": "string"
+      }
+    ],
+    "datetime": null
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/catalog.json",
+      "type": "application/json",
+      "title": "Africa Agriculture Adaptation Atlas Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/exposure_catalog/mapspam2017/collection.json",
+      "type": "application/json",
+      "title": "MapSpam 2017"
+    },
+    {
+      "rel": "parent",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/exposure_catalog/mapspam2017/collection.json",
+      "type": "application/json",
+      "title": "MapSpam 2017"
+    }
+  ],
+  "assets": {
+    "spam2017_vop_admin0-1-2": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/mapspam/processed/crop_vop_adm.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "admin0-1-2Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/exposure/mapspam/processed/crop_vop_adm.parquet"
+        }
+      },
+      "file:size": 960932
+    },
+    "spam2017_vop_admin0": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/mapspam/processed/crop_vop_adm0.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "admin0Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/exposure/mapspam/processed/crop_vop_adm0.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0",
+      "file:size": 13627653
+    },
+    "spam2017_vop_admin1": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/mapspam/processed/crop_vop_adm1.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "admin1Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/exposure/mapspam/processed/crop_vop_adm1.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0",
+      "file:size": 30654215
+    },
+    "spam2017_vop_admin2": {
+      "href": "https://digital-atlas.s3.amazonaws.com//exposure/mapspam/processed/crop_vop_adm2.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "admin2Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/exposure/mapspam/processed/crop_vop_adm2.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0",
+      "file:size": 67007520
+    }
+  },
+  "bbox": [
+    -25.34999769553542,
+    -46.95000144466758,
+    57.80000354349613,
+    39.99999985098839
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/table/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "collection": "mapspam2017"
+}

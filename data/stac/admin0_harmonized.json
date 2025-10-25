@@ -1,0 +1,130 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "admin0_harmonized",
+  "properties": {
+    "description": "GeoBoundaries 6.0.0 for admin 0 using gbHuminatarian where possible and gbOpen otherwise. It is a composite dataset build using individual country datasets. This shows countries as they represent themselves including disputed areas and borders, which does result in some overlapping boundaries. This dataset has not undergone any processing steps to change the geometries; however, some columns have been removed or renamed from the original GeoBoundaries datasets. Columns were added to map admin 1 and admin 2 boundaries to their corresponding admin 0 and admin 1 names.",
+    "proj:epsg": 4326,
+    "created": "2024-05-14T15:50:17.809296Z",
+    "updated": "2024-05-14T15:50:17.809296Z",
+    "table:primary_geometry": "geometry",
+    "table:columns": [
+      {
+        "name": "admin_name",
+        "type": "string",
+        "description": "Name of the admin region this row is for"
+      },
+      {
+        "name": "admin0_name",
+        "type": "string",
+        "description": "Name of Country (admin 0)"
+      },
+      {
+        "name": "iso3",
+        "type": "string",
+        "description": "ISO3 code of the Country"
+      },
+      {
+        "name": "geometry",
+        "type": "geometry",
+        "description": "Geometry of the admin region"
+      }
+    ],
+    "datetime": "2023-11-01T00:00:00Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -17.530915771,
+          -34.834170003
+        ],
+        [
+          -17.530915771,
+          27.3632
+        ],
+        [
+          51.41303253200001,
+          27.3632
+        ],
+        [
+          51.41303253200001,
+          -34.834170003
+        ],
+        [
+          -17.530915771,
+          -34.834170003
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/catalog.json",
+      "type": "application/json",
+      "title": "Africa Agriculture Adaptation Atlas Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/boundary_catalog/geoBoundaries_SSA/collection.json",
+      "type": "application/json",
+      "title": "GeoBoundaries SSA"
+    },
+    {
+      "rel": "parent",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/boundary_catalog/geoBoundaries_SSA/collection.json",
+      "type": "application/json",
+      "title": "GeoBoundaries SSA"
+    }
+  ],
+  "assets": {
+    "atlas-region_admin0_harmonized_geojson": {
+      "href": "https://digital-atlas.s3.amazonaws.com//boundaries/atlas-region_admin0_harmonized.geojson",
+      "type": "application/geo+json",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/boundaries/atlas-region_admin0_harmonized.geojson"
+        }
+      },
+      "file:size": 28938591
+    },
+    "atlas-region_admin0_harmonized_gpkg": {
+      "href": "https://digital-atlas.s3.amazonaws.com//boundaries/atlas-region_admin0_harmonized.gpkg",
+      "type": "application/geopackage+sqlite3",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/boundaries/atlas-region_admin0_harmonized.gpkg"
+        }
+      },
+      "file:size": 14180352
+    },
+    "atlas-region_admin0_harmonized_parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//boundaries/atlas-region_admin0_harmonized.parquet",
+      "type": "application/vnd.apache.parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/boundaries/atlas-region_admin0_harmonized.parquet"
+        }
+      },
+      "geoparquet_schema": "v1.0.0",
+      "file:size": 13622132
+    }
+  },
+  "bbox": [
+    -17.530915771,
+    -34.834170003,
+    51.41303253200001,
+    27.3632
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/table/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "collection": "geoBoundaries_SSA"
+}

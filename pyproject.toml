@@ -5,43 +5,41 @@ description = "Africa Agriculture Adaptation Atlas Assistant"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "langchain>=0.3.27",
-    "langgraph>=0.6.1",
-    "langchain-mistralai>=0.2.12",
-    "dotenv>=0.9.9",
-    "pydantic-settings>=2.11.0",
-    "langchain-chroma>=0.2.6",
-    "mistralai>=1.9.10",
-    "google-genai>=1.39.1",
-    "pyarrow>=15.0.0",
-    "pandas>=2.0.0",
-    "duckdb>=1.0.0",
-    "plotly>=6.3.0",
-    "chainlit>=2.8.1",
     "fastapi>=0.116.2",
-    "pyjwt>=2.10.1",
+    "langchain-chroma>=1.0.0",
+    "langchain-mistralai>=1.0.0",
+    "langchain>=1.0.2",
+    "langgraph>=1.0.1",
+    "mistralai>=1.9.11",
     "pwdlib[argon2]>=0.2.1",
+    "pydantic-settings>=2.11.0",
+    "pyjwt>=2.10.1",
 ]
 
 [dependency-groups]
 dev = [
-    "pre-commit>=3.0.0",
-    "ruff>=0.13.2",
-    "langchain-chroma>=0.2.6",
-    "pytest>=8.4.2",
-    "pytest-asyncio>=0.24.0",
-    "boto3>=1.40.49",
-    "pandas>=2.3.3",
+    "basedpyright>=1.32.0",
+    "chainlit>=2.8.3",
     "fastapi[standard]>=0.116.2",
+    "httpx>=0.28.1",
+    "prek>=0.2.10",
+    "pytest>=8.4.2",
 ]
 
+[tool.basedpyright]
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportMissingTypeStubs = false
+reportAny = false
+reportExplicitAny = false
+
 [tool.pytest.ini_options]
-asyncio_mode = "auto"
 markers = "integration: Run integration tests, which require an LLM API key"
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B", "SIM", "I"]
-ignore = ["E501"]  # Don't worry about line length
 
 [build-system]
 requires = ["hatchling"]

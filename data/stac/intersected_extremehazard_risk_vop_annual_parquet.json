@@ -1,0 +1,136 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "intersected_extremehazard_risk_vop_annual_parquet",
+  "properties": {
+    "title": "Intersected annual extreme hazard x risk x VOP parquets",
+    "atlas:hazard level": "extreme",
+    "atlas:processing_level": "intermediate",
+    "atlas:hazard": null,
+    "atlas:statistic": null,
+    "atlas:ssp": [
+      "historical",
+      "ssp245",
+      "ssp585"
+    ],
+    "atlas:model": "CMIP6 ensemble",
+    "atlas:commodity": null,
+    "atlas:unit": null,
+    "atlas:resolution": {
+      "temporal": [
+        "20 years"
+      ],
+      "spatial": null
+    },
+    "start_datetime": "1995-01-01T00:00:00Z",
+    "end_datetime": "2060-01-01T00:00:00Z",
+    "datetime": null
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          39.99999985098839
+        ],
+        [
+          57.80000354349613,
+          -46.95000144466758
+        ],
+        [
+          -25.34999769553542,
+          -46.95000144466758
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/catalog.json",
+      "type": "application/json",
+      "title": "Africa Agriculture Adaptation Atlas Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/hazard_catalog/hazard_risk_vop_annual/extreme_hazard_risk_vop_annual/collection.json",
+      "type": "application/json",
+      "title": "Annual extreme hazard x risk x VOP"
+    },
+    {
+      "rel": "parent",
+      "href": "https://digital-atlas.s3.amazonaws.com/stac/public_stac/hazard_catalog/hazard_risk_vop_annual/extreme_hazard_risk_vop_annual/collection.json",
+      "type": "application/json",
+      "title": "Annual extreme hazard x risk x VOP"
+    }
+  ],
+  "assets": {
+    "extreme_adm0_int.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk_vop/annual/extreme_adm0_int.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "extreme_adm0_int int.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk_vop/annual/extreme_adm0_int.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "extreme_adm1_int.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk_vop/annual/extreme_adm1_int.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "extreme_adm1_int int.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk_vop/annual/extreme_adm1_int.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "extreme_adm2_int.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk_vop/annual/extreme_adm2_int.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "extreme_adm2_int int.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk_vop/annual/extreme_adm2_int.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    },
+    "extreme_adm_int.parquet": {
+      "href": "https://digital-atlas.s3.amazonaws.com//hazards/hazard_risk_vop/annual/extreme_adm_int.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "extreme_adm_int int.parquet Parquet",
+      "alternate": {
+        "s3": {
+          "title": "s3 URI",
+          "href": "s3://digital-atlas/hazards/hazard_risk_vop/annual/extreme_adm_int.parquet"
+        }
+      },
+      "geoparquet_schema": "v0.1.0"
+    }
+  },
+  "bbox": [
+    -25.34999769553542,
+    -46.95000144466758,
+    57.80000354349613,
+    39.99999985098839
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+  ],
+  "collection": "extreme_hazard_risk_vop_annual"
+}
