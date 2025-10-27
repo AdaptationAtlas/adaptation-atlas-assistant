@@ -23,7 +23,7 @@ uv run chainlit run app.py -w
 To run the FastAPI application:
 
 ```sh
-uv run fastapi dev src/atlas_assistant/api/app.py
+uv run fastapi dev src/atlas_assistant/api.py
 ```
 
 Navigate to http://127.0.0.1:8000/docs to see OpenAPI documentation for the local server.
