@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -7,6 +8,7 @@ from pytest import Config, Parser
 
 import atlas_assistant.api
 import atlas_assistant.settings
+from atlas_assistant.dataset import Dataset, Item
 from atlas_assistant.settings import Settings
 
 
@@ -30,6 +32,15 @@ def client(settings: Settings) -> Iterator[TestClient]:
     )
     with TestClient(atlas_assistant.api.app) as client:
         yield client
+
+
+@pytest.fixture
+def dataset() -> Dataset:
+    with open(
+        Path(__file__).parents[1] / "data" / "stac" / "admin0_simplified.json"
+    ) as f:
+        item = Item.model_validate_json(f.read())
+    return Dataset(item=item, asset_key="atlas-region_admin0_simplified_parquet")
 
 
 def pytest_addoption(parser: Parser) -> None:

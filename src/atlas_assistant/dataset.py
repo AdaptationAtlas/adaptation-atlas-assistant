@@ -72,13 +72,18 @@ class Dataset(BaseModel):
 
     def get_description(self) -> str:
         """Returns a text description for this dataset."""
-        item_text = (
-            self.item.properties.description
-            or self.item.properties.title
-            or self.item.id
-        )
-        asset_text = self.asset.title or self.asset_key
-        return f"{item_text}, {asset_text}"
+        elements = []
+        if title := self.item.properties.title:
+            elements.append("Title: " + title)
+        if description := self.item.properties.description:
+            elements.append("Description: " + description)
+        else:
+            elements.append("ID: " + self.item.id)
+        if asset_title := self.asset.title:
+            elements.append("Asset title: " + asset_title)
+        else:
+            elements.append("Asset key: " + self.asset_key)
+        return "\n".join(elements)
 
     def to_metadata(self) -> Metadata:
         """Converts this dataset to its metadata representation, for an
