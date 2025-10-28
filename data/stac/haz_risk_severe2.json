@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json",
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/alternate-assets/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+  ],
+  "id": "haz_risk_severe2",
+  "properties": {
+    "description": "Crop and livestock exposure data",
+    "table:columns": [
+      {
+        "name": "admin0_name",
+        "type": "VARCHAR",
+        "description": "Name of Country (admin 0)"
+      },
+      {
+        "name": "value",
+        "type": "DOUBLE",
+        "description": "The exposure value"
+      },
+      {
+        "name": "scenario",
+        "type": "VARCHAR",
+        "description": "The climate scenario"
+      },
+      {
+        "name": "timeframe",
+        "type": "VARCHAR",
+        "description": "The timeframe of the exposure"
+      },
+      {
+        "name": "hazard",
+        "type": "VARCHAR",
+        "description": "The type of hazard"
+      },
+      {
+        "name": "hazard_vars",
+        "type": "VARCHAR",
+        "description": "The hazard variables"
+      },
+      {
+        "name": "crop",
+        "type": "VARCHAR",
+        "description": "The type of crop or livestock"
+      },
+      {
+        "name": "severity",
+        "type": "VARCHAR",
+        "description": "The severity of the exposure"
+      },
+      {
+        "name": "exposure",
+        "type": "VARCHAR",
+        "description": "The type of exposure"
+      },
+      {
+        "name": "admin1_name",
+        "type": "VARCHAR",
+        "description": "Name of the admin 1 region"
+      }
+    ]
+  },
+  "assets": {
+    "data": {
+      "href": "https://digital-atlas.s3.amazonaws.com/hazards/hazard_risk_vop/annual/severe_adm_int_a0-a1_crop-livestock.parquet",
+      "type": "application/vnd.apache.parquet",
+      "alternate": {
+        "s3": {
+          "href": "s3://digital-atlas/hazards/hazard_risk_vop/annual/severe_adm_int_a0-a1_crop-livestock.parquet"
+        }
+      }
+    }
+  }
+}

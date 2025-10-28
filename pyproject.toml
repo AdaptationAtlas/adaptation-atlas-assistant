@@ -5,6 +5,7 @@ description = "Africa Agriculture Adaptation Atlas Assistant"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "duckdb>=1.4.1",
     "fastapi>=0.116.2",
     "langchain-chroma>=1.0.0",
     "langchain-mistralai>=1.0.0",
@@ -14,6 +15,7 @@ dependencies = [
     "pwdlib[argon2]>=0.2.1",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
+    "tabulate>=0.9.0",
 ]
 
 [dependency-groups]
@@ -34,6 +36,7 @@ reportUnknownVariableType = false
 reportMissingTypeStubs = false
 reportAny = false
 reportExplicitAny = false
+reportImplicitStringConcatenation = false
 
 [tool.pytest.ini_options]
 markers = "integration: Run integration tests, which require an LLM API key"
