@@ -27,7 +27,7 @@ uv run fastapi dev src/atlas_assistant/api.py
 ```
 
 Navigate to http://127.0.0.1:8000/docs to see OpenAPI documentation for the local server.
-Most endpoints should be behind authentication during intial development.
+Most endpoints should be behind authentication during initial development.
 
 ### Updating the datasets
 
