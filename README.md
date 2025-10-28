@@ -15,18 +15,29 @@ Get [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 ```sh
 cp .env.example .env
 # Set your API key in .env
-uv run python scripts/embed_datasets.py
+echo JWT_KEY=$(openssl rand -hex 32) >> .env
+uv run python scripts/embed_stac.py
 uv run chainlit run app.py -w
 ```
 
 To run the FastAPI application:
 
 ```sh
-uv run fastapi dev src/atlas_assistant/api/app.py
+uv run fastapi dev src/atlas_assistant/api.py
 ```
 
 Navigate to http://127.0.0.1:8000/docs to see OpenAPI documentation for the local server.
-Most endpoints should be behind authentication during intial development.
+Most endpoints should be behind authentication during initial development.
+
+### Updating the datasets
+
+We use the [Atlas's STAC Catalog](https://digital-atlas.s3.amazonaws.com/stac/public_stac/catalog.json) to build our dataset embeddings database.
+To re-fetch all items that have parquet assets and rebuild the embeddings:
+
+```sh
+uv run python scripts/fetch_stac.py
+uv run python scripts/embed_stac.py
+```
 
 ## Development
 
@@ -34,17 +45,17 @@ Most endpoints should be behind authentication during intial development.
 git clone git@github.com:AdaptationAtlas/adaptation-atlas-assistant.git
 cd adaptation-atlas-assistant
 uv sync
-uv run pre-commit install
+uv run prek install
 ```
 
-To run any unit tests:
+To run the unit tests:
 
 ```sh
 uv run pytest
 ```
 
 We have some tests that exercise the agent, which requires access to the LLM model.
-To run those:
+To run those, set your API key in `.env`, then:
 
 ```sh
 uv run pytest --integration
@@ -53,7 +64,7 @@ uv run pytest --integration
 To run linters and formatters:
 
 ```sh
-uv run pre-commit run --all-files
+uv run prek run --all-files
 ```
 
 To run **pre-commit** automatically:
