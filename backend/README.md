@@ -34,7 +34,7 @@ uv run python scripts/embed_stac.py
 
 ```sh
 git clone git@github.com:AdaptationAtlas/adaptation-atlas-assistant.git
-cd adaptation-atlas-assistant
+cd adaptation-atlas-assistant/backend
 uv sync
 uv run prek install
 ```
