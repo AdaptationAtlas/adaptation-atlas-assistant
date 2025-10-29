@@ -27,10 +27,17 @@ npm install          # Install all dependencies
 ### Component Structure
 
 ```
-App.tsx                      # Root wrapper component
-└── Welcome.tsx              # Main application layout
-    └── PromptBox.tsx        # Reusable input component with context tags
+App.tsx                           # Root wrapper component
+└── Chat.tsx                      # Main chat layout and orchestrator
+    ├── PromptBuilderSidebar.tsx  # Collapsible sidebar with sections
+    │   └── SidebarSection.tsx    # Individual sidebar section (×5)
+    ├── EmptyState.tsx            # Welcome/empty state container
+    │   ├── HeroSection.tsx       # Hero with gradient and welcome message
+    │   └── ExamplePrompts.tsx    # Example prompt buttons
+    └── PromptBox.tsx             # Input component with context tags
 ```
+
+**Component Files**: All components are located in `src/components/` with corresponding `.module.css` files for scoped styling. Each component is self-contained with its own styles, following the single responsibility principle.
 
 ### Layout Architecture
 
@@ -45,7 +52,8 @@ The application uses a three-column layout:
 
 - Component-level state using React hooks (useState)
 - PromptBox handles local input state, passes values up via onSubmit callbacks
-- Sidebar collapse/expand state managed in Welcome component
+- Sidebar section expand/collapse state managed in Chat component
+- Chat orchestrates all sub-components with controlled patterns
 - No global state management yet (Redux/Zustand to be added)
 
 ### Styling System
@@ -123,17 +131,20 @@ import styles from './Component.module.css';
 ## Current Implementation Status
 
 ### Completed
-- Welcome page with three-column layout
-- PromptBox component with context tags
-- Sidebar with collapsible sections
+- Chat page with three-column layout (refactored from Welcome)
+- Modular component architecture with sub-components:
+  - PromptBuilderSidebar with SidebarSection sub-components
+  - EmptyState with HeroSection and ExamplePrompts
+  - PromptBox at Chat level for persistence across states
 - Icon system with all UI icons
 - Responsive design (mobile breakpoint at 768px)
-- CSS design system with variables
+- CSS design system with variables and CSS Modules
+- Component-based styling with proper encapsulation
 
 ### In Progress
-- Example prompt cards (UI only, no functionality)
+- Example prompt functionality (UI complete, handlers are placeholders)
 - Sidebar section content (expandable but empty)
-- Submit handlers (placeholder functions)
+- Backend integration for prompt submission
 
 ### Not Yet Implemented
 - Backend API integration
