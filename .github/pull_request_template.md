@@ -8,7 +8,7 @@ Link in any issues that are closed by this PR with "closing keywords", e.g. `Clo
 
 <!-- Feel free to remove any items that don't apply to your PR (e.g. small fixes may not require documentation updates). -->
 
-- [ ] Pre-commit hooks pass (`uv run pre-commit run --all-files`)
+- [ ] Pre-commit hooks pass (`uv run prek run --all-files`)
 - [ ] Documentation updated
 - [ ] Tests pass (`uv run pytest --integration`)
 - [ ] The PR's title is formatted per [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
