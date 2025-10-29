@@ -4,7 +4,8 @@ from langgraph.types import Command
 from mistralai import Mistral
 from pydantic import BaseModel
 
-from atlas_assistant.settings import get_settings
+from ..context import Context
+from ..state import State
 
 
 class SqlQuery(BaseModel):
@@ -16,13 +17,13 @@ class SqlQuery(BaseModel):
 
 
 @tool
-def generate_sql(query: str, runtime: ToolRuntime) -> Command[None]:
+def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[None]:
     """Generates SQL to query a dataset.
 
     Args:
         query: The question that we're going to answer with an SQL query.
     """
-    settings = get_settings()
+    settings = runtime.context.settings
     assert settings.mistral_api_key
     client = Mistral(api_key=settings.mistral_api_key.get_secret_value())
     response = client.chat.parse(

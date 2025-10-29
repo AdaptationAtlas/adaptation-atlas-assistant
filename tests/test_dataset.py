@@ -1,6 +1,6 @@
 import pytest
 
-import atlas_assistant.dataset
+import atlas_assistant.tools.dataset
 from atlas_assistant.dataset import Dataset
 from atlas_assistant.settings import Settings
 
@@ -12,7 +12,7 @@ def test_load_embeddings(settings: Settings) -> None:
 
 @pytest.mark.integration
 def test_search(settings: Settings) -> None:
-    search_result = atlas_assistant.dataset.search(
+    search_result = atlas_assistant.tools.dataset.search(
         query="What crops are being grown in Kenya?", settings=settings
     )
     assert search_result.dataset.item.id == "GLW3_livestock_vopPQ"

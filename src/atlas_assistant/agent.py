@@ -7,29 +7,22 @@ import datetime
 
 import langchain.agents
 from langchain.agents import AgentState
-from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.graph.state import (
-    CompiledStateGraph,
+from langchain.agents.middleware.types import (
+    _InputAgentState,  # pyright: ignore[reportPrivateUsage]
+    _OutputAgentState,  # pyright: ignore[reportPrivateUsage]
 )
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph.state import CompiledStateGraph
 
-from .dataset import Dataset, select_dataset
+from .context import Context
 from .settings import Settings
-from .sql import generate_sql
+from .state import State
+from .tools.dataset import select_dataset
+from .tools.sql import generate_sql
 
-Agent = CompiledStateGraph
-
-
-class State(AgentState[None]):
-    """The agent's state.
-
-    This is updated by tools.
-    """
-
-    dataset: Dataset | None
-    """The active dataset."""
-
-    sql_query: str | None
-    """The active SQL query against the dataset."""
+Agent = CompiledStateGraph[
+    AgentState[None], Context, _InputAgentState, _OutputAgentState[None]
+]
 
 
 def create_agent(settings: Settings) -> Agent:
@@ -39,6 +32,8 @@ def create_agent(settings: Settings) -> Agent:
         system_prompt=get_system_prompt(),
         tools=[select_dataset, generate_sql],
         checkpointer=InMemorySaver(),
+        context_schema=Context,
+        state_schema=State,
     )
 
 
