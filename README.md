@@ -17,7 +17,7 @@ cp .env.example .env
 # Set your API key in .env
 echo JWT_KEY=$(openssl rand -hex 32) >> .env
 uv run python scripts/embed_stac.py
-uv run chainlit run app.py -w
+uv run chainlit run chainlit/app.py -w
 ```
 
 To run the FastAPI application:
