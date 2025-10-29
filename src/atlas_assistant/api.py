@@ -67,10 +67,6 @@ class ChatRequest(BaseModel):
     """The question from the user."""
 
 
-class ChatResponse(BaseModel):
-    """The response from a chat request."""
-
-
 def authenticate_user(
     username: str, password: str, users: dict[str, str]
 ) -> User | None:
