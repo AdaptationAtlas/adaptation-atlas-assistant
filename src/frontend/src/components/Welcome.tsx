@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { PromptBox } from './PromptBox';
 import {
   CaretRightIcon,
-  ChevronLeftIcon,
   MagicWandIcon
 } from '../assets/icons';
 import AtlasLogo from '../assets/atlas-a.svg';
@@ -23,8 +22,8 @@ const sidebarSections = [
 ];
 
 export function Welcome() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeSections, setActiveSections] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedContext, setSelectedContext] = useState<{
     location?: string;
     crop?: string;
@@ -62,7 +61,7 @@ export function Welcome() {
       </div>
 
       {/* Prompt Builder Sidebar */}
-      <div className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ''}`}>
+      <div className={styles.sidebar}>
         <div className={styles.sidebarPanel}>
           <div className={styles.sidebarHeader}>
             <span className={styles.sidebarTitle}>PROMPT BUILDER</span>
@@ -88,24 +87,7 @@ export function Welcome() {
               </div>
             ))}
           </div>
-
-          <button
-            className={styles.collapseBtn}
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <ChevronLeftIcon className={styles.collapseIcon} />
-          </button>
         </div>
-
-        <button
-          className={styles.collapsedToggle}
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <span className={styles.sidebarTitle}>PROMPT BUILDER</span>
-          <ChevronLeftIcon className={`${styles.collapseIcon} ${styles.collapsedIcon}`} />
-        </button>
       </div>
 
       {/* Main Content */}
