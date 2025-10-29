@@ -31,14 +31,7 @@ for path in STAC_DIRECTORY.glob("*.json"):
             )
 
 if EMBEDDINGS_DIRECTORY.exists():
-    print(f"Removing existing directory: {EMBEDDINGS_DIRECTORY.absolute()}")
-    try:
-        shutil.rmtree(EMBEDDINGS_DIRECTORY)
-        print("Successfully removed!")
-    except PermissionError as e:
-        print(f"Permission error: {e}")
-    except Exception as e:
-        print(f"Error: {e}")
+    shutil.rmtree(EMBEDDINGS_DIRECTORY)
 
 embedding = MistralAIEmbeddings(model="mistral-embed")
 _ = Chroma.from_texts(
