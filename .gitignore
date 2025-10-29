@@ -212,4 +212,4 @@ __marimo__/
 
 **/data/atlas-assistant-docs-mistral-index/
 .zed
-data/embeddings/
+**/data/embeddings/
