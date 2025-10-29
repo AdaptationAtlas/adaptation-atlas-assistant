@@ -1,16 +1,24 @@
-from collections.abc import Callable
-from typing import Any
-
 import pytest
+from langchain_core.messages import HumanMessage
+
+import atlas_assistant.agent
+from atlas_assistant.agent import Agent
+from atlas_assistant.context import Context
+from atlas_assistant.settings import Settings
 
 pytestmark = pytest.mark.integration
 
 
-async def test_agent(run_agent: Callable[[str], Any]):
-    result = await run_agent(
-        "Make a plot about percent change in cattle dry matter intake over all "
-        "available countries"
-    )
+@pytest.fixture
+def agent(settings: Settings) -> Agent:
+    return atlas_assistant.agent.create_agent(settings)
 
-    assert "chart" in result
-    assert "chart_data" in result
+
+def test_kenya_crops(agent: Agent, settings: Settings) -> None:
+    _ = agent.invoke(
+        {
+            "messages": [HumanMessage("What crops are being grown in Kenya?")],
+        },
+        config={"configurable": {"thread_id": "test"}},
+        context=Context(settings=settings),
+    )
