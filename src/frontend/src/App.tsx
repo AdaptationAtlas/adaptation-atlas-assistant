@@ -1,8 +1,8 @@
-import { Welcome } from './components/Welcome'
+import { Chat } from './components/Chat'
 import './App.css'
 
 function App() {
-  return <Welcome />
+  return <Chat />
 }
 
 export default App
