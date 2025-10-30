@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+import tabulate
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Item(BaseModel):
@@ -19,13 +20,23 @@ class Item(BaseModel):
 
 
 class Properties(BaseModel):
-    """STAC item properties, the ones we use"""
+    """STAC item properties, the ones we use
 
-    description: str | None = None
-    """An optional description of the item"""
+    Some fields are required here but are not required on a STAC item.
+    """
 
-    title: str | None = None
-    """An optional title for the item"""
+    description: str
+    """A description of the item"""
+
+    table_columns: list[TableColumn] = Field(alias="table:columns")
+    """The datasets' schema"""
+
+    sql_instructions: list[str] | None = Field(
+        alias="atlas_assistant:sql_instructions", default=None
+    )
+    """An extra instructions to issue to the LLM when generating SQL for this item"""
+
+    model_config = ConfigDict(serialize_by_alias=True)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 class Asset(BaseModel):
@@ -34,18 +45,34 @@ class Asset(BaseModel):
     href: str
     """The asset's href"""
 
+    type: str | None = None
+    """The type of the asset"""
+
     title: str | None = None
     """an optional title for the asset"""
 
-    alternate: Alternate | None = None
-    """The alternate asset location, which points to s3"""
 
+class TableColumn(BaseModel):
+    """A table column, from the table extension: https://github.com/stac-extensions/table"""
 
-class Alternate(BaseModel):
-    """An alternate asset definition"""
+    name: str
+    """The column name"""
 
-    s3: Asset
-    """The asset with an s3 url"""
+    description: str
+    """Detailed multi-line description to explain the dimension. CommonMark 0.29
+    syntax MAY be used for rich text representation."""
+
+    type: str
+    """Data type of the column. If using a file format with a type system (like
+    Parquet), we recommend you use those types.
+    """
+
+    values: list[str] | None = None
+    """An optional list of values contained in this column.
+
+    This isn't part of the table extension, but is helpful information to feed
+    to the LLM.
+    """
 
 
 class Dataset(BaseModel):
@@ -65,20 +92,33 @@ class Dataset(BaseModel):
         """The asset itself, as referenced by the key."""
         return self.item.assets[self.asset_key]
 
+    @property
+    def href(self) -> str | None:
+        """The asset's href"""
+        return self.asset.href
+
     def get_description(self) -> str:
         """Returns a text description for this dataset."""
-        elements = []
-        if title := self.item.properties.title:
-            elements.append("Title: " + title)
-        if description := self.item.properties.description:
-            elements.append("Description: " + description)
-        else:
-            elements.append("ID: " + self.item.id)
-        if asset_title := self.asset.title:
-            elements.append("Asset title: " + asset_title)
-        else:
-            elements.append("Asset key: " + self.asset_key)
-        return "\n".join(elements)
+        return self.item.properties.description
+
+    def get_schema_table(self) -> str:
+        """Returns a markdown-formatted table of this dataset's schema."""
+        rows = list(
+            [column.name, column.type, column.description]
+            for column in self.item.properties.table_columns
+        )
+        return tabulate.tabulate(rows, headers=["Name", "Type", "Description"])
+
+    # TODO cache
+    def get_head_table(self, limit: int = 5) -> str:
+        """Returns a formatted table of the first few rows."""
+        import duckdb
+
+        return (
+            duckdb.sql(f"SELECT * FROM '{self.href}' LIMIT {limit}")
+            .to_df()
+            .to_string(index=False)
+        )
 
     def to_metadata(self) -> Metadata:
         """Converts this dataset to its metadata representation, for an
