@@ -42,6 +42,10 @@ reportImplicitStringConcatenation = false
 
 [tool.pytest.ini_options]
 markers = "integration: Run integration tests, which require an LLM API key"
+filterwarnings = [
+    "error",
+    "ignore::pydantic.warnings.PydanticDeprecatedSince20:traceloop.sdk.prompts.model"
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B", "SIM", "I"]
