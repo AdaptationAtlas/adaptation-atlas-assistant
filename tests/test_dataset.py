@@ -38,9 +38,9 @@ def test_schema_table(dataset: Dataset) -> None:
     assert (
         dataset.get_schema_table()
         == """Name         Type     Description
------------  -------  -----------------------------
+-----------  -------  -----------------------------------------------------------------------
 admin0_name  VARCHAR  Name of Country (admin 0)
-value        DOUBLE   The exposure value
+value        DOUBLE   A numeric value that represents how exposed a given crop is to a hazard
 scenario     VARCHAR  The climate scenario
 timeframe    VARCHAR  The timeframe of the exposure
 hazard       VARCHAR  The type of hazard

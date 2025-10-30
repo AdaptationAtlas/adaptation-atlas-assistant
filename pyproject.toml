@@ -27,6 +27,7 @@ dev = [
     "httpx>=0.28.1",
     "prek>=0.2.10",
     "pytest>=8.4.2",
+    "ruff>=0.14.2",
 ]
 
 [tool.basedpyright]
@@ -44,6 +45,9 @@ markers = "integration: Run integration tests, which require an LLM API key"
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B", "SIM", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_dataset.py" = ["E501"]
 
 [build-system]
 requires = ["hatchling"]
