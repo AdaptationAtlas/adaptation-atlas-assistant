@@ -1,0 +1,133 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.promptBox {
+  background-color: #f3f4f6;
+  border: 1px solid #d2d6db;
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: border-color 0.2s ease;
+}
+
+.promptBox.focused {
+  border-color: #2e7636;
+}
+
+.input {
+  width: 100%;
+  min-height: 20px;
+  max-height: 120px;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #1f2a37;
+  overflow-y: auto;
+}
+
+.input::placeholder {
+  color: #6c737f;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contextTags {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid #d2d6db;
+  border-radius: 4px;
+  background-color: #f9fafb;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1f2a37;
+  white-space: nowrap;
+}
+
+.tagClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #6c737f;
+  transition: color 0.2s ease;
+}
+
+.tagClose:hover {
+  color: #1f2a37;
+}
+
+.tagIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.attachIcon {
+  width: 16px;
+  height: 16px;
+  color: #6c737f;
+}
+
+.submitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  background-color: #2e7636;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitBtn:hover:not(.disabled) {
+  background-color: #235a2a;
+  transform: scale(1.05);
+}
+
+.submitBtn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitIcon {
+  width: 16px;
+  height: 16px;
+  color: white;
+}
+
+.disclaimer {
+  margin: 0;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  color: #6c737f;
+  text-align: left;
+}

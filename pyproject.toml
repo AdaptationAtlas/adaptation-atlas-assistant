@@ -5,15 +5,18 @@ description = "Africa Agriculture Adaptation Atlas Assistant"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "duckdb>=1.4.1",
     "fastapi>=0.116.2",
     "langchain-chroma>=1.0.0",
     "langchain-mistralai>=1.0.0",
     "langchain>=1.0.2",
     "langgraph>=1.0.1",
     "mistralai>=1.9.11",
+    "pandas>=2.3.3",
     "pwdlib[argon2]>=0.2.1",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
+    "tabulate>=0.9.0",
 ]
 
 [dependency-groups]
@@ -24,6 +27,7 @@ dev = [
     "httpx>=0.28.1",
     "prek>=0.2.10",
     "pytest>=8.4.2",
+    "ruff>=0.14.2",
 ]
 
 [tool.basedpyright]
@@ -34,12 +38,16 @@ reportUnknownVariableType = false
 reportMissingTypeStubs = false
 reportAny = false
 reportExplicitAny = false
+reportImplicitStringConcatenation = false
 
 [tool.pytest.ini_options]
 markers = "integration: Run integration tests, which require an LLM API key"
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B", "SIM", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_dataset.py" = ["E501"]
 
 [build-system]
 requires = ["hatchling"]

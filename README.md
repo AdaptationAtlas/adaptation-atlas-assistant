@@ -41,6 +41,8 @@ uv run python scripts/embed_stac.py
 
 ## Development
 
+### Backend
+
 ```sh
 git clone git@github.com:AdaptationAtlas/adaptation-atlas-assistant.git
 cd adaptation-atlas-assistant
@@ -78,6 +80,16 @@ If you get sick of adding `uv run` to everything:
 ```sh
 source .venv/bin/activate
 ```
+
+### Frontend
+
+The frontend app is currenty located in: `src/frontend`
+
+To set it up, navigate to that directory and run `npm i` and let the dependencies install.
+
+To run it locally, run `npm run dev`.
+
+To run linting locally, run `npm run lint`
 
 ## Contributing
 
