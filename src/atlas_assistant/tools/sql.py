@@ -118,7 +118,7 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
 
     import duckdb
 
-    data_frame = duckdb.sql(sql_query).to_df()
+    data_frame = duckdb.sql(sql_query).to_df().head(50)
     return Command(
         update={
             "messages": [
