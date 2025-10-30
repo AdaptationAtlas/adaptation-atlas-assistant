@@ -8,6 +8,7 @@
   ],
   "id": "haz_risk_severe2",
   "properties": {
+    "datetime": "2024-06-27T21:58:17Z",
     "description": "Crop and livestock exposure data",
     "table:columns": [
       {
