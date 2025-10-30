@@ -12,7 +12,7 @@
     "description": "Crop and livestock exposure data",
     "atlas_assistant:sql_instructions": [
       "Do not include the severity or exposure columns",
-      "Always either group by the climate scenario column, or select a single scenario"
+      "Always group by scenario"
     ],
     "table:columns": [
       {
