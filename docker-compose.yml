@@ -17,6 +17,6 @@ services:
     pull_policy: never
     command: ["uv", "run", "chainlit", "run", "chainlit/app.py", "--port=8501", "--host=0.0.0.0", "-w"]
     ports:
-      - 8501:8501
+      - "8501:8501"
     volumes_from:
       - api
