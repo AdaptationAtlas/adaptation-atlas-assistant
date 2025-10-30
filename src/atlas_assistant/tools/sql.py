@@ -113,25 +113,27 @@ The SQL should be valid DuckDB SQL.
 
 The dataset schema that the SQL will be used against is:
 
-    {dataset.get_schema_table()}
+{dataset.get_schema_table()}
 
 The first few rows of the table look like:
 
-    {dataset.get_head_table()}
+{dataset.get_head_table()}
+
 """
 
     for table_column in dataset.item.properties.table_columns:
         if table_column.values:
-            prompt += f"""The `{table_column.name} column has the following values:
+            prompt += f"""The `{table_column.name}` column has the following values:
 
-    {"\n".join("- " + value for value in table_column.values)}
+{"\n".join("- " + value for value in table_column.values)}
+
 """
 
     if sql_instructions := dataset.item.properties.sql_instructions:
         prompt += f"""Additional instructions:
 
-    {"\n".join("- " + sql_instruction for sql_instruction in sql_instructions)}
+{"\n".join("- " + sql_instruction for sql_instruction in sql_instructions)}
+
 """
 
-    print(prompt)
     return prompt
