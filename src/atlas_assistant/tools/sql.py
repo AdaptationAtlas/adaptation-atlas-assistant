@@ -97,6 +97,40 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     )
 
 
+@tool
+def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
+    """Executes the sql and returns the result.
+
+    Requires that the SQL has been generated from the selected dataset.
+    """
+    sql_query = runtime.state["sql_query"]
+    if not sql_query:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content="No sql query has been generated",
+                        tool_call_id=runtime.tool_call_id,
+                    )
+                ]
+            }
+        )
+
+    import duckdb
+
+    data_frame = duckdb.sql(sql_query).to_df()
+    return Command(
+        update={
+            "messages": [
+                ToolMessage(
+                    content="Data returned:\n" + data_frame.to_string(index=False),
+                    tool_call_id=runtime.tool_call_id,
+                )
+            ]
+        }
+    )
+
+
 def get_prompt(dataset: Dataset) -> str:
     prompt = f"""I want you to act like a data scientist.
 
