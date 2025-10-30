@@ -10,6 +10,8 @@ from ..context import Context
 from ..dataset import Dataset
 from ..state import State
 
+MAX_DATA_FRAME_LENGTH = 50
+
 
 class SqlQueryParts(BaseModel):
     select: str
@@ -123,13 +125,35 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
 
     import duckdb
 
-    data_frame = duckdb.sql(sql_query).to_df().head(50)
+    try:
+        data_frame = duckdb.sql(sql_query).to_df()
+    except Exception as e:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content=f"Error while executing SQL: {e}",
+                        tool_call_id=runtime.tool_call_id,
+                    )
+                ],
+                "sql_query": None,
+            }
+        )
+
+    header = (
+        "Data returned (truncated):"
+        if len(data_frame) > MAX_DATA_FRAME_LENGTH
+        else "Data returned:"
+    )
     return Command(
         update={
             "messages": [
                 ToolMessage(
-                    content="Data returned:\n\n"
-                    + cast(str, data_frame.to_markdown(index=False)),
+                    content=f"{header}\n\n"
+                    + cast(
+                        str,
+                        data_frame.head(MAX_DATA_FRAME_LENGTH).to_markdown(index=False),
+                    ),
                     tool_call_id=runtime.tool_call_id,
                 )
             ]
