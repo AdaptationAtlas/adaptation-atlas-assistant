@@ -207,7 +207,7 @@ marimo/_lsp/
 __marimo__/
 
 .DS_Store
-.chainlit/
+.chainlit/translations/*
 .files/
 
 data/atlas-assistant-docs-mistral-index/
