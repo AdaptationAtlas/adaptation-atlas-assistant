@@ -1,3 +1,5 @@
+from typing import cast
+
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
 from langgraph.types import Command
@@ -83,7 +85,10 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     sql_query_parts = response.choices[0].message.parsed
     assert sql_query_parts
     sql_query = sql_query_parts.get_query(dataset.asset.href)
-    content = f"Generated SQL: {sql_query}\nExplanation: {sql_query_parts.explanation}"
+    content = (
+        f"Generated SQL:\n\n{sql_query}\n\n"
+        f"Explanation:\n\n{sql_query_parts.explanation}"
+    )
     return Command(
         update={
             "messages": [
@@ -123,7 +128,8 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
         update={
             "messages": [
                 ToolMessage(
-                    content="Data returned:\n" + data_frame.to_string(index=False),
+                    content="Data returned:\n\n"
+                    + cast(str, data_frame.to_markdown(index=False)),
                     tool_call_id=runtime.tool_call_id,
                 )
             ]
