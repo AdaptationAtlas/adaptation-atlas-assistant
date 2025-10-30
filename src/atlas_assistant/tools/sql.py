@@ -164,14 +164,15 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
 def get_prompt(dataset: Dataset) -> str:
     prompt = f"""I want you to act like a data scientist.
 
-You will generate between three and six things:
+You will generate:
 
    - An SQL select statement
    - AN SQL where statement
    - An optional SQL group by statement
    - An optional SQL order by statement
    - An optional SQL limit statement
-   - A brief explanation of why you chose what you did
+   - A brief explanation of why you chose what you did, which should include a
+     description of each output column
 
 The SQL should be valid DuckDB SQL.
 
