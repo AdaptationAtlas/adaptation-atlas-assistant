@@ -7,6 +7,19 @@
     "https://stac-extensions.github.io/table/v1.2.0/schema.json"
   ],
   "id": "haz_risk_severe2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-17.530915771, -34.834170003],
+        [-17.530915771, 27.3632],
+        [51.41303253200001, 27.3632],
+        [51.41303253200001, -34.834170003],
+        [-17.530915771, -34.834170003]
+      ]
+    ]
+  },
+  "bbox": [-17.530915771, -34.834170003, 51.41303253200001, 27.3632],
   "properties": {
     "datetime": "2024-06-27T21:58:17Z",
     "description": "Crop and livestock exposure data",
