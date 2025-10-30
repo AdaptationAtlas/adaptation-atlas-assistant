@@ -12,6 +12,7 @@ dependencies = [
     "langchain>=1.0.2",
     "langgraph>=1.0.1",
     "mistralai>=1.9.11",
+    "pandas>=2.3.3",
     "pwdlib[argon2]>=0.2.1",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",

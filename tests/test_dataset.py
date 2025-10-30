@@ -22,11 +22,7 @@ def test_search(settings: Settings) -> None:
 
 def test_dataset_description(dataset: Dataset) -> None:
     # Our fixture dataset doesn't have a title
-    dataset.item.properties.title = "This is a fake title."
-    assert (
-        dataset.get_description() == "Title: This is a fake title.\n"
-        "Description: Crop and livestock exposure data\nAsset key: data"
-    )
+    assert dataset.get_description() == "Crop and livestock exposure data"
 
 
 @pytest.mark.parametrize(
@@ -53,36 +49,4 @@ crop         VARCHAR  The type of crop or livestock
 severity     VARCHAR  The severity of the exposure
 exposure     VARCHAR  The type of exposure
 admin1_name  VARCHAR  Name of the admin 1 region"""
-    )
-
-
-def test_schema_table_without_extension(
-    dataset: Dataset,
-) -> None:
-    dataset.item.properties.table_columns = None
-    print(dataset.get_schema_table())
-    assert (
-        dataset.get_schema_table()
-        == """Name         Type     Description
------------  -------  -------------
-admin0_name  VARCHAR
-value        DOUBLE
-scenario     VARCHAR
-timeframe    VARCHAR
-hazard       VARCHAR
-hazard_vars  VARCHAR
-crop         VARCHAR
-severity     VARCHAR
-exposure     VARCHAR
-admin1_name  VARCHAR"""
-    )
-
-
-def test_s3_url_cleaning(dataset: Dataset) -> None:
-    asset = dataset.item.assets["data"]
-    assert asset.alternate
-    asset.alternate.s3.href = "s3://digital-atlas//exposure/livestock/processed/livestock_vop_usd17_adm0.parquet"
-    assert (
-        dataset.s3_href
-        == "s3://digital-atlas/exposure/livestock/processed/livestock_vop_usd17_adm0.parquet"
     )

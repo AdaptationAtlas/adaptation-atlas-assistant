@@ -10,41 +10,149 @@
   "properties": {
     "datetime": "2024-06-27T21:58:17Z",
     "description": "Crop and livestock exposure data",
+    "atlas_assistant:sql_instructions": [
+      "Do not include the severity or exposure columns"
+    ],
     "table:columns": [
       {
         "name": "admin0_name",
         "type": "VARCHAR",
-        "description": "Name of Country (admin 0)"
+        "description": "Name of Country (admin 0)",
+        "values": [
+          "Tanzania",
+          "Uganda",
+          "Burundi",
+          "Gambia",
+          "Kenya",
+          "Mali",
+          "Mauritania",
+          "Sudan",
+          "Côte d’Ivoire",
+          "Eritrea",
+          "Gabon",
+          "Malawi",
+          "South Sudan",
+          "Benin",
+          "Lesotho",
+          "Ethiopia",
+          "Madagascar",
+          "Cameroon",
+          "Guinea",
+          "Nigeria",
+          "Botswana",
+          "Burkina Faso",
+          "Liberia",
+          "South Africa",
+          "Central African Republic",
+          "Ghana",
+          "Niger",
+          "Namibia",
+          "Mozambique",
+          "Angola",
+          "Congo - Kinshasa",
+          "Equatorial Guinea",
+          "Eswatini",
+          "Sierra Leone",
+          "Zimbabwe",
+          "Chad",
+          "Guinea-Bissau",
+          "Congo - Brazzaville",
+          "Rwanda",
+          "Togo",
+          "Zambia",
+          "Djibouti",
+          "Senegal",
+          "Somalia"
+        ]
       },
       {
         "name": "value",
         "type": "DOUBLE",
-        "description": "The exposure value"
+        "description": "A numeric value that represents how exposed a given crop is to a hazard"
       },
       {
         "name": "scenario",
         "type": "VARCHAR",
-        "description": "The climate scenario"
+        "description": "The climate scenario",
+        "values": ["historic", "ssp585", "ssp245"]
       },
       {
         "name": "timeframe",
         "type": "VARCHAR",
-        "description": "The timeframe of the exposure"
+        "description": "The timeframe of the exposure",
+        "values": ["2041_2060", "historic", "2021_2040"]
       },
       {
         "name": "hazard",
         "type": "VARCHAR",
-        "description": "The type of hazard"
+        "description": "The type of hazard",
+        "values": [
+          "heat+wet",
+          "dry+wet",
+          "any",
+          "dry+heat",
+          "dry+heat+wet",
+          "wet",
+          "heat",
+          "dry"
+        ]
       },
       {
         "name": "hazard_vars",
         "type": "VARCHAR",
-        "description": "The hazard variables"
+        "description": "The hazard variables",
+        "values": ["NDWS+NTx35+NDWL0", "NDWS+THI_max+NDWL0"]
       },
       {
         "name": "crop",
         "type": "VARCHAR",
-        "description": "The type of crop or livestock"
+        "description": "The type of crop or livestock",
+        "values": [
+          "maize",
+          "potato",
+          "sugarcane",
+          "sunflower",
+          "sheep_tropical",
+          "banana",
+          "bean",
+          "sheep_highland",
+          "plantain",
+          "tobacco",
+          "wheat",
+          "barley",
+          "poultry_tropical",
+          "pearl millet",
+          "sorghum",
+          "chickpea",
+          "soybean",
+          "tea",
+          "cassava",
+          "cotton",
+          "oilpalm",
+          "sweet potato",
+          "pigs_tropical",
+          "sesameseed",
+          "small millet",
+          "yams",
+          "cattle_tropical",
+          "arabica coffee",
+          "cattle_highland",
+          "pigeonpea",
+          "pigs_highland",
+          "rapeseed",
+          "robusta coffee",
+          "sugarbeet",
+          "goats_highland",
+          "poultry_highland",
+          "coconut",
+          "generic",
+          "groundnut",
+          "lentil",
+          "cocoa",
+          "cowpea",
+          "rice",
+          "goats_tropical"
+        ]
       },
       {
         "name": "severity",
@@ -65,13 +173,8 @@
   },
   "assets": {
     "data": {
-      "href": "https://digital-atlas.s3.amazonaws.com/hazards/hazard_risk_vop/annual/severe_adm_int_a0-a1_crop-livestock.parquet",
-      "type": "application/vnd.apache.parquet",
-      "alternate": {
-        "s3": {
-          "href": "s3://digital-atlas/hazards/hazard_risk_vop/annual/severe_adm_int_a0-a1_crop-livestock.parquet"
-        }
-      }
+      "href": "s3://digital-atlas/hazards/hazard_risk_vop/annual/severe_adm_int_a0-a1_crop-livestock.parquet",
+      "type": "application/vnd.apache.parquet"
     }
   }
 }

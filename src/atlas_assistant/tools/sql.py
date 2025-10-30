@@ -60,20 +60,6 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
                 ]
             }
         )
-    s3_href = dataset.s3_href
-    if not s3_href:
-        return Command(
-            update={
-                "dataset": None,
-                "messages": [
-                    ToolMessage(
-                        content=f"Dataset {dataset.item.id} does not have an s3 href, "
-                        "choose a different dataset",
-                        tool_call_id=runtime.tool_call_id,
-                    )
-                ],
-            }
-        )
 
     settings = runtime.context.settings
     assert settings.mistral_api_key
@@ -96,7 +82,7 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     assert response.choices and response.choices[0] and response.choices[0].message
     sql_query_parts = response.choices[0].message.parsed
     assert sql_query_parts
-    sql_query = sql_query_parts.get_query(s3_href)
+    sql_query = sql_query_parts.get_query(dataset.asset.href)
     content = f"Generated SQL: {sql_query}\nExplanation: {sql_query_parts.explanation}"
     return Command(
         update={
@@ -112,7 +98,7 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
 
 
 def get_prompt(dataset: Dataset) -> str:
-    return f"""I want you to act like a data scientist.
+    prompt = f"""I want you to act like a data scientist.
 
 You will generate between three and six things:
 
@@ -128,4 +114,24 @@ The SQL should be valid DuckDB SQL.
 The dataset schema that the SQL will be used against is:
 
     {dataset.get_schema_table()}
+
+The first few rows of the table look like:
+
+    {dataset.get_head_table()}
 """
+
+    for table_column in dataset.item.properties.table_columns:
+        if table_column.values:
+            prompt += f"""The `{table_column.name} column has the following values:
+
+    {"\n".join("- " + value for value in table_column.values)}
+"""
+
+    if sql_instructions := dataset.item.properties.sql_instructions:
+        prompt += f"""Additional instructions:
+
+    {"\n".join("- " + sql_instruction for sql_instruction in sql_instructions)}
+"""
+
+    print(prompt)
+    return prompt

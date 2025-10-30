@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import itertools
-
 import tabulate
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -22,16 +20,23 @@ class Item(BaseModel):
 
 
 class Properties(BaseModel):
-    """STAC item properties, the ones we use"""
+    """STAC item properties, the ones we use
 
-    description: str | None = None
-    """An optional description of the item"""
+    Some fields are required here but are not required on a STAC item.
+    """
 
-    title: str | None = None
-    """An optional title for the item"""
+    description: str
+    """A description of the item"""
 
-    table_columns: list[TableColumn] | None = Field(alias="table:columns", default=None)
+    table_columns: list[TableColumn] = Field(alias="table:columns")
     """The datasets' schema"""
+
+    sql_instructions: list[str] | None = Field(
+        alias="atlas_assistant:sql_instructions", default=None
+    )
+    """An extra instructions to issue to the LLM when generating SQL for this item"""
+
+    model_config = ConfigDict(serialize_by_alias=True)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 class Asset(BaseModel):
@@ -46,16 +51,6 @@ class Asset(BaseModel):
     title: str | None = None
     """an optional title for the asset"""
 
-    alternate: Alternate | None = None
-    """The alternate asset location, which points to s3"""
-
-
-class Alternate(BaseModel):
-    """An alternate asset definition"""
-
-    s3: Asset
-    """The asset with an s3 url"""
-
 
 class TableColumn(BaseModel):
     """A table column, from the table extension: https://github.com/stac-extensions/table"""
@@ -63,18 +58,21 @@ class TableColumn(BaseModel):
     name: str
     """The column name"""
 
-    description: str | None = None
+    description: str
     """Detailed multi-line description to explain the dimension. CommonMark 0.29
     syntax MAY be used for rich text representation."""
 
-    type: str = Field(validation_alias="col_type")
+    type: str
     """Data type of the column. If using a file format with a type system (like
     Parquet), we recommend you use those types.
-
-    The value should be `type`, but some existing Atlas STAC have `col_type`.
     """
 
-    model_config = ConfigDict(validate_by_alias=True, validate_by_name=True)  # pyright: ignore[reportUnannotatedClassAttribute]
+    values: list[str] | None = None
+    """An optional list of values contained in this column.
+
+    This isn't part of the table extension, but is helpful information to feed
+    to the LLM.
+    """
 
 
 class Dataset(BaseModel):
@@ -95,54 +93,32 @@ class Dataset(BaseModel):
         return self.item.assets[self.asset_key]
 
     @property
-    def s3_href(self) -> str | None:
-        """The asset's s3 href"""
-        if alternate := self.asset.alternate:
-            # Some s3 urls have an extra slash in the path, which breaks
-            # requests. This is some opaque voodoo that keeps the double slash
-            # between the scheme and the netloc, but removes all other double
-            # slashes.
-            parts = alternate.s3.href.split("/")
-            return "/".join(
-                itertools.chain(parts[0:2], (part for part in parts[2:] if part))
-            )
-        else:
-            return None
+    def href(self) -> str | None:
+        """The asset's href"""
+        return self.asset.href
 
     def get_description(self) -> str:
         """Returns a text description for this dataset."""
-        elements = []
-        if title := self.item.properties.title:
-            elements.append("Title: " + title)
-        if description := self.item.properties.description:
-            elements.append("Description: " + description)
-        else:
-            elements.append("ID: " + self.item.id)
-        if asset_title := self.asset.title:
-            elements.append("Asset title: " + asset_title)
-        else:
-            elements.append("Asset key: " + self.asset_key)
-        return "\n".join(elements)
+        return self.item.properties.description
 
-    # TODO cache, at least the DuckDB branch
     def get_schema_table(self) -> str:
         """Returns a markdown-formatted table of this dataset's schema."""
-        if table_columns := self.item.properties.table_columns:
-            rows = list(
-                [column.name, column.type, column.description]
-                for column in table_columns
-            )
-        elif s3_href := self.s3_href:
-            import duckdb
-
-            result = duckdb.sql(f"DESCRIBE '{s3_href}'").fetchall()
-            rows = list([row[0], row[1], None] for row in result)
-        else:
-            raise ValueError(
-                "STAC item does not have the table extension, and the asset does not "
-                "have an s3 href"
-            )
+        rows = list(
+            [column.name, column.type, column.description]
+            for column in self.item.properties.table_columns
+        )
         return tabulate.tabulate(rows, headers=["Name", "Type", "Description"])
+
+    # TODO cache
+    def get_head_table(self, limit: int = 5) -> str:
+        """Returns a formatted table of the first few rows."""
+        import duckdb
+
+        return (
+            duckdb.sql(f"SELECT * FROM '{self.href}' LIMIT {limit}")
+            .to_df()
+            .to_string(index=False)
+        )
 
     def to_metadata(self) -> Metadata:
         """Converts this dataset to its metadata representation, for an
