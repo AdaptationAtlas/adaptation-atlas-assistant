@@ -227,7 +227,6 @@ docs/decisions/              # Architectural Decision Records (ADRs)
 ### Backend Development
 
 1. **Updating the datasets**:
-   - Run `uv run python scripts/fetch_stac.py` to re-fetch all items that have parquet assets
    - Run `uv run python scripts/embed_datasets.py` to rebuild embeddings
 2. **Modifying agent behavior**: Edit system prompt in `src/atlas_assistant/agent.py`
 3. **Adding new tools**: Create in `src/atlas_assistant/tools/`, register in `agent.py` tools list
