@@ -19,15 +19,25 @@ class SqlQueryParts(BaseModel):
     group_by: str | None
     """The SQL group by statement"""
 
+    order_by: str | None
+    """The SQL order by statement"""
+
+    limit: str | None
+    """The SQL limit statement"""
+
     explanation: str
     """An explanation of why the model generated this query"""
 
     def get_query(self, href: str) -> str:
         """Gets the full SQL query"""
-        return (
-            f"SELECT {self.select} FROM '{href}' WHERE {self.where} "
-            f"GROUP BY {self.group_by}"
-        )
+        parts = [f"SELECT {self.select} FROM '{href}' WHERE {self.where}"]
+        if self.group_by:
+            parts.append(f"GROUP BY {self.group_by}")
+        if self.order_by:
+            parts.append(f"ORDER BY {self.order_by}")
+        if self.limit:
+            parts.append(f"LIMIT {self.limit}")
+        return " ".join(parts)
 
 
 @tool
@@ -104,11 +114,13 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
 def get_prompt(dataset: Dataset) -> str:
     return f"""I want you to act like a data scientist.
 
-You will generate three or four things:
+You will generate between three and six things:
 
    - An SQL select statement
    - AN SQL where statement
    - An optional SQL group by statement
+   - An optional SQL order by statement
+   - An optional SQL limit statement
    - A brief explanation of why you chose what you did
 
 The SQL should be valid DuckDB SQL.
