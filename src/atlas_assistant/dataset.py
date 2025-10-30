@@ -124,6 +124,7 @@ class Dataset(BaseModel):
             elements.append("Asset key: " + self.asset_key)
         return "\n".join(elements)
 
+    # TODO cache, at least the DuckDB branch
     def get_schema_table(self) -> str:
         """Returns a markdown-formatted table of this dataset's schema."""
         if table_columns := self.item.properties.table_columns:
