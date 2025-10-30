@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Embed the STAC items"""
 
 import json
@@ -27,7 +29,10 @@ for path in STAC_DIRECTORY.glob("*.json"):
             dataset = Dataset(item=item, asset_key=key)
             texts.append(dataset.get_description())
             metadatas.append(
-                dataset.to_metadata().model_dump(mode="json", exclude_none=True)
+                dataset.to_metadata().model_dump(
+                    mode="json",
+                    exclude_none=True,
+                )
             )
 
 if EMBEDDINGS_DIRECTORY.exists():
