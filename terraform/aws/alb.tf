@@ -66,5 +66,13 @@ module "alb" {
     }
   }
 
+  route53_records = {
+    A = {
+      name    = "atlas-lb"
+      type    = "A"
+      zone_id = data.aws_route53_zone.ecs_domain.id
+    }
+  }
+
   tags = var.tags
 }
