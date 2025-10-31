@@ -1,0 +1,13 @@
+**
+
+## Allow files to be sent to builder
+!pyproject.toml
+!uv.lock
+!README.md
+!/data
+!/chainlit
+!/src
+
+## Exclude files in allowed subdirectories
+**/__pycache__/
+**/*.log

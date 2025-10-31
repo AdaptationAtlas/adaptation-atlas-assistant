@@ -210,8 +210,9 @@ __marimo__/
 .chainlit/translations/*
 .files/
 
-data/atlas-assistant-docs-mistral-index/
+**/data/atlas-assistant-docs-mistral-index/
 .zed
+**/data/embeddings/
 
 # Frontend
 src/frontend/node_modules
@@ -245,4 +246,3 @@ src/frontend/*.ntvs*
 src/frontend/*.njsproj
 src/frontend/*.sln
 src/frontend/*.sw?
-data/embeddings/
