@@ -1,3 +1,5 @@
+from typing import cast
+
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
 from langgraph.types import Command
@@ -7,6 +9,8 @@ from pydantic import BaseModel
 from ..context import Context
 from ..dataset import Dataset
 from ..state import State
+
+MAX_DATA_FRAME_LENGTH = 50
 
 
 class SqlQueryParts(BaseModel):
@@ -83,7 +87,10 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     sql_query_parts = response.choices[0].message.parsed
     assert sql_query_parts
     sql_query = sql_query_parts.get_query(dataset.asset.href)
-    content = f"Generated SQL: {sql_query}\nExplanation: {sql_query_parts.explanation}"
+    content = (
+        f"Generated SQL:\n\n{sql_query}\n\n"
+        f"Explanation:\n\n{sql_query_parts.explanation}"
+    )
     return Command(
         update={
             "messages": [
@@ -97,17 +104,75 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     )
 
 
+@tool
+def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
+    """Executes the sql and returns the result.
+
+    Requires that the SQL has been generated from the selected dataset.
+    """
+    sql_query = runtime.state["sql_query"]
+    if not sql_query:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content="No sql query has been generated",
+                        tool_call_id=runtime.tool_call_id,
+                    )
+                ]
+            }
+        )
+
+    import duckdb
+
+    try:
+        data_frame = duckdb.sql(sql_query).to_df()
+    except Exception as e:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content=f"Error while executing SQL: {e}",
+                        tool_call_id=runtime.tool_call_id,
+                    )
+                ],
+                "sql_query": None,
+            }
+        )
+
+    header = (
+        "Data returned (truncated):"
+        if len(data_frame) > MAX_DATA_FRAME_LENGTH
+        else "Data returned:"
+    )
+    return Command(
+        update={
+            "messages": [
+                ToolMessage(
+                    content=f"{header}\n\n"
+                    + cast(
+                        str,
+                        data_frame.head(MAX_DATA_FRAME_LENGTH).to_markdown(index=False),
+                    ),
+                    tool_call_id=runtime.tool_call_id,
+                )
+            ]
+        }
+    )
+
+
 def get_prompt(dataset: Dataset) -> str:
     prompt = f"""I want you to act like a data scientist.
 
-You will generate between three and six things:
+You will generate:
 
-   - An SQL select statement
-   - AN SQL where statement
+   - A SQL select statement
+   - A SQL where statement
    - An optional SQL group by statement
    - An optional SQL order by statement
    - An optional SQL limit statement
-   - A brief explanation of why you chose what you did
+   - A brief explanation of why you chose what you did, which should include a
+     description of each output column
 
 The SQL should be valid DuckDB SQL.
 
