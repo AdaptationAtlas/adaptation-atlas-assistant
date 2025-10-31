@@ -37,7 +37,7 @@ uv run chainlit run chainlit/app.py -w
 
 ```bash
 # Navigate to frontend directory
-cd src/frontend
+cd frontend
 
 # Install dependencies
 npm install
@@ -77,7 +77,7 @@ uv run chainlit run chainlit/app.py -w
 npm run dev          # http://localhost:5173
 
 # Production build
-npm run build        # Output to src/frontend/dist/
+npm run build        # Output to frontend//
 
 # Preview production build
 npm run preview
@@ -113,7 +113,7 @@ The React frontend provides a modern web interface with:
 - **React 19 features**: React Compiler for automatic optimization
 - **Vite bundler**: Fast development and optimized production builds
 
-See [src/frontend/CLAUDE.md](./src/frontend/CLAUDE.md) for detailed frontend documentation.
+See [frontend/CLAUDE.md](./frontend/CLAUDE.md) for detailed frontend documentation.
 
 ### Backend Architecture (LangGraph Agent)
 
@@ -157,7 +157,7 @@ src/atlas_assistant/
     └── create_chart.py      # SQL generation + Plotly visualization
 
 # Frontend Structure
-src/frontend/
+frontend/
 ├── src/
 │   ├── components/          # React components
 │   │   ├── PromptBox/      # Input component with context tags
@@ -234,9 +234,9 @@ docs/decisions/              # Architectural Decision Records (ADRs)
 
 ### Frontend Development
 
-1. **Creating components**: Add to `src/frontend/src/components/` with corresponding CSS modules
+1. **Creating components**: Add to `frontend/src/components/` with corresponding CSS modules
 2. **Styling**: Update design tokens in `index.css` or component-specific `.module.css` files
-3. **Icons**: Add new icon components to `src/frontend/src/assets/icons.tsx`
+3. **Icons**: Add new icon components to `frontend/src/assets/icons.tsx`
 4. **State management**: Currently using local React state; global state management planned
 
 ### Integration (Frontend ↔ Backend)
@@ -320,7 +320,7 @@ Optional:
 
 ### Frontend Issues
 
-**Module not found**: Run `npm install` in the `src/frontend` directory
+**Module not found**: Run `npm install` in the `frontend` directory
 
 **Port already in use**: Vite dev server defaults to 5173, change with `npm run dev -- --port 3000`
 
