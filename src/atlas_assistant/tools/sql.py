@@ -166,8 +166,8 @@ def get_prompt(dataset: Dataset) -> str:
 
 You will generate:
 
-   - An SQL select statement
-   - AN SQL where statement
+   - A SQL select statement
+   - A SQL where statement
    - An optional SQL group by statement
    - An optional SQL order by statement
    - An optional SQL limit statement
