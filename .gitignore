@@ -246,3 +246,8 @@ src/frontend/*.njsproj
 src/frontend/*.sln
 src/frontend/*.sw?
 data/embeddings/
+
+**/.terraform/*
+
+*.tfstate
+*.tfstate.*
