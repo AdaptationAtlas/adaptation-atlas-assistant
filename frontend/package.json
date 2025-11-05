@@ -10,7 +10,7 @@
         "dev": "vite",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
-        "format": "prettier --check \"src/**/*.{ts,tsx,css}\"",
+        "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
         "preview": "vite preview"
     },
     "dependencies": {
