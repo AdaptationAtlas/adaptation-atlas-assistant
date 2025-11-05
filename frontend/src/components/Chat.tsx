@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { PromptBuilderSidebar } from "./PromptBuilderSidebar";
-import { EmptyState } from "./EmptyState";
-import { PromptBox } from "./PromptBox";
-import { BarChart } from "./Charts/Bar";
-import { AreaChart } from "./Charts/Area";
-import AtlasLogo from "../assets/atlas-a.svg";
-import styles from "./Chat.module.css";
-import { areaChartData } from "../../../data/charts/area";
-import { barChartData } from "../../../data/charts/bar";
+import { useState } from 'react';
+import { PromptBuilderSidebar } from './PromptBuilderSidebar';
+import { EmptyState } from './EmptyState';
+import { PromptBox } from './PromptBox';
+import { BarChart } from './Charts/Bar';
+import { AreaChart } from './Charts/Area';
+import AtlasLogo from '../assets/atlas-a.svg';
+import styles from './Chat.module.css';
+import { areaChartData } from '../../../data/charts/area';
+import { barChartData } from '../../../data/charts/bar';
 
 const examplePrompts = [
     'How is maize production projected to change under future climate scenarios in Kenya?',
@@ -22,8 +22,6 @@ const sidebarSections = [
     { id: 'capacity', label: 'ADAPTIVE CAPACITY', expanded: false },
     { id: 'attachments', label: 'ATTACHMENTS', expanded: false },
 ];
-
-
 
 export function Chat() {
     const [activeSections, setActiveSections] = useState<string[]>([]);
@@ -81,38 +79,41 @@ export function Chat() {
                     onExampleClick={handleExampleClick}
                 />
 
-        <div className={styles.promptContainer}>
-          <PromptBox onSubmit={handlePromptSubmit} context={selectedContext} />
-        </div>
+                <div className={styles.promptContainer}>
+                    <PromptBox
+                        onSubmit={handlePromptSubmit}
+                        context={selectedContext}
+                    />
+                </div>
 
-        {barChartData.map((chart, index) => (
-          <BarChart
-            key={`${chart.title}-${index}`}
-            data={chart.values ?? []}
-            xField="percentage"
-            categoryField="type"
-            hasLegend
-            colorDomain={chart.colorDomain}
-            colorRange={chart.colorRange}
-            textColor={chart.textColor}
-            title={chart.title}
-          />
-        ))}
-        {areaChartData.map((chart, index) => (
-          <AreaChart
-            key={`${chart.title}-${index}`}
-            data={chart.values ?? []}
-            xField="year"
-            yField="stock"
-            categoryField={chart.categoryField}
-            xLabel="Year"
-            yLabel={chart.units}
-            title={chart.title}
-            colorDomain={chart.colorDomain}
-            colorRange={chart.colorRange}
-          />
-        ))}
-      </main>
-    </div>
-  );
+                {barChartData.map((chart, index) => (
+                    <BarChart
+                        key={`${chart.title}-${index}`}
+                        data={chart.values ?? []}
+                        xField="percentage"
+                        categoryField="type"
+                        hasLegend
+                        colorDomain={chart.colorDomain}
+                        colorRange={chart.colorRange}
+                        textColor={chart.textColor}
+                        title={chart.title}
+                    />
+                ))}
+                {areaChartData.map((chart, index) => (
+                    <AreaChart
+                        key={`${chart.title}-${index}`}
+                        data={chart.values ?? []}
+                        xField="year"
+                        yField="stock"
+                        categoryField={chart.categoryField}
+                        xLabel="Year"
+                        yLabel={chart.units}
+                        title={chart.title}
+                        colorDomain={chart.colorDomain}
+                        colorRange={chart.colorRange}
+                    />
+                ))}
+            </main>
+        </div>
+    );
 }
