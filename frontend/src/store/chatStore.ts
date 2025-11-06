@@ -20,7 +20,7 @@ const CHAT_ACTION_TYPES = {
 
 const createInitialState = (): Omit<
   ChatUIState,
-  'startStreaming' | 'addEventFromPayload' | 'finishStreaming' | 'setError' | 'reset'
+  'startStreaming' | 'addEvent' | 'finishStreaming' | 'setError' | 'reset'
 > => ({
     status: 'idle',
     events: [],
@@ -44,7 +44,7 @@ export const useChatStore = create<ChatUIState>()(
             CHAT_ACTION_TYPES.startStreaming,
           );
         },
-        addEventFromPayload: () => {
+        addEvent: () => {
           return
         },
         finishStreaming: () => {
