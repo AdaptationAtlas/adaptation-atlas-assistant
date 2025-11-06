@@ -20,7 +20,7 @@ The system uses Mistral AI models for chat and code generation, with both a Chai
 git clone git@github.com:AdaptationAtlas/adaptation-atlas-assistant.git
 cd adaptation-atlas-assistant
 uv sync
-uv run pre-commit install
+uv run prek install
 
 # Configure environment
 cp .env.example .env
@@ -30,14 +30,14 @@ cp .env.example .env
 uv run python scripts/embed_datasets.py
 
 # Run the Chainlit UI (for development)
-uv run chainlit run app.py -w
+uv run chainlit run chainlit/app.py -w
 ```
 
 ### Frontend Setup
 
 ```bash
 # Navigate to frontend directory
-cd src/frontend
+cd frontend
 
 # Install dependencies
 npm install
@@ -62,13 +62,13 @@ uv run pytest
 uv run pytest --agent
 
 # Run linters and formatters
-uv run pre-commit run --all-files
+uv run prek run --all-files
 
 # Activate virtual environment (to skip 'uv run' prefix)
 source .venv/bin/activate
 
 # Run Chainlit development server
-uv run chainlit run app.py -w
+uv run chainlit run chainlit/app.py -w
 ```
 
 ### Frontend Commands
@@ -77,7 +77,7 @@ uv run chainlit run app.py -w
 npm run dev          # http://localhost:5173
 
 # Production build
-npm run build        # Output to src/frontend/dist/
+npm run build        # Output to frontend//
 
 # Preview production build
 npm run preview
@@ -98,7 +98,7 @@ uv run pytest -k "test_name_pattern"
 uv run pytest -v
 
 # Run specific test markers
-uv run pytest -m agent  # Same as --agent flag
+uv run pytest -m agent  # Same as --integration flag
 ```
 
 ## Architecture
@@ -113,7 +113,7 @@ The React frontend provides a modern web interface with:
 - **React 19 features**: React Compiler for automatic optimization
 - **Vite bundler**: Fast development and optimized production builds
 
-See [src/frontend/CLAUDE.md](./src/frontend/CLAUDE.md) for detailed frontend documentation.
+See [frontend/CLAUDE.md](./frontend/CLAUDE.md) for detailed frontend documentation.
 
 ### Backend Architecture (LangGraph Agent)
 
@@ -157,7 +157,7 @@ src/atlas_assistant/
     └── create_chart.py      # SQL generation + Plotly visualization
 
 # Frontend Structure
-src/frontend/
+frontend/
 ├── src/
 │   ├── components/          # React components
 │   │   ├── PromptBox/      # Input component with context tags
@@ -216,7 +216,7 @@ docs/decisions/              # Architectural Decision Records (ADRs)
 
 **pytest markers:**
 - Default: Unit tests that don't require LLM calls
-- `@pytest.mark.agent`: Integration tests requiring `--agent` flag (uses actual Mistral API)
+- `@pytest.mark.agent`: Integration tests requiring `--integration` flag (uses actual Mistral API)
 
 **Fixtures (tests/conftest.py):**
 - `settings`: Returns configured Settings object
@@ -226,9 +226,7 @@ docs/decisions/              # Architectural Decision Records (ADRs)
 
 ### Backend Development
 
-1. **Adding new datasets**:
-   - Update `data/datasets.json` with dataset metadata
-   - Use `scripts/parquet_analyzer.py` to inspect parquet file schema if needed
+1. **Updating the datasets**:
    - Run `uv run python scripts/embed_datasets.py` to rebuild embeddings
 2. **Modifying agent behavior**: Edit system prompt in `src/atlas_assistant/agent.py`
 3. **Adding new tools**: Create in `src/atlas_assistant/tools/`, register in `agent.py` tools list
@@ -236,9 +234,9 @@ docs/decisions/              # Architectural Decision Records (ADRs)
 
 ### Frontend Development
 
-1. **Creating components**: Add to `src/frontend/src/components/` with corresponding CSS modules
+1. **Creating components**: Add to `frontend/src/components/` with corresponding CSS modules
 2. **Styling**: Update design tokens in `index.css` or component-specific `.module.css` files
-3. **Icons**: Add new icon components to `src/frontend/src/assets/icons.tsx`
+3. **Icons**: Add new icon components to `frontend/src/assets/icons.tsx`
 4. **State management**: Currently using local React state; global state management planned
 
 ### Integration (Frontend ↔ Backend)
@@ -318,11 +316,11 @@ Optional:
 
 **Agent test failures**: Verify `MISTRAL_API_KEY` is set in `.env` before running `pytest --agent`
 
-**Chainlit not starting**: Check port 8000 is not in use, try `uv run chainlit run app.py -w --port 8001`
+**Chainlit not starting**: Check port 8000 is not in use, try `uv run chainlit run chainlit/app.py -w --port 8001`
 
 ### Frontend Issues
 
-**Module not found**: Run `npm install` in the `src/frontend` directory
+**Module not found**: Run `npm install` in the `frontend` directory
 
 **Port already in use**: Vite dev server defaults to 5173, change with `npm run dev -- --port 3000`
 
