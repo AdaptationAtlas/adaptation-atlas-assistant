@@ -1,15 +1,22 @@
 """A FastAPI application for answering questions from the frontend."""
 
+import json
+import uuid
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 import jwt
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from langchain_core.messages import HumanMessage
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 from starlette import status
 
 from . import settings
+from .agent import Agent, create_agent
+from .context import Context
 from .settings import Settings
 
 algorithm = "HS256"
@@ -18,6 +25,13 @@ password_hash = PasswordHash.recommended()
 app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+class ChatRequest(BaseModel):
+    """A chat request"""
+
+    query: str
+    """The question from the user."""
 
 
 def get_settings() -> Settings:
@@ -106,3 +120,44 @@ async def login(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+@app.post("/chat", tags=["chat"])
+async def chat(
+    chat_request: ChatRequest,
+    settings: Annotated[Settings, Depends(get_settings)],
+    current_user: Annotated[User, Depends(get_current_user)],  # pyright: ignore[reportUnusedParameter]
+) -> StreamingResponse:
+    agent = create_agent(settings)
+    thread_id = uuid.uuid4()
+    return StreamingResponse(
+        query_agent(agent, chat_request.query, str(thread_id), settings)
+    )
+
+
+async def query_agent(
+    agent: Agent, query: str, thread_id: str, settings: Settings
+) -> AsyncGenerator[str]:
+    """Query the agent and yield messages.
+
+    Each message is a JSON object on a new line.
+    """
+    async for update in agent.astream(
+        {"messages": [HumanMessage(content=query)]},
+        stream_mode="updates",
+        config={"configurable": {"thread_id": thread_id}},
+        context=Context(settings=settings),
+    ):
+        for key, value in update.items():
+            if messages := value.get("messages"):
+                for msg in messages:
+                    if msg.content:
+                        yield (
+                            json.dumps(
+                                {
+                                    "key": key,
+                                    "message": msg.to_json(),
+                                }
+                            )
+                            + "\n"
+                        )
