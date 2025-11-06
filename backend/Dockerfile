@@ -13,6 +13,7 @@ WORKDIR /app
 COPY ./pyproject.toml ./uv.lock ./README.md /app/
 COPY ./data /app/data
 COPY ./chainlit /app/chainlit
+COPY ./.chainlit /app/.chainlit
 COPY ./src /app/src
 
 RUN uv sync --frozen --no-dev

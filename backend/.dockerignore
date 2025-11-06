@@ -6,6 +6,7 @@
 !README.md
 !/data
 !/chainlit
+!/.chainlit
 !/src
 
 ## Exclude files in allowed subdirectories
