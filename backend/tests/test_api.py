@@ -15,8 +15,9 @@ def test_login(client: TestClient) -> None:
 
 
 @pytest.mark.integration
-def test_chat(authenticated_client: TestClient) -> None:
+@pytest.mark.parametrize("headers", [None, {"accept": "text/event-stream"}])
+def test_chat(authenticated_client: TestClient, headers: dict[str, str] | None) -> None:
     response = authenticated_client.post(
-        "/chat", json={"query": "What crops are being grown in Kenya?"}
+        "/chat", json={"query": "What crops are being grown in Kenya?"}, headers=headers
     )
     _ = response.raise_for_status()
