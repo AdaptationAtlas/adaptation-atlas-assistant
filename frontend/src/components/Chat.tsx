@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '../api/hooks';
+import { sendChatMessage, createStreamController } from '../api';
+import { useChatStore } from '../store/chatStore';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
@@ -34,14 +36,41 @@ export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
     const { isAuthenticated, logout } = useAuth();
 
-    const handlePromptSubmit = (value: string) => {
-        console.log('Prompt submitted:', value);
-        // Handle prompt submission
-    };
+    // Chat store
+    const { status, events, userQuery, startStreaming, addEvent, finishStreaming, setError } = useChatStore();
+
+    const handlePromptSubmit = useCallback(async (value: string) => {
+        if (!value.trim()) return;
+
+        startStreaming(value);
+
+        const controller = createStreamController();
+
+        try {
+            await sendChatMessage(value, {
+                onMessage: (message) => {
+                    addEvent({
+                        ...message,
+                        id: `msg-${Date.now()}-${Math.random()}`,
+                        timestamp: Date.now(),
+                    });
+                },
+                onError: (error) => {
+                    setError(error.message);
+                },
+                onComplete: () => {
+                    finishStreaming();
+                },
+                signal: controller.signal,
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
+            setError(errorMessage);
+        }
+    }, [startStreaming, addEvent, finishStreaming, setError]);
 
     const handleExampleClick = (prompt: string) => {
-        console.log('Example prompt clicked:', prompt);
-        // Handle example prompt
+        handlePromptSubmit(prompt);
     };
 
     const toggleSection = (sectionId: string) => {
@@ -97,10 +126,13 @@ export function Chat() {
 
             {/* Main Content */}
             <main className={styles.mainContent}>
-                <EmptyState
-                    examplePrompts={examplePrompts}
-                    onExampleClick={handleExampleClick}
-                />
+                {status === 'idle' && (
+                    <EmptyState
+                        examplePrompts={examplePrompts}
+                        onExampleClick={handleExampleClick}
+                    />
+                )}
+
 
                 <div className={styles.promptContainer}>
                     <PromptBox
