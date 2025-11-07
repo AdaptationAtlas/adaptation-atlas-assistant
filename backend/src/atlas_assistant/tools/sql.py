@@ -190,7 +190,7 @@ The first few rows of the table look like:
         if table_column.values:
             prompt += f"""The `{table_column.name}` column has the following values:
 
-{"\n".join("- " + value for value in table_column.values)}
+{"\n".join("- " + str(value) for value in table_column.values)}
 
 """
 

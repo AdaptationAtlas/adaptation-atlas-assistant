@@ -37,7 +37,9 @@ def client(settings: Settings) -> Iterator[TestClient]:
 @pytest.fixture
 def dataset() -> Dataset:
     with open(
-        Path(__file__).parents[1] / "data" / "stac" / "haz_risk_severe2.json"
+        Path(__file__).parent
+        / "data"
+        / "haz_exposure_cmip6_ssa_jagermeyr_historic_severe_int.json"
     ) as f:
         item = Item.model_validate_json(f.read())
     return Dataset(item=item, asset_key="data")

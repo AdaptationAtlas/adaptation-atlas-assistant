@@ -58,7 +58,7 @@ class TableColumn(BaseModel):
     name: str
     """The column name"""
 
-    description: str
+    description: str | None = None
     """Detailed multi-line description to explain the dimension. CommonMark 0.29
     syntax MAY be used for rich text representation."""
 
@@ -67,7 +67,7 @@ class TableColumn(BaseModel):
     Parquet), we recommend you use those types.
     """
 
-    values: list[str] | None = None
+    values: list[str | int | None] | None = None
     """An optional list of values contained in this column.
 
     This isn't part of the table extension, but is helpful information to feed
