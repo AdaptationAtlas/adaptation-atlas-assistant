@@ -30,6 +30,6 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend/src:/app/src
-      - ./data:/data 
+      - ./frontend/charts:/app/charts
     depends_on:
       - api

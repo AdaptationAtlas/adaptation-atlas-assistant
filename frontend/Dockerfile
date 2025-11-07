@@ -9,6 +9,7 @@ COPY *.json ./
 COPY *.js ./
 COPY *.ts ./
 COPY index.html ./
+COPY charts ./
 
 FROM base AS development
 EXPOSE 5173
