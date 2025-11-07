@@ -133,6 +133,47 @@ export function Chat() {
                     />
                 )}
 
+                {status !== 'idle' && (
+                    <div style={{ padding: '2rem' }}>
+                        {userQuery && (
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>You:</strong> {userQuery}
+                            </div>
+                        )}
+                        <div style={{ marginBottom: '1rem' }}>Status: {status}</div>
+                        <div>
+                            {events.map((event, index) => {
+                                const messageId = event.id || index;
+
+                                return (
+                                    <div key={messageId} style={{ marginBottom: '1.5rem' }}>
+                                        {'error' in event ? (
+                                            <div>Error: {event.error}</div>
+                                        ) : (
+                                            <details>
+                                                <summary style={{
+                                                    cursor: 'pointer',
+                                                    fontWeight: 'bold',
+                                                    marginBottom: '0.5rem'
+                                                }}>
+                                                    {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                </summary>
+                                                <pre style={{
+                                                    whiteSpace: 'pre-wrap',
+                                                    wordWrap: 'break-word',
+                                                    marginLeft: '1.5rem',
+                                                    fontSize: '0.9rem'
+                                                }}>
+                                                    {event.content}
+                                                </pre>
+                                            </details>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 <div className={styles.promptContainer}>
                     <PromptBox
