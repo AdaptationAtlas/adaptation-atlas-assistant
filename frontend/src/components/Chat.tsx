@@ -6,8 +6,8 @@ import { BarChart } from './Charts/Bar';
 import { AreaChart } from './Charts/Area';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
-import { areaChartData } from '../../../data/charts/area';
-import { barChartData } from '../../../data/charts/bar';
+import { areaChartData } from '../../data/areaChart';
+import { barChartData } from '../../data/barChart';
 
 const examplePrompts = [
     'How is maize production projected to change under future climate scenarios in Kenya?',
