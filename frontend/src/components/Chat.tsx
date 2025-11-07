@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../api/hooks';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
@@ -30,6 +31,8 @@ export function Chat() {
         crop?: string;
         files?: number;
     }>({});
+    const [showTooltip, setShowTooltip] = useState(false);
+    const { isAuthenticated, logout } = useAuth();
 
     const handlePromptSubmit = (value: string) => {
         console.log('Prompt submitted:', value);
@@ -49,6 +52,13 @@ export function Chat() {
         );
     };
 
+    const handleAvatarClick = () => {
+        if (isAuthenticated) {
+            logout();
+        }
+        window.location.href = '/login';
+    };
+
     return (
         <div className="relative flex h-screen w-full overflow-hidden bg-white">
             {/* Left gradient sidebar */}
@@ -60,8 +70,21 @@ export function Chat() {
                         className={styles.logo}
                     />
                 </div>
-                <div className={styles.userAvatar}>
-                    <span>B</span>
+                <div className={styles.avatarContainer}>
+                    <button
+                        className={styles.userAvatar}
+                        onClick={handleAvatarClick}
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                        aria-label={isAuthenticated ? 'Log out' : 'Log in'}
+                    >
+                        <span>👤</span>
+                    </button>
+                    {showTooltip && (
+                        <div className={styles.tooltip}>
+                            {isAuthenticated ? 'Log out' : 'Log in'}
+                        </div>
+                    )}
                 </div>
             </div>
 

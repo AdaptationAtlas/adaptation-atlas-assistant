@@ -22,10 +22,16 @@
     height: auto;
 }
 
+.avatarContainer {
+    position: relative;
+    margin-top: auto;
+}
+
 .userAvatar {
     width: 40px;
     height: 40px;
     background-color: #f9fafb;
+    border: none;
     border-radius: 9999px;
     display: flex;
     align-items: center;
@@ -33,7 +39,43 @@
     color: #111927;
     font-weight: 500;
     font-size: 14px;
-    margin-top: auto;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.userAvatar:hover {
+    background-color: #e5e7eb;
+    transform: scale(1.05);
+}
+
+.userAvatar:active {
+    transform: scale(0.95);
+}
+
+.tooltip {
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #111927;
+    color: #f9fafb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-right-color: #111927;
 }
 
 /* Main Content */
