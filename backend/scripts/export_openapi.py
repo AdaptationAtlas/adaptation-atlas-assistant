@@ -3,7 +3,12 @@
 """Export the OpenAPI specification from the FastAPI app."""
 
 import json
+import os
 from pathlib import Path
+
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    print("Skipping OpenAPI export in GitHub Actions CI environment")
+    exit(0)
 
 from atlas_assistant.api import app
 
