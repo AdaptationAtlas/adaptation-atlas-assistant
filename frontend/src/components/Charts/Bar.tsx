@@ -20,6 +20,9 @@ export const BarChart = ({
     colorRange,
     textColor,
 }: BarChartProps) => {
+    type DataItem = Record<string, number | string>;
+    const typedData = data as DataItem[];
+
     const spec: ChartProps['spec'] = {
         height: 40,
         // marginTop: 40,
@@ -37,16 +40,16 @@ export const BarChart = ({
         },
         marks: [
             // Stacked bar
-            Plot.barX(data, { x: xField, fill: categoryField }),
+            Plot.barX(typedData, { x: xField, fill: categoryField }),
             // Text labels
-            Plot.text(data, {
+            Plot.text(typedData, {
                 x: (d, i) => {
                     // Calculate cumulative position for text placement
                     let cumulative = 0;
                     for (let j = 0; j < i; j++) {
-                        cumulative += data[j][xField];
+                        cumulative += typedData[j][xField] as number;
                     }
-                    return cumulative + d[xField] / 2;
+                    return cumulative + (d[xField] as number) / 2;
                 },
                 text: (d) => `${d[xField]}%`,
                 fill: textColor ?? 'black',
