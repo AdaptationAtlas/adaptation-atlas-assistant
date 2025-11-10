@@ -19,7 +19,11 @@ class Settings(BaseSettings):
     chat_model_temperature: float = 0.0
     jwt_key: SecretStr
     embeddings_directory: Path = Path(__file__).parents[2] / "data" / "embeddings"
+    stac_catalog_href: str = (
+        "https://digital-atlas.s3.amazonaws.com/stac/AtlasV3/catalog.json"
+    )
     users: dict[str, str] = DEFAULT_USERS
+    cors_origins: list[str] = ["http://localhost:5173"]
 
     model_config = SettingsConfigDict(env_file=".env")  # pyright: ignore[reportUnannotatedClassAttribute]
 

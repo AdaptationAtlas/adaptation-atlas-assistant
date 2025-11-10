@@ -207,12 +207,15 @@ marimo/_lsp/
 __marimo__/
 
 .DS_Store
-.chainlit/translations/*
 .files/
-
-**/data/atlas-assistant-docs-mistral-index/
 .zed
-**/data/embeddings/
+
+# Backend
+backend/.chainlit/translations/*
+backend/data/embeddings/
+
+# Docker compose stuff
+.chainlit/
 
 # Frontend
 frontend/node_modules

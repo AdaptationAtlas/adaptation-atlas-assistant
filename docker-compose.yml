@@ -17,6 +17,7 @@ services:
       - ./backend/scripts:/app/scripts
       - ./backend/chainlit:/app/chainlit
       - ./backend/data:/app/data
+      - ./backend/.chainlit:/app/.chainlit
 
   chat:
     image: atlas/backend
@@ -35,4 +36,17 @@ services:
     ports:
       - "8501:8501"
     volumes_from:
+      - api
+
+  frontend:
+    image: atlas/frontend
+    build:
+      context: frontend
+      target: ${BUILD_TARGET:-development} #TODO Add BUILD_TARGET to GHA workflow
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/data:/app/data
+    depends_on:
       - api
