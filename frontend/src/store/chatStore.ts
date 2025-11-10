@@ -6,7 +6,13 @@ import type { ChatStatus, StreamEvent } from '../types/chat';
 export interface ChatUIState {
     status: ChatStatus;
     events: StreamEvent[];
-}  
+    userQuery: string;
+    startStreaming: (query: string) => void;
+    addEvent: (event: StreamEvent) => void;
+    finishStreaming: () => void;
+    setError: (message: string) => void;
+    reset: () => void;
+}
 
 const CHAT_ACTION_TYPES = {
   startStreaming: 'chat/startStreaming',
@@ -24,7 +30,8 @@ const createInitialState = (): Omit<
 > => ({
     status: 'idle',
     events: [],
-}); 
+    userQuery: '',
+});
 
 const initialState = createInitialState();
 
@@ -33,19 +40,27 @@ export const useChatStore = create<ChatUIState>()(
     devtools(
       (set, get) => ({
         ...initialState,
-        startStreaming: () => {
+        startStreaming: (query: string) => {
           const baseState = createInitialState();
           set(
             {
               ...baseState,
               status: 'streaming',
+              userQuery: query,
             },
             false,
             CHAT_ACTION_TYPES.startStreaming,
           );
         },
-        addEvent: () => {
-          return
+        addEvent: (event: StreamEvent) => {
+          const { events } = get();
+          set(
+            {
+              events: [...events, event],
+            },
+            false,
+            CHAT_ACTION_TYPES.addEvent,
+          );
         },
         finishStreaming: () => {
           const { status } = get();
@@ -59,12 +74,12 @@ export const useChatStore = create<ChatUIState>()(
             );
           }
         },
-        setError: (
-          // message: string
-        ) => {
+        setError: (message: string) => {
+          const { events } = get();
           set(
             {
               status: 'error',
+              events: [...events, { id: 'error', timestamp: Date.now(), error: message }],
             },
             false,
             CHAT_ACTION_TYPES.setError,
