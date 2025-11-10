@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import SecretStr
 
 import atlas_assistant.api
 import atlas_assistant.settings
@@ -13,6 +14,7 @@ from atlas_assistant.settings import Settings
 @pytest.fixture
 def settings() -> Settings:
     settings = atlas_assistant.settings.get_settings()
+    settings.mistral_api_key = SecretStr("dummy-key")
     # python -c 'from pwdlib import PasswordHash; h = PasswordHash.recommended(); print(h.hash("test-password"))'  # noqa: E501
     settings.users = {
         "test-user": "$argon2id$v=19$m=65536,t=3,p=4$wcrhwu+MkorDhOTHuY6J1w$S3LkpIYNmV7nOg+lgck1Nqfxmtz1ZHrpbQVLrvjhzfI"  # noqa: E501
