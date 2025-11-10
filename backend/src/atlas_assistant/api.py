@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import AsyncGenerator
-from typing import Annotated, Literal
+from contextlib import asynccontextmanager
+from typing import Annotated, Any, Literal
 
 import jwt
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -27,7 +28,14 @@ from .settings import Settings
 algorithm = "HS256"
 password_hash = PasswordHash.recommended()
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[dict[str, Any]]:
+    agent = create_agent(get_settings())
+    yield {"agent": agent}
+
+
+app = FastAPI(lifespan=lifespan)
 
 # Configure CORS
 app.add_middleware(
@@ -189,12 +197,13 @@ async def login(
     "/chat", tags=["chat"], response_model=ToolResponseMessage | AiResponseMessage
 )
 async def chat(
+    request: Request,
     chat_request: ChatRequest,
     settings: Annotated[Settings, Depends(get_settings)],
     current_user: Annotated[User, Depends(get_current_user)],  # pyright: ignore[reportUnusedParameter]
     accept: Annotated[str | None, Header()] = None,
 ) -> StreamingResponse:
-    agent = create_agent(settings)
+    agent: Agent = request.state.agent
     thread_id = chat_request.thread_id or str(uuid.uuid4())
     event_stream = (accept and "text/event-stream" in accept) or False
     return StreamingResponse(
