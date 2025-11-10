@@ -155,6 +155,10 @@
             "type": "string",
             "title": "Content"
           },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
           "type": {
             "type": "string",
             "const": "ai",
@@ -169,6 +173,7 @@
         "type": "object",
         "required": [
           "content",
+          "thread_id",
           "finish_reason"
         ],
         "title": "AiResponseMessage",
@@ -238,6 +243,17 @@
           "query": {
             "type": "string",
             "title": "Query"
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
           }
         },
         "type": "object",
@@ -285,6 +301,10 @@
             "type": "string",
             "title": "Content"
           },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
           "type": {
             "type": "string",
             "const": "tool",
@@ -310,6 +330,7 @@
         "type": "object",
         "required": [
           "content",
+          "thread_id",
           "name",
           "status"
         ],
