@@ -11,7 +11,7 @@ export function Login() {
     e.preventDefault();
     try {
       await login(username, password);
-      window.location.href = '/';
+      window.location.href = import.meta.env.BASE_URL;
     } catch (err) {
       console.error('Login failed:', err);
     }
