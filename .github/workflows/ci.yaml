@@ -43,4 +43,6 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL || '//api.example.com' }}
         run: npm run build
