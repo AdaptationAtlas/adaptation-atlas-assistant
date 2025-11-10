@@ -58,9 +58,6 @@ Work is tracked on the [project board](https://github.com/orgs/developmentseed/p
 # Run all tests (unit tests only)
 uv run pytest
 
-# Run tests including agent integration tests (requires LLM access)
-uv run pytest --agent
-
 # Run linters and formatters
 uv run prek run --all-files
 

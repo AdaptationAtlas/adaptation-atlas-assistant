@@ -5,12 +5,12 @@ from atlas_assistant.dataset import Dataset
 from atlas_assistant.settings import Settings
 
 
-@pytest.mark.integration
+@pytest.mark.vcr
 def test_load_embeddings(settings: Settings) -> None:
     _ = settings.get_embeddings()
 
 
-@pytest.mark.integration
+@pytest.mark.vcr
 def test_search(settings: Settings) -> None:
     search_result = atlas_assistant.tools.dataset.search(
         query="What crops are being grown in Kenya?", settings=settings

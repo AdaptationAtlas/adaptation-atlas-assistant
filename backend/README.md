@@ -46,10 +46,10 @@ uv run pytest
 ```
 
 We have some tests that exercise the agent, which requires access to the LLM model.
-To run those, set your API key in `.env`, then:
+To run those and re-record the responses, set your API key in `.env`, then:
 
 ```sh
-uv run pytest --integration
+uv run pytest --record-mode rewrite
 ```
 
 To run linters and formatters:

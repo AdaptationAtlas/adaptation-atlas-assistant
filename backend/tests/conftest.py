@@ -1,10 +1,8 @@
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
-from pytest import Config, Parser
 
 import atlas_assistant.api
 import atlas_assistant.settings
@@ -55,19 +53,6 @@ def dataset() -> Dataset:
     return Dataset(item=item, asset_key="data")
 
 
-def pytest_addoption(parser: Parser) -> None:
-    parser.addoption(
-        "--integration",
-        action="store_true",
-        default=False,
-        help="run tests that exercise the LLM-backed agent",
-    )
-
-
-def pytest_collection_modifyitems(config: Config, items: Any) -> None:
-    if config.getoption("--integration"):
-        return
-    skip_agent = pytest.mark.skip(reason="need --integration option to run")
-    for item in items:
-        if "integration" in item.keywords:
-            item.add_marker(skip_agent)
+@pytest.fixture(scope="module")
+def vcr_config():
+    return {"filter_headers": ["authorization"]}

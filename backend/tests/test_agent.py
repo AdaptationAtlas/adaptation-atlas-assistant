@@ -6,14 +6,13 @@ from atlas_assistant.agent import Agent
 from atlas_assistant.context import Context
 from atlas_assistant.settings import Settings
 
-pytestmark = pytest.mark.integration
-
 
 @pytest.fixture
 def agent(settings: Settings) -> Agent:
     return atlas_assistant.agent.create_agent(settings)
 
 
+@pytest.mark.vcr
 def test_kenya_crops(agent: Agent, settings: Settings) -> None:
     _ = agent.invoke(
         {

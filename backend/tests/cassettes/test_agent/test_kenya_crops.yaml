@@ -1,0 +1,903 @@
+interactions:
+- request:
+    body: '{"messages":[{"role":"system","content":"You help users leverage Adaptation
+      Atlas data to answer their questions.\n\nYou have access to the following tools:
+      select_dataset, generate_sql, execute_sql\n\nToday is 2025-11-10\n        "},{"role":"user","content":"What
+      crops are being grown in Kenya?"}],"model":"mistral-large-latest","temperature":0.0,"top_p":1,"tools":[{"type":"function","function":{"name":"select_dataset","description":"Selects
+      a dataset based on a user''s query.\n\nArgs:\n    query: Search terms to select
+      the dataset","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"generate_sql","description":"Generates
+      SQL to query a dataset.\n\nThere must be a selected dataset to generate SQL.\n\nArgs:\n    query:
+      The question that we''re going to answer with an SQL query.","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"execute_sql","description":"Executes
+      the sql and returns the result.\n\nRequires that the SQL has been generated
+      from the selected dataset.","parameters":{"properties":{},"type":"object"}}}],"stream":false}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '1209'
+      content-type:
+      - application/json
+      host:
+      - api.mistral.ai
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.mistral.ai/v1/chat/completions
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwAAAP//TJDBTsMwEER/JZqzQW0INPiCxIUDdzgQFK3tbWJw7GJvBSjKv6NUonAd
+        zc68nRneQaM25pqNaay7NQ039nZn6Lpt3f7qhhrHDgo2Mwk76O3upm6323rTKEzJcYDG5ItkCheB
+        8sAXgYSLQOFYaGDoGYecpoP0kt45Fui6bRQkCYWzdLWpFWyaDoHFp3jWt+2ikMwbW4GGHUku/1wr
+        1pi85QL9MsNHx1/QG4W9j76MfWYqKUJDUgq9pRAKFCYuv1w5BYYGleKLUFyZ/1lPmes8bPie7x8+
+        n6CwP0Z76tYzIk3reeHAVnpHQoXXDMrDceIoBRpzh48j5+8OuurwPJJUNqdDqShzZdjHoRpy+oyV
+        j9Ujx2+667BgUedvltd1mCgc1wWwLK/LDwAAAP//AwAwHBrYtgEAAA==
+    headers:
+      CF-RAY:
+      - 99c8be8e5a314781-DFW
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 10 Nov 2025 21:46:45 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=JvKiFR3CX2luJv0Y5cmsPtRq1kiWg2mAyfKrZW_zjiE-1762811205-1.0.1.1-f406O8aNYg9sUtTHQA10NRejeESGJ8nhtgnkKlxbJSprwOCoYMd_G1I7tflJlNWvtwrzlMLz20fs4qq3YdBu6GEU27Wmtc9IFrazRXNh2SQ;
+        path=/; expires=Mon, 10-Nov-25 22:16:45 GMT; domain=.mistral.ai; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=s6xNoCl85Oi0Azij3vv6tix09_pmjsC4UtH.21479lc-1762811205536-0.0.1.1-604800000;
+        path=/; domain=.mistral.ai; HttpOnly; Secure; SameSite=None
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      mistral-correlation-id:
+      - 019a6fbc-555e-7748-950d-d0d9c56dd4a0
+      x-envoy-upstream-service-time:
+      - '490'
+      x-kong-proxy-latency:
+      - '6'
+      x-kong-request-id:
+      - 019a6fbc-555e-7748-950d-d0d9c56dd4a0
+      x-kong-upstream-latency:
+      - '491'
+      x-ratelimit-limit-req-10-second:
+      - '240'
+      x-ratelimit-limit-tokens-minute:
+      - '20000000'
+      x-ratelimit-limit-tokens-month:
+      - '200000000000'
+      x-ratelimit-remaining-req-10-second:
+      - '239'
+      x-ratelimit-remaining-tokens-minute:
+      - '19999698'
+      x-ratelimit-remaining-tokens-month:
+      - '199990237213'
+      x-ratelimit-tokens-query-cost:
+      - '302'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - bdba771d-4597-4b30-8de2-d71fdfc78c40
+      user-agent:
+      - unknown/None; hf_hub/0.35.3; python/3.13.2
+    method: HEAD
+    uri: https://huggingface.co/mistralai/Mixtral-8x7B-v0.1/resolve/main/tokenizer.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+      Access-Control-Max-Age:
+      - '86400'
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename*=UTF-8''tokenizer.json; filename="tokenizer.json";
+      Content-Length:
+      - '264'
+      Content-Security-Policy:
+      - default-src 'none'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Mon, 10 Nov 2025 21:46:45 GMT
+      Location:
+      - /api/resolve-cache/models/mistralai/Mixtral-8x7B-v0.1/fc7ac94680e38d7348cfa806e51218e6273104b0/tokenizer.json?%2Fmistralai%2FMixtral-8x7B-v0.1%2Fresolve%2Fmain%2Ftokenizer.json=&etag=%2243e6daf936dc0f953cb867ec864adab78f92d9ce%22
+      RateLimit:
+      - '"resolvers";r=2993;t=27'
+      RateLimit-Policy:
+      - '"fixed window";"resolvers";q=3000;w=300'
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Vary:
+      - Origin, Accept
+      Via:
+      - 1.1 fcd09f2c31a065e7aa6144a2edfbc126.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - ck89Et6MFoKmvw26-ExAX6DL7jJgYdXwuiDzGzMOg0oshG50Lj639g==
+      X-Amz-Cf-Pop:
+      - DFW59-P5
+      X-Cache:
+      - Miss from cloudfront
+      X-Hub-Cache:
+      - HIT
+      X-Linked-ETag:
+      - '"43e6daf936dc0f953cb867ec864adab78f92d9ce"'
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - fc7ac94680e38d7348cfa806e51218e6273104b0
+      X-Request-Id:
+      - Root=1-69125d45-1da778535cbaffa82c67397c;bdba771d-4597-4b30-8de2-d71fdfc78c40
+      cross-origin-opener-policy:
+      - same-origin
+    status:
+      code: 307
+      message: Temporary Redirect
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 838f3e4e-8799-4b49-8d34-c2a3de9be67e
+      user-agent:
+      - unknown/None; hf_hub/0.35.3; python/3.13.2
+    method: HEAD
+    uri: https://huggingface.co/api/resolve-cache/models/mistralai/Mixtral-8x7B-v0.1/fc7ac94680e38d7348cfa806e51218e6273104b0/tokenizer.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+      Access-Control-Max-Age:
+      - '86400'
+      Age:
+      - '2806792'
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename*=UTF-8''tokenizer.json; filename="tokenizer.json";
+      Content-Length:
+      - '1795303'
+      Content-Security-Policy:
+      - default-src 'none'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Thu, 09 Oct 2025 10:06:54 GMT
+      ETag:
+      - '"43e6daf936dc0f953cb867ec864adab78f92d9ce"'
+      RateLimit:
+      - '"resolvers";r=2984;t=186'
+      RateLimit-Policy:
+      - '"fixed window";"resolvers";q=3000;w=300'
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Vary:
+      - Origin
+      Via:
+      - 1.1 5a2879388aecf2ae307711400ed2adde.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - bUSgf_vplJlNgk87vfAzB8hRXfbOcm6RzLYLdpPziL9Qdjyh4SeXiA==
+      X-Amz-Cf-Pop:
+      - DFW59-P5
+      X-Cache:
+      - Hit from cloudfront
+      X-Hub-Cache:
+      - MISS
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - fc7ac94680e38d7348cfa806e51218e6273104b0
+      X-Request-Id:
+      - Root=1-68e7893e-5b87374a714eff765f87626f;f64980e0-2ebb-4d70-ae02-0a2df702bcd3
+      cross-origin-opener-policy:
+      - same-origin
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"model":"mistral-embed","input":["What crops are being grown in Kenya?"]}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '74'
+      content-type:
+      - application/json
+      host:
+      - api.mistral.ai
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.mistral.ai/v1/embeddings
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      CF-RAY:
+      - 99c8be97a94d72f5-DFW
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 10 Nov 2025 21:46:46 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=tgRL7Eroy5yWeoh7fGFCIYKXyZWMuYWvPWVCDKT9bWI-1762811206-1.0.1.1-hZGMiyB0F5kRAJMHh2uwhoc0LQR8YPWSRROj9yvIi0tjgJbPna7VrIxxoEoUn5LFTfvTc2MN0CLhW9ortelvgAmLQOOsX2CRlagJBL4bigY;
+        path=/; expires=Mon, 10-Nov-25 22:16:46 GMT; domain=.mistral.ai; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=9R17m_9ZnLSJD4_EmqPD9aRB8uZ.KoZpL4WAQ11OX8U-1762811206577-0.0.1.1-604800000;
+        path=/; domain=.mistral.ai; HttpOnly; Secure; SameSite=None
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      mistral-correlation-id:
+      - 019a6fbc-5b22-7425-a411-8b5addb97b31
+      x-envoy-upstream-service-time:
+      - '73'
+      x-kong-proxy-latency:
+      - '4'
+      x-kong-request-id:
+      - 019a6fbc-5b22-7425-a411-8b5addb97b31
+      x-kong-upstream-latency:
+      - '74'
+      x-ratelimit-limit-req-10-second:
+      - '240'
+      x-ratelimit-limit-tokens-minute:
+      - '20000000'
+      x-ratelimit-limit-tokens-month:
+      - '200000000000'
+      x-ratelimit-remaining-req-10-second:
+      - '238'
+      x-ratelimit-remaining-tokens-minute:
+      - '19999990'
+      x-ratelimit-remaining-tokens-month:
+      - '199999722120'
+      x-ratelimit-tokens-query-cost:
+      - '10'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages":[{"role":"system","content":"You help users leverage Adaptation
+      Atlas data to answer their questions.\n\nYou have access to the following tools:
+      select_dataset, generate_sql, execute_sql\n\nToday is 2025-11-10\n        "},{"role":"user","content":"What
+      crops are being grown in Kenya?"},{"role":"assistant","tool_calls":[{"function":{"name":"select_dataset","arguments":"{\"query\":
+      \"What crops are being grown in Kenya?\"}"},"id":"ebeBeBGwV"}],"content":""},{"role":"tool","content":"Selected
+      dataset: This dataset quantifies the historical exposure of crops and livestock
+      to climate hazards, expressed in nominal USD value of production (VOP). It is
+      generated by multiplying crop- or animal-specific hazard risk raster stacks
+      by their corresponding exposure layers, The data represent hazard exposure rather
+      than impact, showing the value of production exposed to specific hazards across
+      administrative levels. Importantly, the dataset distinguishes between individual
+      hazards (e.g., drought or heat alone) and compound hazard interactions (e.g.,
+      simultaneous dry and wet conditions in the same season), recognizing that a
+      crop may show minimal exposure to a single hazard but significant exposure when
+      multiple hazards coincide - which is often more consequential to production.","name":"select_dataset","tool_call_id":"ebeBeBGwV"}],"model":"mistral-large-latest","temperature":0.0,"top_p":1,"tools":[{"type":"function","function":{"name":"select_dataset","description":"Selects
+      a dataset based on a user''s query.\n\nArgs:\n    query: Search terms to select
+      the dataset","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"generate_sql","description":"Generates
+      SQL to query a dataset.\n\nThere must be a selected dataset to generate SQL.\n\nArgs:\n    query:
+      The question that we''re going to answer with an SQL query.","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"execute_sql","description":"Executes
+      the sql and returns the result.\n\nRequires that the SQL has been generated
+      from the selected dataset.","parameters":{"properties":{},"type":"object"}}}],"stream":false}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '2258'
+      content-type:
+      - application/json
+      cookie:
+      - __cf_bm=JvKiFR3CX2luJv0Y5cmsPtRq1kiWg2mAyfKrZW_zjiE-1762811205-1.0.1.1-f406O8aNYg9sUtTHQA10NRejeESGJ8nhtgnkKlxbJSprwOCoYMd_G1I7tflJlNWvtwrzlMLz20fs4qq3YdBu6GEU27Wmtc9IFrazRXNh2SQ;
+        _cfuvid=s6xNoCl85Oi0Azij3vv6tix09_pmjsC4UtH.21479lc-1762811205536-0.0.1.1-604800000
+      host:
+      - api.mistral.ai
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.mistral.ai/v1/chat/completions
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA0yQzU7DMBCEXyWas4uIG9LgCw+AkLgghGhVbZxNYnDsYm8FKMq7oyDxcx3Nzn4z
+        M1wHg67rdaWbbdN0daVZU9W23Ou27Kv62uoaCjYxCXcw5a7WTVnqy1phih17GEwuSyK/8ZQG3ngS
+        zgKFc6aBYWacUpxOcpT4yiHDVNtrBYlC/k+62inYOJ08i4vhVy+bRSG2L2wFBnYkufhzrVhjdJYz
+        zPMMFzr+gLlU6F1weTwmphwDDCRGf7TkfYbCxPmHK0XPMKCcXRYKK/M/63fmOs+Dv39yY32nodCf
+        g/3+bWYEmtbzgQMnEj7mNw8FSsN54iAZBvMeb2dOn3uYYo/HkaSwKZ5yQYmLll0YiiHF91C4UNxy
+        +KSbPRYs6rfLclhnCcJh7Y9lOSxfAAAA//8DAP/7jKe0AQAA
+    headers:
+      CF-RAY:
+      - 99c8be99984e4781-DFW
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 10 Nov 2025 21:46:47 GMT
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      mistral-correlation-id:
+      - 019a6fbc-5c55-7e5d-bc66-089b98eb9e8a
+      x-envoy-upstream-service-time:
+      - '264'
+      x-kong-proxy-latency:
+      - '4'
+      x-kong-request-id:
+      - 019a6fbc-5c55-7e5d-bc66-089b98eb9e8a
+      x-kong-upstream-latency:
+      - '265'
+      x-ratelimit-limit-req-10-second:
+      - '240'
+      x-ratelimit-limit-tokens-minute:
+      - '20000000'
+      x-ratelimit-limit-tokens-month:
+      - '200000000000'
+      x-ratelimit-remaining-req-10-second:
+      - '237'
+      x-ratelimit-remaining-tokens-minute:
+      - '19999241'
+      x-ratelimit-remaining-tokens-month:
+      - '199990236756'
+      x-ratelimit-tokens-query-cost:
+      - '457'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"model":"codestral-latest","messages":[{"content":"I want you to act like
+      a data scientist.\n\nYou will generate:\n\n   - A SQL select statement\n   -
+      A SQL where statement\n   - An optional SQL group by statement\n   - An optional
+      SQL order by statement\n   - An optional SQL limit statement\n   - A brief explanation
+      of why you chose what you did, which should include a\n     description of each
+      output column\n\nThe SQL should be valid DuckDB SQL.\n\nThe dataset schema that
+      the SQL will be used against is:\n\nName           Type    Description\n-------------  ------  --------------------------------------------------------------------------\niso3           string  The
+      ISO3 character code for the country.\nadmin0_name    string  The name of the
+      country.\nadmin1_name    string  The name of the admin1 region (i.e. state or
+      province).\nadmin2_name    string  The name of the admin2 region (i.e. city
+      or municipality).\ngaul0_code     double  The GAUL (Global Administrative Unit
+      Layers) numeric code for the country.\ngaul1_code     double  The GAUL numeric
+      code for the admin1 region.\ngaul2_code     double  The GAUL numeric code for
+      the admin2 region.\nvalue          double  Numeric value that represents how
+      exposed a given crop is to a hazard.\nscenario       string  The SSP of the
+      model represented in the record (always historic).\nmodel          string  Name
+      of the model represented in the record (always historic).\ntimeframe      string  The
+      timeframe of the model represented in the record (always historic).\nhazard         string  Common
+      name of the hazard(s) represented by hazard_vars.\nhazard_vars    string  The
+      variable(s) of the hazard represented in the record.\ncrop           string\nseverity       string  The
+      severity of the hazard represented in the record. (always severe).\nexposure_var   string  The
+      exposure variable exposed to the hazard (always vop).\nexposure_unit  string  The
+      unit of the exposure variable (always usd15).\n\nThe first few rows of the table
+      look like:\n\niso3 admin0_name admin1_name admin2_name  gaul0_code  gaul1_code  gaul2_code  value
+      scenario    model timeframe   hazard      hazard_vars           crop severity
+      exposure_var exposure_unit          domain    period           processing region      source  variable\n
+      DZA     Algeria        None        None       101.0         NaN         NaN    0.0
+      historic historic  historic      any NDWS+NTx35+NDWL0 arabica-coffee   severe          vop         usd15
+      hazard_exposure jagermeyr hazard-risk-exposure    ssa atlas_cmip6 vop_usd15\n
+      DZA     Algeria        None        None       101.0         NaN         NaN    0.0
+      historic historic  historic      dry NDWS+NTx35+NDWL0 arabica-coffee   severe          vop         usd15
+      hazard_exposure jagermeyr hazard-risk-exposure    ssa atlas_cmip6 vop_usd15\n
+      DZA     Algeria        None        None       101.0         NaN         NaN    0.0
+      historic historic  historic     heat NDWS+NTx35+NDWL0 arabica-coffee   severe          vop         usd15
+      hazard_exposure jagermeyr hazard-risk-exposure    ssa atlas_cmip6 vop_usd15\n
+      DZA     Algeria        None        None       101.0         NaN         NaN    0.0
+      historic historic  historic      wet NDWS+NTx35+NDWL0 arabica-coffee   severe          vop         usd15
+      hazard_exposure jagermeyr hazard-risk-exposure    ssa atlas_cmip6 vop_usd15\n
+      DZA     Algeria        None        None       101.0         NaN         NaN    0.0
+      historic historic  historic dry+heat NDWS+NTx35+NDWL0 arabica-coffee   severe          vop         usd15
+      hazard_exposure jagermeyr hazard-risk-exposure    ssa atlas_cmip6 vop_usd15\n\nThe
+      `iso3` column has the following values:\n\n- COG\n- NAM\n- SLE\n- ZAF\n- ERI\n-
+      SWZ\n- MWI\n- CMR\n- MUS\n- TCD\n- COM\n- GIN\n- GMB\n- ESH\n- SSD\n- DJI\n-
+      STP\n- BDI\n- UGA\n- GAB\n- MAR\n- MOZ\n- COD\n- RWA\n- SOM\n- ZMB\n- EGY\n-
+      NGA\n- LSO\n- TUN\n- LBR\n- CPV\n- DZA\n- ETH\n- TZA\n- CIV\n- GHA\n- SEN\n-
+      SYC\n- ZWE\n- NER\n- SDN\n- TGO\n- BEN\n- BFA\n- LBY\n- MDG\n- MLI\n- MRT\n-
+      CAF\n- GNB\n- KEN\n- AGO\n- BWA\n- GNQ\n\nThe `admin0_name` column has the following
+      values:\n\n- Seychelles\n- Guinea\n- Niger\n- Djibouti\n- Togo\n- Libya\n- Uganda\n-
+      Mozambique\n- Sierra Leone\n- South Africa\n- Eswatini\n- Central African Republic\n-
+      Western Sahara\n- Congo\n- Guinea-Bissau\n- Angola\n- Malawi\n- Gabon\n- Mauritania\n-
+      United Republic of Tanzania\n- Chad\n- Ghana\n- Democratic Republic of the Congo\n-
+      Sudan\n- Benin\n- Botswana\n- Equatorial Guinea\n- Cabo Verde\n- Comoros\n-
+      Namibia\n- Senegal\n- Zimbabwe\n- Nigeria\n- Mali\n- Lesotho\n- Liberia\n- Burundi\n-
+      Algeria\n- Somalia\n- Kenya\n- South Sudan\n- Egypt\n- Burkina Faso\n- Eritrea\n-
+      Mauritius\n- Morocco\n- C\u00f4te D''Ivoire\n- Zambia\n- Tunisia\n- Madagascar\n-
+      Cameroon\n- Ethiopia\n- Gambia\n- Rwanda\n- Sao Tome And Principe\n\nThe `scenario`
+      column has the following values:\n\n- historic\n\nThe `model` column has the
+      following values:\n\n- historic\n\nThe `timeframe` column has the following
+      values:\n\n- historic\n\nThe `hazard` column has the following values:\n\n-
+      dry+heat\n- dry+wet\n- wet\n- any\n- heat+wet\n- dry+heat+wet\n- dry\n- heat\n\nThe
+      `hazard_vars` column has the following values:\n\n- NDWS+NTx35+NDWL0\n- PTOT-L+NTxS+PTOT-G\n-
+      NDWS+THI-max+NDWL0\n- PTOT-L+THI-max+PTOT-G\n\nThe `crop` column has the following
+      values:\n\n- soybean\n- chickpea\n- cotton\n- cowpea\n- goats-tropical\n- maize\n-
+      potato\n- rapeseed\n- sugarbeet\n- coconut\n- lentil\n- pigeonpea\n- sheep-tropical\n-
+      arabica-coffee\n- cassava\n- poultry-tropical\n- wheat\n- yams\n- barley\n-
+      sesameseed\n- sugarcane\n- sweet-potato\n- generic-crop\n- groundnut\n- pearl-millet\n-
+      pigs-highland\n- pigs-tropical\n- plantain\n- sheep-highland\n- sorghum\n- bean\n-
+      cattle-tropical\n- cocoa\n- goats-highland\n- robusta-coffee\n- sunflower\n-
+      tea\n- tobacco\n- banana\n- rice\n- small-millet\n- cattle-highland\n- oilpalm\n-
+      poultry-highland\n\nThe `severity` column has the following values:\n\n- severe\n\nThe
+      `exposure_var` column has the following values:\n\n- vop\n\nThe `exposure_unit`
+      column has the following values:\n\n- usd15\n\n","role":"system"},{"content":"What
+      crops are being grown in Kenya?","role":"user"}],"stream":false,"response_format":{"type":"json_schema","json_schema":{"name":"SqlQueryParts","schema":{"properties":{"select":{"title":"Select","type":"string"},"where":{"title":"Where","type":"string"},"group_by":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Group
+      By"},"order_by":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Order
+      By"},"limit":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Limit"},"explanation":{"title":"Explanation","type":"string"}},"required":["select","where","group_by","order_by","limit","explanation"],"title":"SqlQueryParts","type":"object","additionalProperties":false},"strict":true}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '6848'
+      content-type:
+      - application/json
+      host:
+      - api.mistral.ai
+      user-agent:
+      - mistral-client-python/1.9.11
+    method: POST
+    uri: https://api.mistral.ai/v1/chat/completions
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA0yQTW8aMRCG/8poLrlso/ANK/XU9hBFyqXcuhV47YF16/VsPGMRhPjvlSENXOf9
+        euwTeoc1Tlez+YoW8+W4nUznZmIWq/nIjVw7Xc0m43aCFdpERslhPVrMx8vRaPy0rLBnRwFrtOxI
+        NJnwJRglUawwi9kT1iccEveDbpT/UpQSnz1VqKwm3G7L6axCy/0QSD3HT2E1O1fI7R+yWlY6o483
+        V4Hq2FsSrH+d0EdH71g/Vbjz0Uu3SWSEI9YoygNW2JP8Z0ocCGs0Il7UxMKrzGFjTQiCdcwhFJ6o
+        FMvwqUGhQFYbrKHB788/18+v39ZgEw8NVtDgoaNEV9ULT+ArPLz8eH24ivvEedi0x6JfqqFBTo7S
+        x63BW1Hwvdd7I70PwURTHnz1rjsv8JYpHeEKJaAdgfOiPlq9QAnsEx8i+AgvFI/mEdYdwbagbcFy
+        yH0EL5CFHCjDzgeldKlJZDk5gR2n+2giyUEFTCK4oJMDE4bOtKS+/NoR2uNlGqLp6RrirEPWu71t
+        MWwrOHTedhC8fLDn6N8y3eJyA2/wjOfz7/M/AAAA//8DANb4mdGpAgAA
+    headers:
+      CF-RAY:
+      - 99c8bea52ef2e7d3-DFW
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 10 Nov 2025 21:46:49 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=MKDNFPgDoYDAwlk94zJvGGEzR4zvXQ6AhRaSmD8DJS4-1762811209-1.0.1.1-fuwBqqjO0l5Y3WfFDY7OhU9NuRrfi0GeMGrAgqzcGAs6K78DY8VLyXe2Mpjek8_x8EqCLmXLv2uqQ2.zSZZNp_WkXfmGYuUi8xOpmmvQXiY;
+        path=/; expires=Mon, 10-Nov-25 22:16:49 GMT; domain=.mistral.ai; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=6kpTeqCEOuu6XLJTsREFpL8cwbiKEiRdq2b0EJg.mas-1762811209244-0.0.1.1-604800000;
+        path=/; domain=.mistral.ai; HttpOnly; Secure; SameSite=None
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      mistral-correlation-id:
+      - 019a6fbc-638b-7fef-8db0-b3da6bc2cb68
+      x-envoy-upstream-service-time:
+      - '585'
+      x-kong-proxy-latency:
+      - '7'
+      x-kong-request-id:
+      - 019a6fbc-638b-7fef-8db0-b3da6bc2cb68
+      x-kong-upstream-latency:
+      - '585'
+      x-ratelimit-limit-req-10-second:
+      - '240'
+      x-ratelimit-limit-tokens-minute:
+      - '20000000'
+      x-ratelimit-limit-tokens-month:
+      - '200000000000'
+      x-ratelimit-remaining-req-10-second:
+      - '236'
+      x-ratelimit-remaining-tokens-minute:
+      - '19997396'
+      x-ratelimit-remaining-tokens-month:
+      - '199990234911'
+      x-ratelimit-tokens-query-cost:
+      - '1845'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages":[{"role":"system","content":"You help users leverage Adaptation
+      Atlas data to answer their questions.\n\nYou have access to the following tools:
+      select_dataset, generate_sql, execute_sql\n\nToday is 2025-11-10\n        "},{"role":"user","content":"What
+      crops are being grown in Kenya?"},{"role":"assistant","tool_calls":[{"function":{"name":"select_dataset","arguments":"{\"query\":
+      \"What crops are being grown in Kenya?\"}"},"id":"ebeBeBGwV"}],"content":""},{"role":"tool","content":"Selected
+      dataset: This dataset quantifies the historical exposure of crops and livestock
+      to climate hazards, expressed in nominal USD value of production (VOP). It is
+      generated by multiplying crop- or animal-specific hazard risk raster stacks
+      by their corresponding exposure layers, The data represent hazard exposure rather
+      than impact, showing the value of production exposed to specific hazards across
+      administrative levels. Importantly, the dataset distinguishes between individual
+      hazards (e.g., drought or heat alone) and compound hazard interactions (e.g.,
+      simultaneous dry and wet conditions in the same season), recognizing that a
+      crop may show minimal exposure to a single hazard but significant exposure when
+      multiple hazards coincide - which is often more consequential to production.","name":"select_dataset","tool_call_id":"ebeBeBGwV"},{"role":"assistant","tool_calls":[{"function":{"name":"generate_sql","arguments":"{\"query\":
+      \"What crops are being grown in Kenya?\"}"},"id":"UlPYih6M2"}],"content":""},{"role":"tool","content":"Generated
+      SQL:\n\nSELECT DISTINCT crop FROM ''https://digital-atlas.s3.amazonaws.com/domain=hazard_exposure/source=atlas_cmip6/region=ssa/processing=hazard-risk-exposure/variable=vop_usd15/period=jagermeyr/model=historic/severity=severe/int=multi-hazard.parquet''
+      WHERE iso3 = ''KEN'' ORDER BY crop\n\nExplanation:\n\nThis query selects the
+      distinct crops grown in Kenya. The `iso3` column is used to filter the records
+      for Kenya. The results are ordered alphabetically by crop name. The output column
+      is `crop`, which lists the unique crop names in Kenya.","name":"generate_sql","tool_call_id":"UlPYih6M2"}],"model":"mistral-large-latest","temperature":0.0,"top_p":1,"tools":[{"type":"function","function":{"name":"select_dataset","description":"Selects
+      a dataset based on a user''s query.\n\nArgs:\n    query: Search terms to select
+      the dataset","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"generate_sql","description":"Generates
+      SQL to query a dataset.\n\nThere must be a selected dataset to generate SQL.\n\nArgs:\n    query:
+      The question that we''re going to answer with an SQL query.","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"execute_sql","description":"Executes
+      the sql and returns the result.\n\nRequires that the SQL has been generated
+      from the selected dataset.","parameters":{"properties":{},"type":"object"}}}],"stream":false}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '3059'
+      content-type:
+      - application/json
+      cookie:
+      - __cf_bm=JvKiFR3CX2luJv0Y5cmsPtRq1kiWg2mAyfKrZW_zjiE-1762811205-1.0.1.1-f406O8aNYg9sUtTHQA10NRejeESGJ8nhtgnkKlxbJSprwOCoYMd_G1I7tflJlNWvtwrzlMLz20fs4qq3YdBu6GEU27Wmtc9IFrazRXNh2SQ;
+        _cfuvid=s6xNoCl85Oi0Azij3vv6tix09_pmjsC4UtH.21479lc-1762811205536-0.0.1.1-604800000
+      host:
+      - api.mistral.ai
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.mistral.ai/v1/chat/completions
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA0yQy2rDMBBF/+Wu1WI7wam16wcEsiu0BDOWx4laPVJrXAJG/14UaJPt5c7MObPC
+        jtCgoa6nzmyYmm5L05aoNe2mGqZhbHbD1ELBzEzCI3S9a5uXum6qTsHHkR00vE0yk3tyNJ/4yZFw
+        EigsiU4MveIyR3+RXuIXhwTdVhsFiULuIeoUTPQXx2JjuOdZIQ6fbAQa5kzyfC8VqnO0hhP0xwob
+        Rr5CVwqTDTad+5kpxQANidH1hpxLUPCc/rDm6LjYp2STUCjID9XbzvKdn8P7YW9f929QmJZgbrf1
+        ikC+jPOVzSLcp28HBZpPi+cgCRprRlb/XPlYDINwKC7I+Zh/AQAA//8DAL2v+Qh/AQAA
+    headers:
+      CF-RAY:
+      - 99c8beaa1d4c4781-DFW
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 10 Nov 2025 21:47:01 GMT
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      mistral-correlation-id:
+      - 019a6fbc-66ac-7e79-a434-03e86f3843e5
+      x-envoy-upstream-service-time:
+      - '11888'
+      x-kong-proxy-latency:
+      - '5'
+      x-kong-request-id:
+      - 019a6fbc-66ac-7e79-a434-03e86f3843e5
+      x-kong-upstream-latency:
+      - '11890'
+      x-ratelimit-limit-req-10-second:
+      - '240'
+      x-ratelimit-limit-tokens-minute:
+      - '20000000'
+      x-ratelimit-limit-tokens-month:
+      - '200000000000'
+      x-ratelimit-remaining-req-10-second:
+      - '239'
+      x-ratelimit-remaining-tokens-minute:
+      - '19996787'
+      x-ratelimit-remaining-tokens-month:
+      - '199990234302'
+      x-ratelimit-tokens-query-cost:
+      - '609'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"messages":[{"role":"system","content":"You help users leverage Adaptation
+      Atlas data to answer their questions.\n\nYou have access to the following tools:
+      select_dataset, generate_sql, execute_sql\n\nToday is 2025-11-10\n        "},{"role":"user","content":"What
+      crops are being grown in Kenya?"},{"role":"assistant","tool_calls":[{"function":{"name":"select_dataset","arguments":"{\"query\":
+      \"What crops are being grown in Kenya?\"}"},"id":"ebeBeBGwV"}],"content":""},{"role":"tool","content":"Selected
+      dataset: This dataset quantifies the historical exposure of crops and livestock
+      to climate hazards, expressed in nominal USD value of production (VOP). It is
+      generated by multiplying crop- or animal-specific hazard risk raster stacks
+      by their corresponding exposure layers, The data represent hazard exposure rather
+      than impact, showing the value of production exposed to specific hazards across
+      administrative levels. Importantly, the dataset distinguishes between individual
+      hazards (e.g., drought or heat alone) and compound hazard interactions (e.g.,
+      simultaneous dry and wet conditions in the same season), recognizing that a
+      crop may show minimal exposure to a single hazard but significant exposure when
+      multiple hazards coincide - which is often more consequential to production.","name":"select_dataset","tool_call_id":"ebeBeBGwV"},{"role":"assistant","tool_calls":[{"function":{"name":"generate_sql","arguments":"{\"query\":
+      \"What crops are being grown in Kenya?\"}"},"id":"UlPYih6M2"}],"content":""},{"role":"tool","content":"Generated
+      SQL:\n\nSELECT DISTINCT crop FROM ''https://digital-atlas.s3.amazonaws.com/domain=hazard_exposure/source=atlas_cmip6/region=ssa/processing=hazard-risk-exposure/variable=vop_usd15/period=jagermeyr/model=historic/severity=severe/int=multi-hazard.parquet''
+      WHERE iso3 = ''KEN'' ORDER BY crop\n\nExplanation:\n\nThis query selects the
+      distinct crops grown in Kenya. The `iso3` column is used to filter the records
+      for Kenya. The results are ordered alphabetically by crop name. The output column
+      is `crop`, which lists the unique crop names in Kenya.","name":"generate_sql","tool_call_id":"UlPYih6M2"},{"role":"assistant","tool_calls":[{"function":{"name":"execute_sql","arguments":"{}"},"id":"vPZPMiAMW"}],"content":""},{"role":"tool","content":"Data
+      returned:\n\n| crop             |\n|:-----------------|\n| arabica-coffee   |\n|
+      banana           |\n| barley           |\n| bean             |\n| cassava          |\n|
+      cattle-highland  |\n| cattle-tropical  |\n| chickpea         |\n| cocoa            |\n|
+      coconut          |\n| cotton           |\n| cowpea           |\n| generic-crop     |\n|
+      goats-highland   |\n| goats-tropical   |\n| groundnut        |\n| lentil           |\n|
+      maize            |\n| oilpalm          |\n| pearl-millet     |\n| pigeonpea        |\n|
+      pigs-highland    |\n| pigs-tropical    |\n| plantain         |\n| potato           |\n|
+      poultry-highland |\n| poultry-tropical |\n| rapeseed         |\n| rice             |\n|
+      robusta-coffee   |\n| sesameseed       |\n| sheep-highland   |\n| sheep-tropical   |\n|
+      small-millet     |\n| sorghum          |\n| soybean          |\n| sugarbeet        |\n|
+      sugarcane        |\n| sunflower        |\n| sweet-potato     |\n| tea              |\n|
+      tobacco          |\n| wheat            |\n| yams             |","name":"execute_sql","tool_call_id":"vPZPMiAMW"}],"model":"mistral-large-latest","temperature":0.0,"top_p":1,"tools":[{"type":"function","function":{"name":"select_dataset","description":"Selects
+      a dataset based on a user''s query.\n\nArgs:\n    query: Search terms to select
+      the dataset","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"generate_sql","description":"Generates
+      SQL to query a dataset.\n\nThere must be a selected dataset to generate SQL.\n\nArgs:\n    query:
+      The question that we''re going to answer with an SQL query.","parameters":{"properties":{"query":{"type":"string"}},"required":["query"],"type":"object"}}},{"type":"function","function":{"name":"execute_sql","description":"Executes
+      the sql and returns the result.\n\nRequires that the SQL has been generated
+      from the selected dataset.","parameters":{"properties":{},"type":"object"}}}],"stream":false}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '4283'
+      content-type:
+      - application/json
+      cookie:
+      - __cf_bm=JvKiFR3CX2luJv0Y5cmsPtRq1kiWg2mAyfKrZW_zjiE-1762811205-1.0.1.1-f406O8aNYg9sUtTHQA10NRejeESGJ8nhtgnkKlxbJSprwOCoYMd_G1I7tflJlNWvtwrzlMLz20fs4qq3YdBu6GEU27Wmtc9IFrazRXNh2SQ;
+        _cfuvid=s6xNoCl85Oi0Azij3vv6tix09_pmjsC4UtH.21479lc-1762811205536-0.0.1.1-604800000
+      host:
+      - api.mistral.ai
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.mistral.ai/v1/chat/completions
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3yS32/UMAzH/xUre4HqFl3a3q++wT2ABIjTbhJCBE1u6mvDUqdKcowx7X9HubGN
+        F/YQyXY+tr+OcydsJxoxr+pqpbBSddnWi/KAqw6NqnFjsF3Wm1bMhAmEiTrRqNWyXCtVluVMjL4j
+        Jxox2pgCunOHoadzh4liEjNxjNiTaO7EFPw4pavkr4mjaNaL5Uwkn9A9hZSqNjNh/Dg5Stbz00W5
+        ru5nwrc/yCTRCDNgks9YFjZ4ayiK5tudsNzRL9HMZ+Jg2cbhKhBGz6IRMflJzMRI8VFT8I5EIzBG
+        GxNy1pu8d1cGnYui4aNzWRAn4tz4PQUCDARpIDDBTxGQO3D2J8XkzTW0ZLmHPvgbBh8goI3UgWX4
+        QHyLjWbNZ2dnUBTbnNwUhWYl4U3A1hqErT8ciDSXEt4iI6PmKpvB0a3mWsJbQta8kLDFGPEnal5K
+        2A7WXE+EmlcStt541Lx+sPiYNG+ynZJnzWqe7ZsTrJSEd8EfuTtRqpTwkThZp1lVEj6h/U2aVS3h
+        s3WwQzdqVgsJO8Lg4JN1jnLaUsLO9uT5oehKws4hJ7S53VrCzidMXrPaSLjAiSJRp7mcS7iwJs+q
+        JFz49hjTP/OXEvYUcSTYP+CVhP2I7rlvWUvY+9APx1FzucjObXt6nXIpYX/sMbR0Ald/XYOcS6+z
+        ywfnbyhoLjcS9jdE6UlnNZdwmUeplIRL36IxOVpK+DIQJs1VJeErjvF5lx8f1/+4z6LYYkqOigJe
+        vbf94PInyecy+MkadK9POy6Kdx5TfImqMrWz/YtQfYL80aVw+xK3yNx+IJr+T4n7++/3fwAAAP//
+        AwDMMuxMEQQAAA==
+    headers:
+      CF-RAY:
+      - 99c8befa19044781-DFW
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 10 Nov 2025 21:47:04 GMT
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      mistral-correlation-id:
+      - 019a6fbc-98b8-7af9-ba33-dbf0d6ebba8b
+      x-envoy-upstream-service-time:
+      - '2322'
+      x-kong-proxy-latency:
+      - '6'
+      x-kong-request-id:
+      - 019a6fbc-98b8-7af9-ba33-dbf0d6ebba8b
+      x-kong-upstream-latency:
+      - '2324'
+      x-ratelimit-limit-req-10-second:
+      - '240'
+      x-ratelimit-limit-tokens-minute:
+      - '20000000'
+      x-ratelimit-limit-tokens-month:
+      - '200000000000'
+      x-ratelimit-remaining-req-10-second:
+      - '239'
+      x-ratelimit-remaining-tokens-minute:
+      - '19995648'
+      x-ratelimit-remaining-tokens-month:
+      - '199990233163'
+      x-ratelimit-tokens-query-cost:
+      - '1139'
+    status:
+      code: 200
+      message: OK
+version: 1

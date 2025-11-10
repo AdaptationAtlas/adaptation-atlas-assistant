@@ -1,0 +1,146 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 226c6a30-a4de-4ea8-a9d4-2bd2fc919074
+      user-agent:
+      - unknown/None; hf_hub/0.35.3; python/3.13.2
+    method: HEAD
+    uri: https://huggingface.co/mistralai/Mixtral-8x7B-v0.1/resolve/main/tokenizer.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+      Access-Control-Max-Age:
+      - '86400'
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename*=UTF-8''tokenizer.json; filename="tokenizer.json";
+      Content-Length:
+      - '264'
+      Content-Security-Policy:
+      - default-src 'none'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Mon, 10 Nov 2025 21:47:18 GMT
+      Location:
+      - /api/resolve-cache/models/mistralai/Mixtral-8x7B-v0.1/fc7ac94680e38d7348cfa806e51218e6273104b0/tokenizer.json?%2Fmistralai%2FMixtral-8x7B-v0.1%2Fresolve%2Fmain%2Ftokenizer.json=&etag=%2243e6daf936dc0f953cb867ec864adab78f92d9ce%22
+      RateLimit:
+      - '"resolvers";r=2999;t=294'
+      RateLimit-Policy:
+      - '"fixed window";"resolvers";q=3000;w=300'
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Vary:
+      - Origin, Accept
+      Via:
+      - 1.1 c9e462b6fec2db2b38560afd1b3c7ef8.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - _7UKjYf1qg8yh79mdMqZlh0EJYorDjGb06gkvbaRpCC3e03bvW47hw==
+      X-Amz-Cf-Pop:
+      - DFW59-P5
+      X-Cache:
+      - Miss from cloudfront
+      X-Hub-Cache:
+      - HIT
+      X-Linked-ETag:
+      - '"43e6daf936dc0f953cb867ec864adab78f92d9ce"'
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - fc7ac94680e38d7348cfa806e51218e6273104b0
+      X-Request-Id:
+      - Root=1-69125d66-52d0566c6b33d7484dfb9cb1;226c6a30-a4de-4ea8-a9d4-2bd2fc919074
+      cross-origin-opener-policy:
+      - same-origin
+    status:
+      code: 307
+      message: Temporary Redirect
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 52cab5d8-ec04-48ac-8a4c-8693aa973d07
+      user-agent:
+      - unknown/None; hf_hub/0.35.3; python/3.13.2
+    method: HEAD
+    uri: https://huggingface.co/api/resolve-cache/models/mistralai/Mixtral-8x7B-v0.1/fc7ac94680e38d7348cfa806e51218e6273104b0/tokenizer.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+      Access-Control-Max-Age:
+      - '86400'
+      Age:
+      - '2806824'
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename*=UTF-8''tokenizer.json; filename="tokenizer.json";
+      Content-Length:
+      - '1795303'
+      Content-Security-Policy:
+      - default-src 'none'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Thu, 09 Oct 2025 10:06:54 GMT
+      ETag:
+      - '"43e6daf936dc0f953cb867ec864adab78f92d9ce"'
+      RateLimit:
+      - '"resolvers";r=2984;t=186'
+      RateLimit-Policy:
+      - '"fixed window";"resolvers";q=3000;w=300'
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Vary:
+      - Origin
+      Via:
+      - 1.1 c9e462b6fec2db2b38560afd1b3c7ef8.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - dn9d0d1OTtZDcQ_MlKhc9QfNXYYK4VAFi5cHDucScSaj2sP-6_WKpg==
+      X-Amz-Cf-Pop:
+      - DFW59-P5
+      X-Cache:
+      - Hit from cloudfront
+      X-Hub-Cache:
+      - MISS
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - fc7ac94680e38d7348cfa806e51218e6273104b0
+      X-Request-Id:
+      - Root=1-68e7893e-5b87374a714eff765f87626f;f64980e0-2ebb-4d70-ae02-0a2df702bcd3
+      cross-origin-opener-policy:
+      - same-origin
+    status:
+      code: 200
+      message: OK
+version: 1

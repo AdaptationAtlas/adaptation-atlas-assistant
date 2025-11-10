@@ -14,7 +14,7 @@ def test_login(client: TestClient) -> None:
     _ = response.raise_for_status()
 
 
-@pytest.mark.integration
+@pytest.mark.vcr
 @pytest.mark.parametrize("headers", [None, {"accept": "text/event-stream"}])
 def test_chat(authenticated_client: TestClient, headers: dict[str, str] | None) -> None:
     response = authenticated_client.post(

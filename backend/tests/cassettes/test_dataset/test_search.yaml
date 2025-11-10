@@ -1,0 +1,307 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - d2a46de8-36ff-4542-b0fd-795ea6005afe
+      user-agent:
+      - unknown/None; hf_hub/0.35.3; python/3.13.2
+    method: HEAD
+    uri: https://huggingface.co/mistralai/Mixtral-8x7B-v0.1/resolve/main/tokenizer.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+      Access-Control-Max-Age:
+      - '86400'
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename*=UTF-8''tokenizer.json; filename="tokenizer.json";
+      Content-Length:
+      - '264'
+      Content-Security-Policy:
+      - default-src 'none'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Mon, 10 Nov 2025 21:47:18 GMT
+      Location:
+      - /api/resolve-cache/models/mistralai/Mixtral-8x7B-v0.1/fc7ac94680e38d7348cfa806e51218e6273104b0/tokenizer.json?%2Fmistralai%2FMixtral-8x7B-v0.1%2Fresolve%2Fmain%2Ftokenizer.json=&etag=%2243e6daf936dc0f953cb867ec864adab78f92d9ce%22
+      RateLimit:
+      - '"resolvers";r=2998;t=294'
+      RateLimit-Policy:
+      - '"fixed window";"resolvers";q=3000;w=300'
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Vary:
+      - Origin, Accept
+      Via:
+      - 1.1 b96bff460d10fba92905d57e0a87f9de.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - WxBy_zUACQaVKdNP_NzBu-89JDr8Jz14QXF91wKDyzkKYXvvG_cGHA==
+      X-Amz-Cf-Pop:
+      - DFW59-P5
+      X-Cache:
+      - Miss from cloudfront
+      X-Hub-Cache:
+      - MISS
+      X-Linked-ETag:
+      - '"43e6daf936dc0f953cb867ec864adab78f92d9ce"'
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - fc7ac94680e38d7348cfa806e51218e6273104b0
+      X-Request-Id:
+      - Root=1-69125d66-256a84725143798a4f3bbd6f;d2a46de8-36ff-4542-b0fd-795ea6005afe
+      cross-origin-opener-policy:
+      - same-origin
+    status:
+      code: 307
+      message: Temporary Redirect
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      X-Amzn-Trace-Id:
+      - 66872fd4-4db6-4541-ab97-385dc0ee559c
+      user-agent:
+      - unknown/None; hf_hub/0.35.3; python/3.13.2
+    method: HEAD
+    uri: https://huggingface.co/api/resolve-cache/models/mistralai/Mixtral-8x7B-v0.1/fc7ac94680e38d7348cfa806e51218e6273104b0/tokenizer.json
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - https://huggingface.co
+      Access-Control-Expose-Headers:
+      - X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash
+      Access-Control-Max-Age:
+      - '86400'
+      Age:
+      - '2806825'
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename*=UTF-8''tokenizer.json; filename="tokenizer.json";
+      Content-Length:
+      - '1795303'
+      Content-Security-Policy:
+      - default-src 'none'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Thu, 09 Oct 2025 10:06:54 GMT
+      ETag:
+      - '"43e6daf936dc0f953cb867ec864adab78f92d9ce"'
+      RateLimit:
+      - '"resolvers";r=2984;t=186'
+      RateLimit-Policy:
+      - '"fixed window";"resolvers";q=3000;w=300'
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Vary:
+      - Origin
+      Via:
+      - 1.1 b96bff460d10fba92905d57e0a87f9de.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - JsROIozJHWGZvWVj90JJT7C4qYgoaLqmwdykOSH276afsRoy4aEesA==
+      X-Amz-Cf-Pop:
+      - DFW59-P5
+      X-Cache:
+      - Hit from cloudfront
+      X-Hub-Cache:
+      - MISS
+      X-Powered-By:
+      - huggingface-moon
+      X-Repo-Commit:
+      - fc7ac94680e38d7348cfa806e51218e6273104b0
+      X-Request-Id:
+      - Root=1-68e7893e-5b87374a714eff765f87626f;f64980e0-2ebb-4d70-ae02-0a2df702bcd3
+      cross-origin-opener-policy:
+      - same-origin
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"model":"mistral-embed","input":["What crops are being grown in Kenya?"]}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '74'
+      content-type:
+      - application/json
+      host:
+      - api.mistral.ai
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.mistral.ai/v1/embeddings
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      CF-RAY:
+      - 99c8bf653a3c4744-DFW
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 10 Nov 2025 21:47:19 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=HOgRm8kYbYAqLp9XYntP2UBg.SiVci8H1XIubSa9nv4-1762811239-1.0.1.1-ZCEvHWv_a4bfgNmGMrvAt.ST4BqwAnKPRcqTf88M2uJwdm2ePs17mNO7W3AXn7nCSCOAXV80RvhKzVfqGXu.fW9BPaiVenobwWdbpQD6RFg;
+        path=/; expires=Mon, 10-Nov-25 22:17:19 GMT; domain=.mistral.ai; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=ZbL7Z9QeC6_6ky0Usj3YBBplYuuxexgtXRIXFHNOo3c-1762811239480-0.0.1.1-604800000;
+        path=/; domain=.mistral.ai; HttpOnly; Secure; SameSite=None
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      access-control-allow-origin:
+      - '*'
+      alt-svc:
+      - h3=":443"; ma=86400
+      cf-cache-status:
+      - DYNAMIC
+      mistral-correlation-id:
+      - 019a6fbc-dba3-75f9-a794-74b428599148
+      x-envoy-upstream-service-time:
+      - '77'
+      x-kong-proxy-latency:
+      - '7'
+      x-kong-request-id:
+      - 019a6fbc-dba3-75f9-a794-74b428599148
+      x-kong-upstream-latency:
+      - '77'
+      x-ratelimit-limit-req-10-second:
+      - '240'
+      x-ratelimit-limit-tokens-minute:
+      - '20000000'
+      x-ratelimit-limit-tokens-month:
+      - '200000000000'
+      x-ratelimit-remaining-req-10-second:
+      - '233'
+      x-ratelimit-remaining-tokens-minute:
+      - '19999968'
+      x-ratelimit-remaining-tokens-month:
+      - '199999722098'
+      x-ratelimit-tokens-query-cost:
+      - '10'
+    status:
+      code: 200
+      message: OK
+version: 1
