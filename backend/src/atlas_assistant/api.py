@@ -55,6 +55,9 @@ class ChatRequest(BaseModel):
     query: str
     """The question from the user."""
 
+    thread_id: str | None = None
+    """A thread id, provided by a previous chat."""
+
 
 class Token(BaseModel):
     """The return type for the token endpoint."""
@@ -86,6 +89,9 @@ class ResponseMessage(BaseModel):
 
     content: str
     """The content of the message"""
+
+    thread_id: str
+    """The thread id, which can be re-used to continue conversations"""
 
     def to_event_stream(self) -> str:
         return "data: " + self.model_dump_json()
@@ -189,10 +195,10 @@ async def chat(
     accept: Annotated[str | None, Header()] = None,
 ) -> StreamingResponse:
     agent = create_agent(settings)
-    thread_id = uuid.uuid4()
+    thread_id = chat_request.thread_id or str(uuid.uuid4())
     event_stream = (accept and "text/event-stream" in accept) or False
     return StreamingResponse(
-        query_agent(agent, chat_request.query, str(thread_id), settings, event_stream),
+        query_agent(agent, chat_request.query, thread_id, settings, event_stream),
         media_type="text-event-stream" if event_stream else "application/x-ndjson",
     )
 
@@ -208,7 +214,11 @@ async def graph_recursion_handler(
 
 
 async def query_agent(
-    agent: Agent, query: str, thread_id: str, settings: Settings, event_stream: bool
+    agent: Agent,
+    query: str,
+    thread_id: str,
+    settings: Settings,
+    event_stream: bool,
 ) -> AsyncGenerator[str]:
     """Query the agent and yield messages.
 
@@ -224,7 +234,7 @@ async def query_agent(
             if messages := value.get("messages"):
                 for msg in messages:
                     if msg.content:
-                        response_message = create_response_message(msg)
+                        response_message = create_response_message(msg, thread_id)
                         if response_message:
                             if event_stream:
                                 yield response_message.to_event_stream() + "\n\n"
@@ -234,6 +244,7 @@ async def query_agent(
 
 def create_response_message(
     message: BaseMessage,
+    thread_id: str,
 ) -> ToolResponseMessage | AiResponseMessage | None:
     if isinstance(message, ToolMessage):
         assert isinstance(message.content, str)
@@ -241,10 +252,12 @@ def create_response_message(
             name=message.name,
             content=message.content,
             status=message.status,
+            thread_id=thread_id,
         )
     elif isinstance(message, AIMessage):
         assert isinstance(message.content, str)
         return AiResponseMessage(
             content=message.content,
             finish_reason=message.response_metadata["finish_reason"],
+            thread_id=thread_id,
         )
