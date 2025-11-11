@@ -184,10 +184,8 @@ You will generate:
    - An optional SQL limit statement   
    - If aggregating data, limit to 1 non-aggregated field and its aggregated value
    - If aggregating data, non-aggregated fields must be in the GROUP BY clause
-   - If aggregating data, order by the aggregated field in descending order 
+   - If aggregating data, order by the aggregated field in most relevant order
    - If aggregating data, limit to n results
-   - For SUM aggregations, handle NaN/NULL: SUM(CASE WHEN col IS NULL
-     OR isnan(col) THEN 0 ELSE col END)
    - A brief explanation of why you chose what you did, which should include a
      description of each output column
 
