@@ -20,7 +20,7 @@ class State(AgentState[None]):
     sql_query: SqlQuery | None
     """The active SQL query against the dataset."""
 
-    serialized_data: dict[str, Any] | None
+    serialized_data: SerializedData | None
     """The serialized data resulting from executing the SQL query."""
 
     chart_data: list[dict[str, Any]] | None
@@ -35,3 +35,9 @@ class SqlQuery(BaseModel):
 
     explanation: str
     """The explanation, which provides information about each output column"""
+
+
+class SerializedData(BaseModel):
+    columns: list[str]
+    data: list[list[str | float | int | None]]
+    column_names: list[str | None]

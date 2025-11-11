@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, cast
+from typing import cast
 
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from ..context import Context
 from ..dataset import Dataset
-from ..state import SqlQuery, State
+from ..state import SerializedData, SqlQuery, State
 
 MAX_DATA_FRAME_LENGTH = 50
 
@@ -241,26 +241,70 @@ class BarChart(BaseModel):
 
 
 @tool
-def map_sql_to_chart(
+def make_bar_chart_config(
     runtime: ToolRuntime[Context, State],
 ) -> Command[None]:
-    """Maps the SQL result to a bar chart structure.
+    """Maps the serialized data result to a bar chart structure.
 
-    Requires that the SQL has been executed and returned data.
+    Requires that the SQL has been executed and returned data with multiple columns.
     """
     serialized_data = runtime.state["serialized_data"]
-    if not serialized_data:
+    if not serialized_data or not serialized_data.data:
         return Command(
             update={
                 "messages": [
                     ToolMessage(
-                        content="No serialized data available to transform to chart",
+                        content="Cannot create bar chart config: "
+                        "No serialized data available to transform",
                         tool_call_id=runtime.tool_call_id,
                     )
                 ]
             }
         )
+    columns = serialized_data.columns
+    if len(columns) == 1:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content=(
+                            "Cannot create bar chart config: Received single column. "
+                            f"(column: {columns[0] if columns else 'unknown'}). "
+                            "Bar charts require one or more numeric fields. "
+                            "Please modify your query to include aggregated data, like "
+                            "sums, or averages. "
+                            "For example, try asking for 'top crops by exposure'. "
+                        ),
+                        tool_call_id=runtime.tool_call_id,
+                    )
+                ],
+                "chart_data": None,
+            }
+        )
 
+        # Check if second column contains numeric data
+    data = serialized_data.data
+    if data and len(data[0]) > 0 and len(data[0]) >= 2:
+        # Sample the second column to check if it's numeric
+        sample_value = data[0][1]
+        if not isinstance(sample_value, (int, float)):
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(
+                            content=(
+                                "Cannot create bar chart config: "
+                                "The data does not contain numeric values. "
+                                f"Columns available: {', '.join(columns)}. "
+                                "Please modify your query to include numeric "
+                                "aggregations like SUM, COUNT, or AVG."
+                            ),
+                            tool_call_id=runtime.tool_call_id,
+                        )
+                    ],
+                    "chart_data": None,
+                }
+            )
     settings = runtime.context.settings
     assert settings.mistral_api_key
     client = Mistral(
@@ -275,7 +319,7 @@ def map_sql_to_chart(
         messages=[
             {
                 "role": "system",
-                "content": get_chart_prompt(serialized_data),
+                "content": get_chart_config_prompt(serialized_data),
             },
             {
                 "role": "user",
@@ -284,7 +328,6 @@ def map_sql_to_chart(
         ],
         response_format=BarChart,
     )
-    logger.info(f"Chart response: {response}")
     assert response.choices and response.choices[0] and response.choices[0].message
     chart_data = response.choices[0].message.parsed
     assert chart_data
@@ -292,7 +335,7 @@ def map_sql_to_chart(
         update={
             "messages": [
                 ToolMessage(
-                    content="Transformed SQL result to bar chart data structure.",
+                    content="Transformed SQL result to bar chart config structure.",
                     tool_call_id=runtime.tool_call_id,
                 )
             ],
@@ -301,8 +344,8 @@ def map_sql_to_chart(
     )
 
 
-def get_chart_prompt(serialized_data: dict[str, Any]) -> str:
-    """Generate a prompt for chart transformation using BarChart.
+def get_chart_config_prompt(serialized_data: SerializedData) -> str:
+    """Generate a prompt for data transformation using BarChart as the target format.
 
     Uses Pydantic's schema generation to ensure the prompt schema
     always matches the BarChart class definition.
@@ -315,7 +358,7 @@ Your task is to analyze the following data and create a bar chart by:
 1. Identifying the best categorical field for the X-axis
 2. Identifying the best numeric field for the Y-axis
 3. Creating a descriptive title
-4. Mapping each data row to a chart data point
+4. Mapping the data values to the BarChart schema provided below
 
 Data to visualize:
 {json.dumps(serialized_data, indent=2)}
