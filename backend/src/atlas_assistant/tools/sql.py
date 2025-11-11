@@ -219,20 +219,20 @@ The first few rows of the table look like:
     return prompt
 
 
-class BarChartDataSchema(BaseModel):
+class BarChartData(BaseModel):
     type: str
     value: float | int
-    valueLabel: str
+    value_label: str
 
 
-class BarChartSchema(BaseModel):
+class BarChart(BaseModel):
     title: str
-    categoryField: str
-    valueField: str
-    colorDomain: list[str]
-    colorRange: list[str] = ["#79A1B7", "#195B83"]
-    textColor: str | None
-    values: list[BarChartDataSchema]
+    category_field: str
+    value_field: str
+    color_domain: list[str]
+    color_range: list[str] = ["#79A1B7", "#195B83"]
+    text_color: str | None
+    values: list[BarChartData]
 
 
 @tool
@@ -277,7 +277,7 @@ def map_sql_to_chart(
                 "content": "Format the data for use in a bar chart component.",
             },
         ],
-        response_format=BarChartSchema,
+        response_format=BarChart,
     )
     logger.info(f"Chart response: {response}")
     assert response.choices and response.choices[0] and response.choices[0].message
@@ -297,12 +297,12 @@ def map_sql_to_chart(
 
 
 def get_chart_prompt(serialized_data: dict[str, Any]) -> str:
-    """Generate a prompt for chart transformation using BarChartSchema.
+    """Generate a prompt for chart transformation using BarChart.
 
     Uses Pydantic's schema generation to ensure the prompt schema
-    always matches the BarChartSchema class definition.
+    always matches the BarChart class definition.
     """
-    schema = BarChartSchema.model_json_schema()
+    schema = BarChart.model_json_schema()
     schema_str = json.dumps(schema, indent=2)
 
     prompt = f"""You are an expert in data visualization.
