@@ -20,6 +20,28 @@ class SearchResult(BaseModel):
 
 
 @tool
+def list_datasets(runtime: ToolRuntime[Context, State]) -> Command[None]:
+    """Lists all datasets available to the assistant."""
+    settings = runtime.context.settings
+    embeddings = settings.get_embeddings()
+    dataset_descriptions = [
+        Metadata.model_validate(d).to_dataset().get_description()
+        for d in embeddings.get(include=["metadatas"])["metadatas"]
+    ]
+    return Command(
+        update={
+            "messages": [
+                ToolMessage(
+                    content=f"Got {len(dataset_descriptions)} with these descriptions:"
+                    "\n\n" + "- ".join(dataset_descriptions),
+                    tool_call_id=runtime.tool_call_id,
+                )
+            ],
+        }
+    )
+
+
+@tool
 def select_dataset(query: str, runtime: ToolRuntime[Context, State]) -> Command[None]:
     """Selects a dataset based on a user's query.
 

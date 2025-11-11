@@ -17,14 +17,14 @@ from langgraph.graph.state import CompiledStateGraph
 from .context import Context
 from .settings import Settings
 from .state import State
-from .tools.dataset import select_dataset
+from .tools.dataset import list_datasets, select_dataset
 from .tools.sql import execute_sql, generate_sql
 
 Agent = CompiledStateGraph[
     AgentState[None], Context, _InputAgentState, _OutputAgentState[None]
 ]
 
-TOOLS = [select_dataset, generate_sql, execute_sql]
+TOOLS = [list_datasets, select_dataset, generate_sql, execute_sql]
 
 
 def create_agent(settings: Settings) -> Agent:
