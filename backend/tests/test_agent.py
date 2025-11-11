@@ -1,4 +1,3 @@
-from typing import Any, cast
 from unittest.mock import Mock
 
 import pytest
@@ -75,7 +74,7 @@ def test_make_bar_chart_config(
     mock_runtime.context = Context(settings=settings)
     mock_runtime.tool_call_id = "test-call-id"
 
-    result = cast(Any, make_bar_chart_config).func(mock_runtime)
+    result = make_bar_chart_config.func(mock_runtime)
 
     # Check the command update
     messages = result.update.get("messages", [])
