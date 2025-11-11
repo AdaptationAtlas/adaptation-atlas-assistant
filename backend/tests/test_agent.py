@@ -7,11 +7,6 @@ from atlas_assistant.context import Context
 from atlas_assistant.settings import Settings
 
 
-@pytest.fixture
-def agent(settings: Settings) -> Agent:
-    return atlas_assistant.agent.create_agent(settings)
-
-
 @pytest.mark.parametrize(
     "query", ("What crops are being grown in Kenya?", "What datasets are available?")
 )
