@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from typing import Any
 
 from langchain.agents import AgentState
+from pydantic import BaseModel
 
 from .dataset import Dataset
 
@@ -14,7 +17,7 @@ class State(AgentState[None]):
     dataset: Dataset | None
     """The active dataset."""
 
-    sql_query: str | None
+    sql_query: SqlQuery | None
     """The active SQL query against the dataset."""
 
     serialized_data: dict[str, Any] | None
@@ -22,3 +25,13 @@ class State(AgentState[None]):
 
     chart_data: list[dict[str, Any]] | None
     """The chart data resulting from transforming the executed SQL serialized data."""
+
+
+class SqlQuery(BaseModel):
+    """The current SQL query"""
+
+    query: str
+    """The query itself"""
+
+    explanation: str
+    """The explanation, which provides information about each output column"""

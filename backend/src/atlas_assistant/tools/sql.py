@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from ..context import Context
 from ..dataset import Dataset
-from ..state import State
+from ..state import SqlQuery, State
 
 MAX_DATA_FRAME_LENGTH = 50
 
@@ -36,7 +36,7 @@ class SqlQueryParts(BaseModel):
     explanation: str
     """An explanation of why the model generated this query"""
 
-    def get_query(self, href: str) -> str:
+    def get_query(self, href: str) -> SqlQuery:
         """Gets the full SQL query"""
         parts = [f"SELECT {self.select} FROM '{href}' WHERE {self.where}"]
         if self.group_by:
@@ -45,7 +45,7 @@ class SqlQueryParts(BaseModel):
             parts.append(f"ORDER BY {self.order_by}")
         if self.limit:
             parts.append(f"LIMIT {self.limit}")
-        return " ".join(parts)
+        return SqlQuery(query=" ".join(parts), explanation=self.explanation)
 
 
 @tool
@@ -94,7 +94,7 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     assert sql_query_parts
     sql_query = sql_query_parts.get_query(dataset.asset.href)
     content = (
-        f"Generated SQL:\n\n{sql_query}\n\n"
+        f"Generated SQL:\n\n```sql\n{sql_query.query}\n```\n\n"
         f"Explanation:\n\n{sql_query_parts.explanation}"
     )
     return Command(
@@ -132,7 +132,7 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
     import duckdb
 
     try:
-        data_frame = duckdb.sql(sql_query).to_df()
+        data_frame = duckdb.sql(sql_query.query).to_df()
     except Exception as e:
         return Command(
             update={
@@ -146,10 +146,15 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
             }
         )
 
-    header = (
-        "Data returned (truncated):"
+    content = (
+        f"Returned data had {len(data_frame)} rows. Either summarize the data by "
+        "re-generating the SQL with `group by` or `distinct`, or create a plot using "
+        "the full data frame that is saved as an artifact."
         if len(data_frame) > MAX_DATA_FRAME_LENGTH
-        else "Data returned:"
+        else "Data returned:\n\n"
+        + cast(str, data_frame.to_markdown(index=False))
+        + "\n\nExplanation: "
+        + sql_query.explanation
     )
     logger.info(data_frame.head(10))
     serialized_data = data_frame.to_dict("tight", index=False)
@@ -157,11 +162,8 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
         update={
             "messages": [
                 ToolMessage(
-                    content=f"{header}\n\n"
-                    + cast(
-                        str,
-                        data_frame.head(MAX_DATA_FRAME_LENGTH).to_markdown(index=False),
-                    ),
+                    content=content,
+                    artifact=data_frame.to_dict(),
                     tool_call_id=runtime.tool_call_id,
                 ),
             ],
@@ -198,6 +200,11 @@ The dataset schema that the SQL will be used against is:
 The first few rows of the table look like:
 
 {dataset.get_head_table()}
+
+Other instructions:
+
+    - When aggregating numeric values, you must include a `where` clause
+      that removes all `nan` values using the DuckDB `isnan` function
 
 """
 
