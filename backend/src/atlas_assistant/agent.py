@@ -18,13 +18,13 @@ from .context import Context
 from .settings import Settings
 from .state import State
 from .tools.dataset import select_dataset
-from .tools.sql import execute_sql, generate_sql
+from .tools.sql import execute_sql, generate_sql, map_sql_to_chart
 
 Agent = CompiledStateGraph[
     AgentState[None], Context, _InputAgentState, _OutputAgentState[None]
 ]
 
-TOOLS = [select_dataset, generate_sql, execute_sql]
+TOOLS = [select_dataset, generate_sql, execute_sql, map_sql_to_chart]
 
 
 def create_agent(settings: Settings) -> Agent:

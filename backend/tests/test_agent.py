@@ -15,10 +15,28 @@ def agent(settings: Settings) -> Agent:
 
 
 def test_kenya_crops(agent: Agent, settings: Settings) -> None:
-    _ = agent.invoke(
+    result = agent.invoke(
         {
             "messages": [HumanMessage("What crops are being grown in Kenya?")],
         },
         config={"configurable": {"thread_id": "test"}},
         context=Context(settings=settings),
     )
+
+    assert "serialized_data" in result
+    assert "chart_data" in result
+    chart_data = result["chart_data"]
+
+    # # Verify chart structure
+    assert "title" in chart_data
+    assert "categoryField" in chart_data
+    assert "valueField" in chart_data
+    assert "values" in chart_data
+    assert isinstance(chart_data["values"], list)
+    assert len(chart_data["values"]) > 0
+
+    # # Verify first data point structure
+    first_value = chart_data["values"][0]
+    assert "type" in first_value
+    assert "value" in first_value
+    assert "valueLabel" in first_value

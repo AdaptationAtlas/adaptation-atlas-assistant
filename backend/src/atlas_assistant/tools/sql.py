@@ -1,4 +1,6 @@
-from typing import cast
+import json
+import logging
+from typing import Any, cast
 
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
@@ -11,6 +13,8 @@ from ..dataset import Dataset
 from ..state import State
 
 MAX_DATA_FRAME_LENGTH = 50
+
+logger = logging.getLogger(__name__)
 
 
 class SqlQueryParts(BaseModel):
@@ -68,9 +72,11 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     settings = runtime.context.settings
     assert settings.mistral_api_key
     client = Mistral(
-        api_key=settings.mistral_api_key.get_secret_value()
-        if settings.mistral_api_key
-        else None
+        api_key=(
+            settings.mistral_api_key.get_secret_value()
+            if settings.mistral_api_key
+            else None
+        )
     )
     response = client.chat.parse(
         model="codestral-latest",
@@ -145,6 +151,11 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
         if len(data_frame) > MAX_DATA_FRAME_LENGTH
         else "Data returned:"
     )
+    logger.info(data_frame.head(10))
+    serialized_data = {
+        "columns": data_frame.columns.tolist(),
+        "rows": data_frame.to_dict(orient="records"),  # List of dicts
+    }
     return Command(
         update={
             "messages": [
@@ -155,8 +166,9 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
                         data_frame.head(MAX_DATA_FRAME_LENGTH).to_markdown(index=False),
                     ),
                     tool_call_id=runtime.tool_call_id,
-                )
-            ]
+                ),
+            ],
+            "serialized_data": serialized_data,
         }
     )
 
@@ -170,7 +182,13 @@ You will generate:
    - A SQL where statement
    - An optional SQL group by statement
    - An optional SQL order by statement
-   - An optional SQL limit statement
+   - An optional SQL limit statement   
+   - If aggregating data, limit to 1 non-aggregated field and its aggregated value
+   - If aggregating data, non-aggregated fields must be in the GROUP BY clause
+   - If aggregating data, order by the aggregated field in descending order 
+   - If aggregating data, limit to n results
+   - For SUM aggregations, handle NaN/NULL: SUM(CASE WHEN col IS NULL
+     OR isnan(col) THEN 0 ELSE col END)
    - A brief explanation of why you chose what you did, which should include a
      description of each output column
 
@@ -199,6 +217,109 @@ The first few rows of the table look like:
 
 {"\n".join("- " + sql_instruction for sql_instruction in sql_instructions)}
 
+"""
+
+    return prompt
+
+
+class BarChartDataSchema(BaseModel):
+    type: str
+    value: float | int
+    valueLabel: str
+
+
+class BarChartSchema(BaseModel):
+    title: str
+    categoryField: str
+    valueField: str
+    colorDomain: list[str]
+    colorRange: list[str] = ["#79A1B7", "#195B83"]
+    textColor: str | None
+    values: list[BarChartDataSchema]
+
+
+@tool
+def map_sql_to_chart(
+    runtime: ToolRuntime[Context, State],
+) -> Command[None]:
+    """Maps the SQL result to a bar chart structure.
+
+    Requires that the SQL has been executed and returned data.
+    """
+    serialized_data = runtime.state["serialized_data"]
+    if not serialized_data:
+        return Command(
+            update={
+                "messages": [
+                    ToolMessage(
+                        content="No serialized data available to transform to chart",
+                        tool_call_id=runtime.tool_call_id,
+                    )
+                ]
+            }
+        )
+
+    settings = runtime.context.settings
+    assert settings.mistral_api_key
+    client = Mistral(
+        api_key=(
+            settings.mistral_api_key.get_secret_value()
+            if settings.mistral_api_key
+            else None
+        )
+    )
+    response = client.chat.parse(
+        model="codestral-latest",
+        messages=[
+            {
+                "role": "system",
+                "content": get_chart_prompt(serialized_data),
+            },
+            {
+                "role": "user",
+                "content": "Format the data for use in a bar chart component.",
+            },
+        ],
+        response_format=BarChartSchema,
+    )
+    logger.info(f"Chart response: {response}")
+    assert response.choices and response.choices[0] and response.choices[0].message
+    chart_data = response.choices[0].message.parsed
+    assert chart_data
+    return Command(
+        update={
+            "messages": [
+                ToolMessage(
+                    content="Transformed SQL result to bar chart data structure.",
+                    tool_call_id=runtime.tool_call_id,
+                )
+            ],
+            "chart_data": json.loads(chart_data.model_dump_json()),
+        }
+    )
+
+
+def get_chart_prompt(serialized_data: dict[str, Any]) -> str:
+    """Generate a prompt for chart transformation using BarChartSchema.
+
+    Uses Pydantic's schema generation to ensure the prompt schema
+    always matches the BarChartSchema class definition.
+    """
+    schema = BarChartSchema.model_json_schema()
+    schema_str = json.dumps(schema, indent=2)
+
+    prompt = f"""You are an expert in data visualization.
+Your task is to analyze the following data and create a bar chart by:
+1. Identifying the best categorical field for the X-axis
+2. Identifying the best numeric field for the Y-axis
+3. Creating a descriptive title
+4. Mapping each data row to a chart data point
+
+Data to visualize:
+{json.dumps(serialized_data, indent=2)}
+
+You must respond with a JSON object matching this schema:
+{schema_str}
 """
 
     return prompt
