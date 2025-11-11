@@ -7,6 +7,7 @@ from langchain_core.messages import HumanMessage
 import atlas_assistant.agent
 from atlas_assistant.context import Context
 from atlas_assistant.settings import Settings
+from atlas_assistant.state import SerializedData
 from atlas_assistant.tools.sql import make_bar_chart_config
 
 
@@ -66,7 +67,8 @@ def test_make_bar_chart_config(
 ) -> None:
     """Unit test for make_bar_chart_config tool."""
 
-    serialized_data = request.getfixturevalue(serialized_data_fixture)
+    serialized_data_dictionary = request.getfixturevalue(serialized_data_fixture)
+    serialized_data = SerializedData(**serialized_data_dictionary)
 
     mock_runtime = Mock()
     mock_runtime.state = {"serialized_data": serialized_data}
@@ -83,7 +85,7 @@ def test_make_bar_chart_config(
 
     if expected_success:
         assert "chart_data" in result.update
-        if serialized_data["data"]:
+        if serialized_data.data:
             assert result.update["chart_data"] is not None
             chart_data = result.update["chart_data"]
             print(chart_data)
