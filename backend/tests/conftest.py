@@ -71,3 +71,51 @@ def pytest_collection_modifyitems(config: Config, items: Any) -> None:
     for item in items:
         if "integration" in item.keywords:
             item.add_marker(skip_agent)
+
+
+@pytest.fixture
+def serialized_data_valid() -> dict[str, Any]:
+    """Valid data with categorical and numeric columns."""
+    return {
+        "columns": ["crop", "total_value"],
+        "data": [
+            ["maize", 1500.5],
+            ["wheat", 1200.3],
+            ["rice", 900.7],
+        ],
+        "column_names": [None, None],
+    }
+
+
+@pytest.fixture
+def serialized_data_single_column() -> dict[str, Any]:
+    """Data with only categorical column (no numeric data)."""
+    return {
+        "columns": ["crop"],
+        "data": [["maize"], ["wheat"], ["rice"]],
+        "column_names": [None],
+    }
+
+
+@pytest.fixture
+def serialized_data_empty() -> dict[str, Any]:
+    """Valid structure but no data rows."""
+    return {
+        "columns": ["crop", "total_value"],
+        "data": [],
+        "column_names": [None, None],
+    }
+
+
+@pytest.fixture
+def serialized_data_only_categorical() -> dict[str, Any]:
+    """Data where second column is not numeric."""
+    return {
+        "columns": ["crop", "region"],
+        "data": [
+            ["maize", "East"],
+            ["wheat", "West"],
+            ["rice", "North"],
+        ],
+        "column_names": [None, None],
+    }
