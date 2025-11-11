@@ -152,10 +152,7 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
         else "Data returned:"
     )
     logger.info(data_frame.head(10))
-    serialized_data = {
-        "columns": data_frame.columns.tolist(),
-        "rows": data_frame.to_dict(orient="records"),  # List of dicts
-    }
+    serialized_data = data_frame.to_dict("tight", index=False)
     return Command(
         update={
             "messages": [
