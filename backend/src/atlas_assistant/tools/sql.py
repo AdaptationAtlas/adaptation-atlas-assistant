@@ -188,7 +188,7 @@ The first few rows of the table look like:
 
 Other instructions:
 
-    - Whenever summing over numeric values, you must include a `where` clause
+    - When aggregating numeric values, you must include a `where` clause
       that removes all `nan` values using the DuckDB `isnan` function
 
 """
