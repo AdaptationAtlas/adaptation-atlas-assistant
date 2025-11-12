@@ -1,5 +1,4 @@
 import json
-from typing import Any
 
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
@@ -66,19 +65,20 @@ def generate_bar_chart_metadata(runtime: ToolRuntime[Context, State]) -> Command
     )
 
 
-def get_bar_chart_metadata_prompt(data: dict[str, Any]) -> str:
+def get_bar_chart_metadata_prompt(data: str) -> str:
     return f"""You are an expert in data visualization.
 
 Your task is to analyze the following data and create bar chart by:
 
 1. Identifying the best categorical field for the X-axis
-2. Identifying one or more numeric fields for the Y-axis
+2. Identifying a numeric fields for the Y-axis
 3. Creating a descriptive title
+4. Optionally identifying a column that should be used for grouping
 
 Data to visualize:
 
 ```json
-{json.dumps(data, indent=2)}
+{data}
 ```
 
 You must respond with a JSON object matching this schema:
@@ -86,6 +86,4 @@ You must respond with a JSON object matching this schema:
 ```json
 {json.dumps(BarChartMetadata.model_json_schema(), indent=2)}
 ```
-
-IMPORTANT: You must select at least one column for the y_axis
 """

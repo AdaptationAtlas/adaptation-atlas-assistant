@@ -44,5 +44,8 @@ class BarChartMetadata(BaseModel):
     x_column: str
     """The name the data column used for the x-axis"""
 
-    y_columns: list[str]
-    """The name of the data column(s) used for the y-axis"""
+    y_columns: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name that should be used for grouping"""
