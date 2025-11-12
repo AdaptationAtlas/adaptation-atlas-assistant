@@ -49,7 +49,7 @@ export function Chat() {
         try {
             await sendChatMessage(value, threadId, {
                 onMessage: (message) => {
-                    if (!threadId && 'thread_id' in message) {
+                    if (!threadId && 'thread_id' in message && typeof message.thread_id === 'string') {
                         setThreadId(message.thread_id);
                     }
 
