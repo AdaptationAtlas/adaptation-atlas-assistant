@@ -22,7 +22,7 @@ jobs:
       TFVARS_FILE: tfvars/production.tfvars
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform/aws
         shell: bash -euo pipefail {0}
 
     steps:
