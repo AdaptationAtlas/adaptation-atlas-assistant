@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from langchain.agents import AgentState
 from pydantic import BaseModel
 
@@ -20,11 +18,8 @@ class State(AgentState[None]):
     sql_query: SqlQuery | None
     """The active SQL query against the dataset."""
 
-    output_data: OutputData | None
-    """The data resulting from executing the SQL query."""
-
-    chart_data: list[dict[str, Any]] | None
-    """The chart data resulting from transforming the output data from executed SQL."""
+    data: str | None
+    """The active data from a SQL query, as a markdown table"""
 
 
 class SqlQuery(BaseModel):
@@ -35,9 +30,3 @@ class SqlQuery(BaseModel):
 
     explanation: str
     """The explanation, which provides information about each output column"""
-
-
-class OutputData(BaseModel):
-    columns: list[str]
-    data: list[list[str | float | int | None]]
-    column_names: list[str | None]
