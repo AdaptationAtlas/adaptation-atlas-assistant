@@ -37,7 +37,7 @@ export function Chat() {
     const { isAuthenticated, logout } = useAuth();
 
     // Chat store
-    const { status, events, userQuery, startStreaming, addEvent, finishStreaming, setError } = useChatStore();
+    const { status, events, userQuery, threadId, startStreaming, addEvent, finishStreaming, setError, setThreadId } = useChatStore();
 
     const handlePromptSubmit = useCallback(async (value: string) => {
         if (!value.trim()) return;
@@ -47,8 +47,12 @@ export function Chat() {
         const controller = createStreamController();
 
         try {
-            await sendChatMessage(value, {
+            await sendChatMessage(value, threadId, {
                 onMessage: (message) => {
+                    if (!threadId && 'thread_id' in message) {
+                        setThreadId(message.thread_id);
+                    }
+
                     addEvent({
                         ...message,
                         id: `msg-${Date.now()}-${Math.random()}`,
@@ -67,7 +71,7 @@ export function Chat() {
             const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
             setError(errorMessage);
         }
-    }, [startStreaming, addEvent, finishStreaming, setError]);
+    }, [startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
 
     const handleExampleClick = (prompt: string) => {
         handlePromptSubmit(prompt);
