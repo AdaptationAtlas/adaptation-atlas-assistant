@@ -44,7 +44,7 @@ class BarChartMetadata(BaseModel):
     x_column: str
     """The name the data column used for the x-axis"""
 
-    y_columns: str
+    y_column: str
     """The name of the numeric data column used for the y-axis"""
 
     grouping_column: str | None
