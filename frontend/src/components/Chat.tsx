@@ -6,11 +6,8 @@ import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
 import { BarChart } from './Charts/Bar';
-import { AreaChart } from './Charts/Area';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
-import { areaChartData } from '../../data/areaChart';
-import { barChartData } from '../../data/barChart';
 
 const examplePrompts = [
     'How is maize production projected to change under future climate scenarios in Kenya?',
@@ -149,6 +146,11 @@ export function Chat() {
                                     <div key={messageId} style={{ marginBottom: '1.5rem' }}>
                                         {'error' in event ? (
                                             <div>Error: {event.error}</div>
+                                        ) : event.type === 'bar-chart' ? (
+                                            <BarChart
+                                                data={JSON.parse(event.content)}
+                                                metadata={event.metadata}
+                                            />
                                         ) : (
                                             <details>
                                                 <summary style={{
@@ -181,34 +183,6 @@ export function Chat() {
                         context={selectedContext}
                     />
                 </div>
-
-                {barChartData.map((chart, index) => (
-                    <BarChart
-                        key={`${chart.title}-${index}`}
-                        data={chart.values ?? []}
-                        xField="percentage"
-                        categoryField="type"
-                        hasLegend
-                        colorDomain={chart.colorDomain}
-                        colorRange={chart.colorRange}
-                        textColor={chart.textColor}
-                        title={chart.title}
-                    />
-                ))}
-                {areaChartData.map((chart, index) => (
-                    <AreaChart
-                        key={`${chart.title}-${index}`}
-                        data={chart.values ?? []}
-                        xField="year"
-                        yField="stock"
-                        categoryField={chart.categoryField}
-                        xLabel="Year"
-                        yLabel={chart.units}
-                        title={chart.title}
-                        colorDomain={chart.colorDomain}
-                        colorRange={chart.colorRange}
-                    />
-                ))}
             </main>
         </div>
     );
