@@ -48,8 +48,6 @@ class SqlQueryParts(BaseModel):
 def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[None]:
     """Generates SQL to return a table of data and then executes that SQL
 
-    The SQL output is suitable for printing to a user to summarize data.
-
     Before generating SQL, you must select a dataset.
 
     Args:
@@ -125,7 +123,7 @@ def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[
             "Data returned:",
             cast(str, data_frame.to_markdown(index=False)),
         ]
-        data = data_frame.to_markdown()
+        data = data_frame.to_json()
     return Command(
         update={
             "messages": [

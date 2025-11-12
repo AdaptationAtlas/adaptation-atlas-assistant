@@ -33,7 +33,7 @@ def list_datasets(runtime: ToolRuntime[Context, State]) -> Command[None]:
             "messages": [
                 ToolMessage(
                     content=f"Got {len(dataset_descriptions)} with these descriptions:"
-                    "\n\n" + "- ".join(dataset_descriptions),
+                    "\n\n" + "- \n".join(dataset_descriptions),
                     tool_call_id=runtime.tool_call_id,
                 )
             ],

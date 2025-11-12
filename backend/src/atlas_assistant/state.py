@@ -19,7 +19,10 @@ class State(AgentState[None]):
     """The active SQL query against the dataset."""
 
     data: str | None
-    """The active data from a SQL query, as a markdown table"""
+    """The active data from a SQL query, as a json string."""
+
+    bar_chart_metadata: BarChartMetadata | None
+    """Bar chat metadata for the data."""
 
 
 class SqlQuery(BaseModel):
@@ -30,3 +33,16 @@ class SqlQuery(BaseModel):
 
     explanation: str
     """The explanation, which provides information about each output column"""
+
+
+class BarChartMetadata(BaseModel):
+    """Data to create a bar chart"""
+
+    title: str
+    """The title of the bar chart."""
+
+    x_column: str
+    """The name the data column used for the x-axis"""
+
+    y_columns: list[str]
+    """The name of the data column(s) used for the y-axis"""

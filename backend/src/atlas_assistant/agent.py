@@ -18,6 +18,7 @@ from .context import Context
 from .settings import Settings
 from .state import State
 from .tools.dataset import list_datasets, select_dataset
+from .tools.plot import generate_bar_chart_metadata
 from .tools.sql import generate_table
 
 Agent = CompiledStateGraph[
@@ -28,6 +29,7 @@ TOOLS = [
     list_datasets,
     select_dataset,
     generate_table,
+    generate_bar_chart_metadata,
 ]
 
 
