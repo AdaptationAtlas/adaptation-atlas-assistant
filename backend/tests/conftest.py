@@ -1,6 +1,7 @@
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,6 +11,8 @@ import atlas_assistant.api
 import atlas_assistant.settings
 from atlas_assistant.dataset import Dataset, Item
 from atlas_assistant.settings import Settings
+from atlas_assistant.state import OutputData
+from atlas_assistant.tools.sql import BarChart, BarChartData
 
 
 @pytest.fixture
@@ -74,48 +77,85 @@ def pytest_collection_modifyitems(config: Config, items: Any) -> None:
 
 
 @pytest.fixture
-def serialized_data_valid() -> dict[str, Any]:
+def output_data_valid() -> OutputData:
     """Valid data with categorical and numeric columns."""
-    return {
-        "columns": ["crop", "total_value"],
-        "data": [
+    return OutputData(
+        columns=["crop", "total_value"],
+        data=[
             ["maize", 1500.5],
             ["wheat", 1200.3],
             ["rice", 900.7],
         ],
-        "column_names": [None, None],
-    }
+        column_names=[None, None],
+    )
 
 
 @pytest.fixture
-def serialized_data_single_column() -> dict[str, Any]:
+def output_data_single_column() -> OutputData:
     """Data with only categorical column (no numeric data)."""
-    return {
-        "columns": ["crop"],
-        "data": [["maize"], ["wheat"], ["rice"]],
-        "column_names": [None],
-    }
+    return OutputData(
+        columns=["crop"],
+        data=[["maize"], ["wheat"], ["rice"]],
+        column_names=[None],
+    )
 
 
 @pytest.fixture
-def serialized_data_empty() -> dict[str, Any]:
+def output_data_empty() -> OutputData:
     """Valid structure but no data rows."""
-    return {
-        "columns": ["crop", "total_value"],
-        "data": [],
-        "column_names": [None, None],
-    }
+    return OutputData(
+        columns=["crop", "total_value"],
+        data=[],
+        column_names=[None, None],
+    )
 
 
 @pytest.fixture
-def serialized_data_only_categorical() -> dict[str, Any]:
+def output_data_only_categorical() -> OutputData:
     """Data where second column is not numeric."""
-    return {
-        "columns": ["crop", "region"],
-        "data": [
+    return OutputData(
+        columns=["crop", "region"],
+        data=[
             ["maize", "East"],
             ["wheat", "West"],
             ["rice", "North"],
         ],
-        "column_names": [None, None],
-    }
+        column_names=[None, None],
+    )
+
+
+@pytest.fixture
+def mock_mistral_client():
+    """Mock the Mistral client to return a valid BarChart response."""
+    with patch("atlas_assistant.tools.sql.Mistral") as mock_mistral:
+        # Create a mock chart
+        mock_chart = BarChart(
+            title="Test Chart",
+            category_field="crop",
+            value_field="total_value",
+            color_domain=["maize", "wheat", "rice"],
+            color_range=["#79A1B7", "#195B83"],
+            text_color=None,
+            values=[
+                BarChartData(type="maize", value=1500.5, value_label="1500.5"),
+                BarChartData(type="wheat", value=1200.3, value_label="1200.3"),
+                BarChartData(type="rice", value=900.7, value_label="900.7"),
+            ],
+        )
+
+        # Create mock response structure
+        mock_message = MagicMock()
+        mock_message.parsed = mock_chart
+
+        mock_choice = MagicMock()
+        mock_choice.message = mock_message
+
+        mock_response = MagicMock()
+        mock_response.choices = [mock_choice]
+
+        # Configure the mock client
+        mock_client_instance = MagicMock()
+        mock_client_instance.chat.parse.return_value = mock_response
+        mock_mistral.return_value = mock_client_instance
+
+        yield mock_mistral

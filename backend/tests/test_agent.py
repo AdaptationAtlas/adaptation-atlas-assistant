@@ -1,12 +1,12 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 from langchain_core.messages import HumanMessage
+from pydantic import SecretStr
 
 import atlas_assistant.agent
 from atlas_assistant.context import Context
 from atlas_assistant.settings import Settings
-from atlas_assistant.state import SerializedData
 from atlas_assistant.tools.sql import make_bar_chart_config
 
 
@@ -42,35 +42,38 @@ def test_sql_execution(settings: Settings) -> None:
     )
 
     final_state = states[-1]
-    assert "serialized_data" in final_state, (
+    assert "output_data" in final_state, (
         f"Agent stopped early. Keys in final state: {list(final_state.keys())}"
     )
 
-    assert final_state["serialized_data"] is not None
+    assert final_state["output_data"] is not None
 
 
 @pytest.mark.parametrize(
-    "serialized_data_fixture,expected_success",
+    "output_data_fixture,expected_success",
     [
-        ("serialized_data_valid", True),
-        ("serialized_data_empty", False),
-        ("serialized_data_single_column", False),
-        ("serialized_data_only_categorical", False),
+        ("output_data_valid", True),
+        ("output_data_empty", False),
+        ("output_data_single_column", False),
+        ("output_data_only_categorical", False),
     ],
 )
 def test_make_bar_chart_config(
-    serialized_data_fixture: str,
+    output_data_fixture: str,
     expected_success: bool,
     settings: Settings,
     request: pytest.FixtureRequest,
+    mock_mistral_client: MagicMock,
 ) -> None:
     """Unit test for make_bar_chart_config tool."""
 
-    serialized_data_dictionary = request.getfixturevalue(serialized_data_fixture)
-    serialized_data = SerializedData(**serialized_data_dictionary)
+    settings.mistral_api_key = SecretStr("test-api-key-12345")
+    print("Mock Mistral client:", mock_mistral_client)  # noop to use the fixture
+
+    output_data = request.getfixturevalue(output_data_fixture)
 
     mock_runtime = Mock()
-    mock_runtime.state = {"serialized_data": serialized_data}
+    mock_runtime.state = {"output_data": output_data}
     mock_runtime.context = Context(settings=settings)
     mock_runtime.tool_call_id = "test-call-id"
 
@@ -84,7 +87,7 @@ def test_make_bar_chart_config(
 
     if expected_success:
         assert "chart_data" in result.update
-        if serialized_data.data:
+        if output_data.data:
             assert result.update["chart_data"] is not None
             chart_data = result.update["chart_data"]
             print(chart_data)

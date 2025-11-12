@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from ..context import Context
 from ..dataset import Dataset
-from ..state import SerializedData, SqlQuery, State
+from ..state import OutputData, SqlQuery, State
 
 MAX_DATA_FRAME_LENGTH = 50
 
@@ -157,7 +157,8 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
         + sql_query.explanation
     )
     logger.info(data_frame.head(10))
-    serialized_data = data_frame.to_dict("tight", index=False)
+    # output_data = data_frame.to_dict("tight", index=False)
+    output_data = OutputData(**data_frame.to_dict("tight", index=False))
     return Command(
         update={
             "messages": [
@@ -167,7 +168,7 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
                     tool_call_id=runtime.tool_call_id,
                 ),
             ],
-            "serialized_data": serialized_data,
+            "output_data": output_data,
         }
     )
 
@@ -248,8 +249,8 @@ def make_bar_chart_config(
 
     Requires that the SQL has been executed and returned data with multiple columns.
     """
-    serialized_data = runtime.state["serialized_data"]
-    if not serialized_data or not serialized_data.data:
+    output_data = runtime.state["output_data"]
+    if not output_data or not output_data.data:
         return Command(
             update={
                 "messages": [
@@ -261,7 +262,8 @@ def make_bar_chart_config(
                 ]
             }
         )
-    columns = serialized_data.columns
+    columns = output_data.columns
+    data = output_data.data
     if len(columns) == 1:
         return Command(
             update={
@@ -282,8 +284,7 @@ def make_bar_chart_config(
             }
         )
 
-        # Check if second column contains numeric data
-    data = serialized_data.data
+    # Check if second column contains numeric data
     if data and len(data[0]) > 0 and len(data[0]) >= 2:
         # Sample the second column to check if it's numeric
         sample_value = data[0][1]
@@ -319,7 +320,7 @@ def make_bar_chart_config(
         messages=[
             {
                 "role": "system",
-                "content": get_chart_config_prompt(serialized_data),
+                "content": get_chart_config_prompt(output_data),
             },
             {
                 "role": "user",
@@ -344,7 +345,7 @@ def make_bar_chart_config(
     )
 
 
-def get_chart_config_prompt(serialized_data: SerializedData) -> str:
+def get_chart_config_prompt(output_data: OutputData) -> str:
     """Generate a prompt for data transformation using BarChart as the target format.
 
     Uses Pydantic's schema generation to ensure the prompt schema
@@ -361,7 +362,7 @@ Your task is to analyze the following data and create a bar chart by:
 4. Mapping the data values to the BarChart schema provided below
 
 Data to visualize:
-{json.dumps(serialized_data, indent=2)}
+{json.dumps(output_data.model_dump(), indent=2)}
 
 You must respond with a JSON object matching this schema:
 {schema_str}
