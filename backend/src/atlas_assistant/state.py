@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from langchain.agents import AgentState
 from pydantic import BaseModel
 
@@ -20,11 +18,11 @@ class State(AgentState[None]):
     sql_query: SqlQuery | None
     """The active SQL query against the dataset."""
 
-    output_data: OutputData | None
-    """The data resulting from executing the SQL query."""
+    data: str | None
+    """The active data from a SQL query, as a json string."""
 
-    chart_data: list[dict[str, Any]] | None
-    """The chart data resulting from transforming the output data from executed SQL."""
+    bar_chart_metadata: BarChartMetadata | None
+    """Bar chat metadata for the data."""
 
 
 class SqlQuery(BaseModel):
@@ -37,7 +35,17 @@ class SqlQuery(BaseModel):
     """The explanation, which provides information about each output column"""
 
 
-class OutputData(BaseModel):
-    columns: list[str]
-    data: list[list[str | float | int | None]]
-    column_names: list[str | None]
+class BarChartMetadata(BaseModel):
+    """Data to create a bar chart"""
+
+    title: str
+    """The title of the bar chart."""
+
+    x_column: str
+    """The name the data column used for the x-axis"""
+
+    y_column: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name that should be used for grouping"""
