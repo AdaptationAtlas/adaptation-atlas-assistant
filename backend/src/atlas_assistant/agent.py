@@ -18,7 +18,7 @@ from .context import Context
 from .settings import Settings
 from .state import State
 from .tools.dataset import list_datasets, select_dataset
-from .tools.sql import execute_sql, generate_sql
+from .tools.sql import generate_table
 
 Agent = CompiledStateGraph[
     AgentState[None], Context, _InputAgentState, _OutputAgentState[None]
@@ -27,8 +27,7 @@ Agent = CompiledStateGraph[
 TOOLS = [
     list_datasets,
     select_dataset,
-    generate_sql,
-    execute_sql,
+    generate_table,
 ]
 
 

@@ -45,13 +45,15 @@ class SqlQueryParts(BaseModel):
 
 
 @tool
-def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[None]:
-    """Generates SQL to query a dataset.
+def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[None]:
+    """Generates SQL to return a table of data and then executes that SQL
 
-    There must be a selected dataset to generate SQL.
+    The SQL output is suitable for printing to a user to summarize data.
+
+    Before generating SQL, you must select a dataset.
 
     Args:
-        query: The question that we're going to answer with an SQL query.
+        query: The question that we're going to answer with the SQL query.
     """
     dataset = runtime.state["dataset"]
     if not dataset:
@@ -89,41 +91,6 @@ def generate_sql(query: str, runtime: ToolRuntime[Context, State]) -> Command[No
     sql_query_parts = response.choices[0].message.parsed
     assert sql_query_parts
     sql_query = sql_query_parts.get_query(dataset.asset.href)
-    content = (
-        f"Generated SQL:\n\n```sql\n{sql_query.query}\n```\n\n"
-        f"Explanation:\n\n{sql_query_parts.explanation}"
-    )
-    return Command(
-        update={
-            "messages": [
-                ToolMessage(
-                    content=content,
-                    tool_call_id=runtime.tool_call_id,
-                )
-            ],
-            "sql_query": sql_query,
-        }
-    )
-
-
-@tool
-def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
-    """Executes the sql and returns the result.
-
-    Requires that the SQL has been generated from the selected dataset.
-    """
-    sql_query = runtime.state["sql_query"]
-    if not sql_query:
-        return Command(
-            update={
-                "messages": [
-                    ToolMessage(
-                        content="No sql query has been generated",
-                        tool_call_id=runtime.tool_call_id,
-                    )
-                ]
-            }
-        )
 
     import duckdb
 
@@ -142,24 +109,33 @@ def execute_sql(runtime: ToolRuntime[Context, State]) -> Command[None]:
             }
         )
 
-    content = (
-        f"Returned data had {len(data_frame)} rows. Summarize the data by "
-        "re-generating the SQL with `group by` or `distinct`."
-        if len(data_frame) > MAX_DATA_FRAME_LENGTH
-        else "Data returned:\n\n"
-        + cast(str, data_frame.to_markdown(index=False))
-        + "\n\nExplanation of the query used to fetch the data: "
-        + sql_query.explanation
-    )
+    content_parts = [
+        "Generated this SQL:",
+        f"```sql\n{sql_query.query}\n```",
+        sql_query.explanation,
+    ]
+    if len(data_frame) > MAX_DATA_FRAME_LENGTH:
+        content_parts.append(
+            f"Returned data had {len(data_frame)} rows. Summarize the data by "
+            "re-generating the SQL with `group by` or `distinct`."
+        )
+        data = None
+    else:
+        content_parts += [
+            "Data returned:",
+            cast(str, data_frame.to_markdown(index=False)),
+        ]
+        data = data_frame.to_markdown()
     return Command(
         update={
             "messages": [
                 ToolMessage(
-                    content=content,
+                    content="\n\n".join(content_parts),
                     tool_call_id=runtime.tool_call_id,
                 ),
             ],
-            "data": data_frame.to_markdown(),
+            "sql_query": sql_query,
+            "data": data,
         }
     )
 
