@@ -3,16 +3,23 @@ module "ecr" {
 
   repository_name = "atlas"
 
-  repository_read_write_access_arns = [data.aws_caller_identity.current.arn]
+  repository_image_tag_mutability = "IMMUTABLE_WITH_EXCLUSION"
+  repository_image_tag_mutability_exclusion_filter = [
+    {
+      filter      = "latest*"
+      filter_type = "WILDCARD"
+    }
+  ]
+
   repository_lifecycle_policy = jsonencode({
     rules = [
       {
         rulePriority = 1,
-        description  = "Keep last 10 images",
+        description  = "Keep last 3 images",
         selection = {
           tagStatus   = "untagged",
           countType   = "imageCountMoreThan",
-          countNumber = 10
+          countNumber = 3
         },
         action = {
           type = "expire"

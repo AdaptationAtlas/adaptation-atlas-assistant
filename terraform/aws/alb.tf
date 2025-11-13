@@ -40,6 +40,7 @@ module "alb" {
     ecs-https = {
       port            = 443
       protocol        = "HTTPS"
+      ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
       certificate_arn = module.acm.acm_certificate_arn
 
       forward = {
@@ -59,7 +60,7 @@ module "alb" {
         enabled             = true
         healthy_threshold   = 5
         interval            = 30
-        path                = "/"
+        path                = "/docs"
         timeout             = 5
         unhealthy_threshold = 2
       }
@@ -68,7 +69,7 @@ module "alb" {
 
   route53_records = {
     A = {
-      name    = "atlas-lb"
+      name    = "api"
       type    = "A"
       zone_id = data.aws_route53_zone.ecs_domain.id
     }
