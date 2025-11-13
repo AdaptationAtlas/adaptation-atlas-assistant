@@ -16,7 +16,7 @@ def generate_bar_chart_metadata(runtime: ToolRuntime[Context, State]) -> Command
     Requires that we've generated a table of data first.
     """
 
-    data = runtime.state["data"]
+    data = runtime.state.get("data")
     if not data:
         return Command(
             update={
