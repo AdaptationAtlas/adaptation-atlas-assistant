@@ -217,6 +217,12 @@ backend/data/embeddings/
 # Docker compose stuff
 .chainlit/
 
+# Infrastructure
+**/.terraform/*
+
+*.tfstate
+*.tfstate.*
+
 # Frontend
 frontend/node_modules
 frontend/dist

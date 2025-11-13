@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.13-slim
+FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -12,11 +12,9 @@ WORKDIR /app
 
 COPY ./pyproject.toml ./uv.lock ./README.md /app/
 COPY ./data /app/data
-COPY ./chainlit /app/chainlit
-COPY ./.chainlit /app/.chainlit
 COPY ./src /app/src
 
-RUN uv sync --frozen --no-dev
+RUN uv sync --locked --no-editable --compile-bytecode --no-dev
 
 RUN chown -R atlas:atlas /app
 USER atlas
