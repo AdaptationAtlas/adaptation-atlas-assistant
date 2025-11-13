@@ -50,13 +50,18 @@ def select_dataset(query: str, runtime: ToolRuntime[Context, State]) -> Command[
     """
     settings = runtime.context.settings
     search_result = search(query, settings)
-    content = f"Selected dataset: {search_result.dataset.get_description()}"
+    content = (
+        f"Selected dataset with id={search_result.dataset.item.id}:\n\n"
+        + search_result.dataset.get_description()
+    )
+
     return Command(
         update={
             "messages": [
                 ToolMessage(
                     content=content,
                     tool_call_id=runtime.tool_call_id,
+                    artifact=search_result.dataset,
                 )
             ],
             "dataset": search_result.dataset,

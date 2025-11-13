@@ -58,6 +58,7 @@ def generate_bar_chart_metadata(runtime: ToolRuntime[Context, State]) -> Command
                     + bar_chart_metadata.model_dump_json(indent=2)
                     + "\n```",
                     tool_call_id=runtime.tool_call_id,
+                    artifact=bar_chart_metadata,
                 )
             ],
             "bar_chart_metadata": bar_chart_metadata,
