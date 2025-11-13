@@ -131,7 +131,7 @@ export function Chat() {
                 )}
 
                 {status !== 'idle' && (
-                    <div style={{ padding: '2rem' }}>
+                    <div className={styles.contentArea}>
                         {userQuery && (
                             <div className={styles.userMessage}>
                                 {userQuery}
