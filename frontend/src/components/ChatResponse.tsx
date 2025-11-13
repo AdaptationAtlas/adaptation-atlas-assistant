@@ -16,14 +16,14 @@ function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { 
 }
 
 const markdownComponents = {
-    pre: ({ children, ...props }: any) => {
+    pre: ({ children, ...props }: React.ComponentPropsWithoutRef<'pre'>) => {
         return (
             <div className={styles.codeBlock}>
                 <pre {...props}>{children}</pre>
             </div>
         );
     },
-    code: ({ children, ...props }: any) => {
+    code: ({ children, ...props }: React.ComponentPropsWithoutRef<'code'>) => {
         return <code className={styles.inlineCode} {...props}>{children}</code>;
     }
 };
