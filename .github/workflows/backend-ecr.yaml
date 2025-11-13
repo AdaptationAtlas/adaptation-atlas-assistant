@@ -1,0 +1,48 @@
+name: Build and push backend docker image 
+
+on:
+  push:
+    branches: [ "main"]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ecr.yaml'
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPO: ${{ secrets.ECR_REPO }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image (SHA tag)
+        env:
+          ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          SHORT_SHA="sha-${GITHUB_SHA::7}"
+          IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$SHORT_SHA"
+
+          echo "Building $IMAGE"
+          docker build -t "$IMAGE" -f backend/Dockerfile backend
+
+          echo "Pushing $IMAGE"
+          docker push "$IMAGE"
+
+          echo "Image pushed: $IMAGE"
