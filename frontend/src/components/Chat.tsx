@@ -5,7 +5,7 @@ import { useChatStore } from '../store/chatStore';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
-import { BarChart } from './Charts/Bar';
+import { ChatResponse } from './ChatResponse';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
 
@@ -35,6 +35,7 @@ export function Chat() {
 
     // Chat store
     const { status, events, userQuery, startStreaming, addEvent, finishStreaming, setError } = useChatStore();
+
 
     const handlePromptSubmit = useCallback(async (value: string) => {
         if (!value.trim()) return;
@@ -85,6 +86,7 @@ export function Chat() {
         window.location.href = '/login';
     };
 
+
     return (
         <div className="relative flex h-screen w-full overflow-hidden bg-white">
             {/* Left gradient sidebar */}
@@ -114,14 +116,12 @@ export function Chat() {
                 </div>
             </div>
 
-            {/* Prompt Builder Sidebar */}
             <PromptBuilderSidebar
                 sections={sidebarSections}
                 activeSections={activeSections}
                 onToggleSection={toggleSection}
             />
 
-            {/* Main Content */}
             <main className={styles.mainContent}>
                 {status === 'idle' && (
                     <EmptyState
@@ -137,43 +137,7 @@ export function Chat() {
                                 <strong>You:</strong> {userQuery}
                             </div>
                         )}
-                        <div style={{ marginBottom: '1rem' }}>Status: {status}</div>
-                        <div>
-                            {events.map((event, index) => {
-                                const messageId = event.id || index;
-
-                                return (
-                                    <div key={messageId} style={{ marginBottom: '1.5rem' }}>
-                                        {'error' in event ? (
-                                            <div>Error: {event.error}</div>
-                                        ) : event.type === 'bar-chart' ? (
-                                            <BarChart
-                                                data={JSON.parse(event.content)}
-                                                metadata={event.metadata}
-                                            />
-                                        ) : (
-                                            <details>
-                                                <summary style={{
-                                                    cursor: 'pointer',
-                                                    fontWeight: 'bold',
-                                                    marginBottom: '0.5rem'
-                                                }}>
-                                                    {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
-                                                </summary>
-                                                <pre style={{
-                                                    whiteSpace: 'pre-wrap',
-                                                    wordWrap: 'break-word',
-                                                    marginLeft: '1.5rem',
-                                                    fontSize: '0.9rem'
-                                                }}>
-                                                    {event.content}
-                                                </pre>
-                                            </details>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                        <ChatResponse events={events} status={status} />
                     </div>
                 )}
 
