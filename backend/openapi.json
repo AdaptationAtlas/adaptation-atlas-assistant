@@ -125,10 +125,16 @@
                       "$ref": "#/components/schemas/ToolResponseMessage"
                     },
                     {
-                      "$ref": "#/components/schemas/AiResponseMessage"
+                      "$ref": "#/components/schemas/SelectDatasetResponseMessage"
                     },
                     {
-                      "$ref": "#/components/schemas/BarChartResponseMessage"
+                      "$ref": "#/components/schemas/GenerateTableResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GenerateBarChartMetadataResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiResponseMessage"
                     }
                   ],
                   "title": "Response Chat Chat Post"
@@ -182,6 +188,42 @@
         "title": "AiResponseMessage",
         "description": "The response from the AI"
       },
+      "Asset": {
+        "properties": {
+          "href": {
+            "type": "string",
+            "title": "Href"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "href"
+        ],
+        "title": "Asset",
+        "description": "A STAC asset, with only the fields we need"
+      },
       "BarChartMetadata": {
         "properties": {
           "title": {
@@ -217,35 +259,6 @@
         ],
         "title": "BarChartMetadata",
         "description": "Data to create a bar chart"
-      },
-      "BarChartResponseMessage": {
-        "properties": {
-          "content": {
-            "type": "string",
-            "title": "Content"
-          },
-          "thread_id": {
-            "type": "string",
-            "title": "Thread Id"
-          },
-          "type": {
-            "type": "string",
-            "const": "bar-chart",
-            "title": "Type",
-            "default": "bar-chart"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/BarChartMetadata"
-          }
-        },
-        "type": "object",
-        "required": [
-          "content",
-          "thread_id",
-          "metadata"
-        ],
-        "title": "BarChartResponseMessage",
-        "description": "The agent has created a bar chart and here it is.\n\nThe message content is the data as a JSON string."
       },
       "Body_login_token_post": {
         "properties": {
@@ -331,6 +344,129 @@
         "title": "ChatRequest",
         "description": "A chat request"
       },
+      "Dataset": {
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/Item"
+          },
+          "asset_key": {
+            "type": "string",
+            "title": "Asset Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item",
+          "asset_key"
+        ],
+        "title": "Dataset",
+        "description": "A parquet dataset, which is an asset.\n\nWe include the item in case we want to look information up there."
+      },
+      "GenerateBarChartMetadataResponseMessage": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_bar_chart_metadata"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "bart_chart_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BarChartMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "bart_chart_metadata"
+        ],
+        "title": "GenerateBarChartMetadataResponseMessage",
+        "description": "The response from generate_bar_chart_metadata"
+      },
+      "GenerateTableResponseMessage": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_table"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "sql_query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sql Query"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "data",
+          "sql_query"
+        ],
+        "title": "GenerateTableResponseMessage",
+        "description": "The response from generate_table"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -343,6 +479,161 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "Item": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/Properties"
+          },
+          "assets": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Asset"
+            },
+            "type": "object",
+            "title": "Assets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "properties",
+          "assets"
+        ],
+        "title": "Item",
+        "description": "A STAC item, with only the fields we need."
+      },
+      "Properties": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "table:columns": {
+            "items": {
+              "$ref": "#/components/schemas/TableColumn"
+            },
+            "type": "array",
+            "title": "Table:Columns"
+          },
+          "atlas_assistant:sql_instructions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atlas Assistant:Sql Instructions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "description",
+          "table:columns"
+        ],
+        "title": "Properties",
+        "description": "STAC item properties, the ones we use\n\nSome fields are required here but are not required on a STAC item."
+      },
+      "SelectDatasetResponseMessage": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "select_dataset"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/Dataset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "dataset"
+        ],
+        "title": "SelectDatasetResponseMessage",
+        "description": "The response from select_dataset"
+      },
+      "TableColumn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "title": "TableColumn",
+        "description": "A table column, from the table extension: https://github.com/stac-extensions/table"
       },
       "Token": {
         "properties": {
@@ -380,14 +671,7 @@
             "default": "tool"
           },
           "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
             "title": "Name"
           },
           "status": {
