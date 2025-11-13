@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { BarChart } from './Charts/Bar';
 import type { AiResponseMessage } from '../types/generated';
 import type { StreamEvent, ChatStatus } from '../types/chat';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { CopyIcon, CheckIcon } from '../assets/icons';
+import { copyToClipboard } from '../utils/clipboard';
 
 interface ChatResponseProps {
     events: StreamEvent[];
@@ -25,8 +29,58 @@ const markdownComponents = {
     },
     code: ({ children, ...props }: React.ComponentPropsWithoutRef<'code'>) => {
         return <code className={styles.inlineCode} {...props}>{children}</code>;
+    },
+    table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => {
+        return <table className={styles.table} {...props}>{children}</table>;
+    },
+    thead: ({ children, ...props }: React.ComponentPropsWithoutRef<'thead'>) => {
+        return <thead className={styles.thead} {...props}>{children}</thead>;
+    },
+    tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => {
+        return <tbody className={styles.tbody} {...props}>{children}</tbody>;
+    },
+    tr: ({ children, ...props }: React.ComponentPropsWithoutRef<'tr'>) => {
+        return <tr className={styles.tr} {...props}>{children}</tr>;
+    },
+    th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => {
+        return <th className={styles.th} {...props}>{children}</th>;
+    },
+    td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => {
+        return <td className={styles.td} {...props}>{children}</td>;
     }
 };
+
+interface CopyButtonProps {
+    content: string;
+    className?: string;
+}
+
+function CopyButton({ content, className = '' }: CopyButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const success = await copyToClipboard(content);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <button
+            onClick={handleCopy}
+            className={`${styles.copyButton} ${className}`}
+            title="Copy raw markdown"
+            aria-label="Copy raw markdown"
+        >
+            {copied ? (
+                <CheckIcon className={styles.copyIcon} />
+            ) : (
+                <CopyIcon className={styles.copyIcon} />
+            )}
+        </button>
+    );
+}
 
 export function ChatResponse({ events, status }: ChatResponseProps) {
     const intermediateMessages: typeof events = [];
@@ -75,10 +129,13 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                                     ) : (
                                         <details>
                                             <summary className={styles.toolSummary}>
-                                                {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                <div className={styles.messageHeader}>
+                                                    <span>{event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}</span>
+                                                    <CopyButton content={event.content} />
+                                                </div>
                                             </summary>
                                             <div className={styles.toolContent}>
-                                                <ReactMarkdown components={markdownComponents}>{event.content}</ReactMarkdown>
+                                                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
                                             </div>
                                         </details>
                                     )}
@@ -94,10 +151,15 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                 return (
                     <div key={messageId} className={styles.artifact}>
                         {!('error' in event) && event.type === 'bar-chart' && (
-                            <BarChart
-                                data={JSON.parse(event.content)}
-                                metadata={event.metadata}
-                            />
+                            <>
+                                <div className={styles.artifactHeader}>
+                                    <CopyButton content={event.content} />
+                                </div>
+                                <BarChart
+                                    data={JSON.parse(event.content)}
+                                    metadata={event.metadata}
+                                />
+                            </>
                         )}
                     </div>
                 );
@@ -107,8 +169,11 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                 if (!isAiMessage(finalAiMessage)) return null;
                 return (
                     <div className={styles.aiMessage}>
+                        <div className={styles.aiMessageHeader}>
+                            <CopyButton content={(finalAiMessage as AiResponseMessage).content} />
+                        </div>
                         <div className={styles.aiContent}>
-                            <ReactMarkdown components={markdownComponents}>{(finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
+                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{(finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
                         </div>
                     </div>
                 );
