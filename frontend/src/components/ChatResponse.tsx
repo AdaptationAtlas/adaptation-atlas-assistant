@@ -16,15 +16,15 @@ function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { 
 }
 
 const markdownComponents = {
-    code: ({ node, inline, ...props }: any) => {
-        if (inline) {
-            return <code {...props} />;
-        }
+    pre: ({ children, ...props }: any) => {
         return (
             <div className={styles.codeBlock}>
-                <code {...props} />
+                <pre {...props}>{children}</pre>
             </div>
         );
+    },
+    code: ({ children, ...props }: any) => {
+        return <code className={styles.inlineCode} {...props}>{children}</code>;
     }
 };
 
