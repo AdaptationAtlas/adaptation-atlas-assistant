@@ -133,8 +133,8 @@ export function Chat() {
                 {status !== 'idle' && (
                     <div style={{ padding: '2rem' }}>
                         {userQuery && (
-                            <div style={{ marginBottom: '1rem' }}>
-                                <strong>You:</strong> {userQuery}
+                            <div className={styles.userMessage}>
+                                {userQuery}
                             </div>
                         )}
                         <ChatResponse events={events} status={status} />
