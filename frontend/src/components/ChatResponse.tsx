@@ -3,6 +3,7 @@ import type { AiResponseMessage } from '../types/generated';
 import type { StreamEvent, ChatStatus } from '../types/chat';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface ChatResponseProps {
     events: StreamEvent[];
@@ -25,6 +26,24 @@ const markdownComponents = {
     },
     code: ({ children, ...props }: React.ComponentPropsWithoutRef<'code'>) => {
         return <code className={styles.inlineCode} {...props}>{children}</code>;
+    },
+    table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => {
+        return <table className={styles.table} {...props}>{children}</table>;
+    },
+    thead: ({ children, ...props }: React.ComponentPropsWithoutRef<'thead'>) => {
+        return <thead className={styles.thead} {...props}>{children}</thead>;
+    },
+    tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => {
+        return <tbody className={styles.tbody} {...props}>{children}</tbody>;
+    },
+    tr: ({ children, ...props }: React.ComponentPropsWithoutRef<'tr'>) => {
+        return <tr className={styles.tr} {...props}>{children}</tr>;
+    },
+    th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => {
+        return <th className={styles.th} {...props}>{children}</th>;
+    },
+    td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => {
+        return <td className={styles.td} {...props}>{children}</td>;
     }
 };
 
@@ -78,7 +97,7 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                                                 {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
                                             </summary>
                                             <div className={styles.toolContent}>
-                                                <ReactMarkdown components={markdownComponents}>{event.content}</ReactMarkdown>
+                                                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
                                             </div>
                                         </details>
                                     )}
@@ -108,7 +127,7 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                 return (
                     <div className={styles.aiMessage}>
                         <div className={styles.aiContent}>
-                            <ReactMarkdown components={markdownComponents}>{(finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
+                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{(finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
                         </div>
                     </div>
                 );
