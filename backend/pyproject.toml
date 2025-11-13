@@ -40,6 +40,8 @@ reportMissingTypeStubs = false
 reportAny = false
 reportExplicitAny = false
 reportImplicitStringConcatenation = false
+reportAttributeAccessIssue = false
+
 
 [tool.pytest.ini_options]
 markers = "integration: Run integration tests, which require an LLM API key"

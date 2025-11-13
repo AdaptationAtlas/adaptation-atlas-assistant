@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import uuid
-from collections.abc import AsyncGenerator
-from typing import Annotated, Literal
+from collections.abc import AsyncGenerator, Sequence
+from contextlib import asynccontextmanager
+from typing import Annotated, Any, Literal
 
 import jwt
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -15,6 +17,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.errors import GraphRecursionError
 from langgraph.graph.message import BaseMessage
+from langgraph.graph.state import RunnableConfig
+from langgraph.types import StateSnapshot
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 from starlette import status
@@ -23,11 +27,20 @@ from . import settings
 from .agent import Agent, create_agent
 from .context import Context
 from .settings import Settings
+from .state import BarChartMetadata
 
+logger = logging.getLogger(__name__)
 algorithm = "HS256"
 password_hash = PasswordHash.recommended()
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[dict[str, Any]]:
+    agent = create_agent(get_settings())
+    yield {"agent": agent}
+
+
+app = FastAPI(lifespan=lifespan)
 
 # Configure CORS
 app.add_middleware(
@@ -54,6 +67,9 @@ class ChatRequest(BaseModel):
 
     query: str
     """The question from the user."""
+
+    thread_id: str | None = None
+    """A thread id, provided by a previous chat."""
 
 
 class Token(BaseModel):
@@ -87,6 +103,9 @@ class ResponseMessage(BaseModel):
     content: str
     """The content of the message"""
 
+    thread_id: str
+    """The thread id, which can be re-used to continue conversations"""
+
     def to_event_stream(self) -> str:
         return "data: " + self.model_dump_json()
 
@@ -112,6 +131,17 @@ class AiResponseMessage(ResponseMessage):
 
     finish_reason: str
     """The reason why the agent stopped"""
+
+
+class BarChartResponseMessage(ResponseMessage):
+    """The agent has created a bar chart and here it is.
+
+    The message content is the data as a JSON string.
+    """
+
+    type: Literal["bar-chart"] = "bar-chart"
+
+    metadata: BarChartMetadata
 
 
 class Error(BaseModel):
@@ -180,19 +210,22 @@ async def login(
 
 
 @app.post(
-    "/chat", tags=["chat"], response_model=ToolResponseMessage | AiResponseMessage
+    "/chat",
+    tags=["chat"],
+    response_model=ToolResponseMessage | AiResponseMessage | BarChartResponseMessage,
 )
 async def chat(
+    request: Request,
     chat_request: ChatRequest,
     settings: Annotated[Settings, Depends(get_settings)],
     current_user: Annotated[User, Depends(get_current_user)],  # pyright: ignore[reportUnusedParameter]
     accept: Annotated[str | None, Header()] = None,
 ) -> StreamingResponse:
-    agent = create_agent(settings)
-    thread_id = uuid.uuid4()
+    agent: Agent = request.state.agent
+    thread_id = chat_request.thread_id or str(uuid.uuid4())
     event_stream = (accept and "text/event-stream" in accept) or False
     return StreamingResponse(
-        query_agent(agent, chat_request.query, str(thread_id), settings, event_stream),
+        query_agent(agent, chat_request.query, thread_id, settings, event_stream),
         media_type="text-event-stream" if event_stream else "application/x-ndjson",
     )
 
@@ -208,43 +241,69 @@ async def graph_recursion_handler(
 
 
 async def query_agent(
-    agent: Agent, query: str, thread_id: str, settings: Settings, event_stream: bool
+    agent: Agent,
+    query: str,
+    thread_id: str,
+    settings: Settings,
+    event_stream: bool,
 ) -> AsyncGenerator[str]:
     """Query the agent and yield messages.
 
     Each message is a JSON object on a new line.
     """
+    config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
     async for update in agent.astream(
         {"messages": [HumanMessage(content=query)]},
         stream_mode="updates",
-        config={"configurable": {"thread_id": thread_id}},
+        config=config,
         context=Context(settings=settings),
     ):
+        state = agent.get_state(config)
         for value in update.values():
             if messages := value.get("messages"):
                 for msg in messages:
                     if msg.content:
-                        response_message = create_response_message(msg)
-                        if response_message:
+                        for response_message in create_response_messages(
+                            msg, thread_id, state
+                        ):
                             if event_stream:
                                 yield response_message.to_event_stream() + "\n\n"
                             else:
                                 yield response_message.model_dump_json() + "\n"
 
 
-def create_response_message(
+def create_response_messages(
     message: BaseMessage,
-) -> ToolResponseMessage | AiResponseMessage | None:
+    thread_id: str,
+    state: StateSnapshot,
+) -> Sequence[ResponseMessage]:
     if isinstance(message, ToolMessage):
         assert isinstance(message.content, str)
-        return ToolResponseMessage(
+        tool_response_message = ToolResponseMessage(
             name=message.name,
             content=message.content,
             status=message.status,
+            thread_id=thread_id,
         )
+        messages: list[ResponseMessage] = [tool_response_message]
+        if tool_response_message.name == "generate_bar_chart_metadata":
+            messages.append(
+                BarChartResponseMessage(
+                    content=state.values["data"],
+                    metadata=state.values["bar_chart_metadata"],
+                    thread_id=thread_id,
+                )
+            )
+        return messages
     elif isinstance(message, AIMessage):
         assert isinstance(message.content, str)
-        return AiResponseMessage(
-            content=message.content,
-            finish_reason=message.response_metadata["finish_reason"],
-        )
+        return [
+            AiResponseMessage(
+                content=message.content,
+                finish_reason=message.response_metadata["finish_reason"],
+                thread_id=thread_id,
+            )
+        ]
+    else:
+        logger.warning(f"No response messages created for message: {message.to_json()}")
+        return []

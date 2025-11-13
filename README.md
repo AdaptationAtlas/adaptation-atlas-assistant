@@ -1,7 +1,7 @@
 # Adaptation Atlas Assistant
 
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/AdaptationAtlas/adaptation-atlas-assistant/ci.yaml?style=for-the-badge)](https://github.com/AdaptationAtlas/adaptation-atlas-assistant/actions/workflows/ci.yaml)
-[![Frontend](https://img.shields.io/github/deployments/adaptationatlas/adaptation-atlas-assistant/github-pages?style=for-the-badge&label=frontend)](https://adaptationatlas.github.io/adaptation-atlas-assistant/)
+[![GitHub deployments](https://img.shields.io/github/deployments/AdaptationAtlas/adaptation-atlas-assistant/github-pages?style=for-the-badge&label=Github%20pages)](https://adaptationatlas.github.io/adaptation-atlas-assistant/)
 
 We're building an app that generates visualizations and text summaries of Adaptation Atlas data using natural language.
 These visualizations and summaries will be modeled after the stories already in-use on the [Adaptation Atlas](https://adaptationatlas.cgiar.org/).

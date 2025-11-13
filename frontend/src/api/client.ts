@@ -4,7 +4,7 @@ export class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
 
-  constructor(baseUrl: string = '//localhost:8000') {
+  constructor(baseUrl: string = import.meta.env.VITE_API_URL || '//localhost:8000') {
     this.baseUrl = baseUrl;
     this.token = this.getStoredToken();
   }

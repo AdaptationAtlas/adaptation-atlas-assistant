@@ -126,6 +126,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/AiResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BarChartResponseMessage"
                     }
                   ],
                   "title": "Response Chat Chat Post"
@@ -155,6 +158,10 @@
             "type": "string",
             "title": "Content"
           },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
           "type": {
             "type": "string",
             "const": "ai",
@@ -169,10 +176,76 @@
         "type": "object",
         "required": [
           "content",
+          "thread_id",
           "finish_reason"
         ],
         "title": "AiResponseMessage",
         "description": "The response from the AI"
+      },
+      "BarChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "x_column": {
+            "type": "string",
+            "title": "X Column"
+          },
+          "y_column": {
+            "type": "string",
+            "title": "Y Column"
+          },
+          "grouping_column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grouping Column"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "x_column",
+          "y_column",
+          "grouping_column"
+        ],
+        "title": "BarChartMetadata",
+        "description": "Data to create a bar chart"
+      },
+      "BarChartResponseMessage": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "bar-chart",
+            "title": "Type",
+            "default": "bar-chart"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/BarChartMetadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "metadata"
+        ],
+        "title": "BarChartResponseMessage",
+        "description": "The agent has created a bar chart and here it is.\n\nThe message content is the data as a JSON string."
       },
       "Body_login_token_post": {
         "properties": {
@@ -238,6 +311,17 @@
           "query": {
             "type": "string",
             "title": "Query"
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
           }
         },
         "type": "object",
@@ -285,6 +369,10 @@
             "type": "string",
             "title": "Content"
           },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
           "type": {
             "type": "string",
             "const": "tool",
@@ -310,6 +398,7 @@
         "type": "object",
         "required": [
           "content",
+          "thread_id",
           "name",
           "status"
         ],
