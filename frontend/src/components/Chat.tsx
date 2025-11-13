@@ -5,12 +5,9 @@ import { useChatStore } from '../store/chatStore';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
-import { BarChart } from './Charts/Bar';
-import { AreaChart } from './Charts/Area';
+import { ChatResponse } from './ChatResponse';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
-import { areaChartData } from '../../data/areaChart';
-import { barChartData } from '../../data/barChart';
 
 const examplePrompts = [
     'How is maize production projected to change under future climate scenarios in Kenya?',
@@ -37,7 +34,8 @@ export function Chat() {
     const { isAuthenticated, logout } = useAuth();
 
     // Chat store
-    const { status, events, userQuery, startStreaming, addEvent, finishStreaming, setError } = useChatStore();
+    const { status, events, userQuery, threadId, startStreaming, addEvent, finishStreaming, setError, setThreadId } = useChatStore();
+
 
     const handlePromptSubmit = useCallback(async (value: string) => {
         if (!value.trim()) return;
@@ -47,8 +45,12 @@ export function Chat() {
         const controller = createStreamController();
 
         try {
-            await sendChatMessage(value, {
+            await sendChatMessage(value, threadId, {
                 onMessage: (message) => {
+                    if (!threadId && 'thread_id' in message && typeof message.thread_id === 'string') {
+                        setThreadId(message.thread_id);
+                    }
+
                     addEvent({
                         ...message,
                         id: `msg-${Date.now()}-${Math.random()}`,
@@ -67,7 +69,7 @@ export function Chat() {
             const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
             setError(errorMessage);
         }
-    }, [startStreaming, addEvent, finishStreaming, setError]);
+    }, [startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
 
     const handleExampleClick = (prompt: string) => {
         handlePromptSubmit(prompt);
@@ -87,6 +89,7 @@ export function Chat() {
         }
         window.location.href = '/login';
     };
+
 
     return (
         <div className="relative flex h-screen w-full overflow-hidden bg-white">
@@ -117,14 +120,12 @@ export function Chat() {
                 </div>
             </div>
 
-            {/* Prompt Builder Sidebar */}
             <PromptBuilderSidebar
                 sections={sidebarSections}
                 activeSections={activeSections}
                 onToggleSection={toggleSection}
             />
 
-            {/* Main Content */}
             <main className={styles.mainContent}>
                 {status === 'idle' && (
                     <EmptyState
@@ -134,44 +135,13 @@ export function Chat() {
                 )}
 
                 {status !== 'idle' && (
-                    <div style={{ padding: '2rem' }}>
+                    <div className={styles.contentArea}>
                         {userQuery && (
-                            <div style={{ marginBottom: '1rem' }}>
-                                <strong>You:</strong> {userQuery}
+                            <div className={styles.userMessage}>
+                                {userQuery}
                             </div>
                         )}
-                        <div style={{ marginBottom: '1rem' }}>Status: {status}</div>
-                        <div>
-                            {events.map((event, index) => {
-                                const messageId = event.id || index;
-
-                                return (
-                                    <div key={messageId} style={{ marginBottom: '1.5rem' }}>
-                                        {'error' in event ? (
-                                            <div>Error: {event.error}</div>
-                                        ) : (
-                                            <details>
-                                                <summary style={{
-                                                    cursor: 'pointer',
-                                                    fontWeight: 'bold',
-                                                    marginBottom: '0.5rem'
-                                                }}>
-                                                    {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
-                                                </summary>
-                                                <pre style={{
-                                                    whiteSpace: 'pre-wrap',
-                                                    wordWrap: 'break-word',
-                                                    marginLeft: '1.5rem',
-                                                    fontSize: '0.9rem'
-                                                }}>
-                                                    {event.content}
-                                                </pre>
-                                            </details>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                        <ChatResponse events={events} status={status} />
                     </div>
                 )}
 
@@ -181,34 +151,6 @@ export function Chat() {
                         context={selectedContext}
                     />
                 </div>
-
-                {barChartData.map((chart, index) => (
-                    <BarChart
-                        key={`${chart.title}-${index}`}
-                        data={chart.values ?? []}
-                        xField="percentage"
-                        categoryField="type"
-                        hasLegend
-                        colorDomain={chart.colorDomain}
-                        colorRange={chart.colorRange}
-                        textColor={chart.textColor}
-                        title={chart.title}
-                    />
-                ))}
-                {areaChartData.map((chart, index) => (
-                    <AreaChart
-                        key={`${chart.title}-${index}`}
-                        data={chart.values ?? []}
-                        xField="year"
-                        yField="stock"
-                        categoryField={chart.categoryField}
-                        xLabel="Year"
-                        yLabel={chart.units}
-                        title={chart.title}
-                        colorDomain={chart.colorDomain}
-                        colorRange={chart.colorRange}
-                    />
-                ))}
             </main>
         </div>
     );
