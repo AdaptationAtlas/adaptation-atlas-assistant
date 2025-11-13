@@ -1,6 +1,7 @@
 services:
   api:
     image: atlas/backend
+    platform: linux/amd64
     build:
       context: backend
     ports:

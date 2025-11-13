@@ -206,7 +206,7 @@ version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "duckdb" },
-    { name = "fastapi" },
+    { name = "fastapi", extra = ["standard"] },
     { name = "langchain" },
     { name = "langchain-chroma" },
     { name = "langchain-mistralai" },
@@ -223,7 +223,6 @@ dependencies = [
 dev = [
     { name = "basedpyright" },
     { name = "chainlit" },
-    { name = "fastapi", extra = ["standard"] },
     { name = "prek" },
     { name = "pystac" },
     { name = "pytest" },
@@ -235,6 +234,7 @@ dev = [
 requires-dist = [
     { name = "duckdb", specifier = ">=1.4.1" },
     { name = "fastapi", specifier = ">=0.116.2" },
+    { name = "fastapi", extras = ["standard"], specifier = ">=0.116.2" },
     { name = "langchain", specifier = ">=1.0.2" },
     { name = "langchain-chroma", specifier = ">=1.0.0" },
     { name = "langchain-mistralai", specifier = ">=1.0.0" },
@@ -251,7 +251,6 @@ requires-dist = [
 dev = [
     { name = "basedpyright", specifier = ">=1.32.0" },
     { name = "chainlit", specifier = ">=2.8.3" },
-    { name = "fastapi", extras = ["standard"], specifier = ">=0.116.2" },
     { name = "prek", specifier = ">=0.2.10" },
     { name = "pystac", specifier = ">=1.14.1" },
     { name = "pytest", specifier = ">=8.4.2" },
