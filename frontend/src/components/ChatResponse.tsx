@@ -193,9 +193,7 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                                             ) : (
                                                 <details>
                                                     <summary className={styles.toolSummary}>
-                                                        <div className={styles.messageHeader}>
-                                                            <span>{event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}</span>
-                                                        </div>
+                                                        {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
                                                     </summary>
                                                     <div className={styles.toolContent}>
                                                         <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
