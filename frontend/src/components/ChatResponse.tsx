@@ -89,23 +89,68 @@ function CopyButton({ content, className = '' }: CopyButtonProps) {
 }
 
 export function ChatResponse({ events, status }: ChatResponseProps) {
-    const intermediateMessages: typeof events = [];
-    const artifacts: typeof events = [];
-    let finalAiMessage: typeof events[0] | null = null;
+    interface ConversationTurn {
+        userMessages: typeof events;
+        intermediateMessages: typeof events;
+        artifacts: typeof events;
+        finalAiMessage: typeof events[0] | null;
+    }
 
-    const lastAiMessageIndex = events.map((e, i) => !('error' in e) && e.type === 'ai' ? i : -1)
-        .filter(i => i !== -1)
-        .pop();
+    const conversationTurns: ConversationTurn[] = [];
+    let currentTurn: ConversationTurn = {
+        userMessages: [],
+        intermediateMessages: [],
+        artifacts: [],
+        finalAiMessage: null,
+    };
 
-    events.forEach((event, index) => {
-        if ('error' in event) {
-            intermediateMessages.push(event);
-        } else if (event.type === 'bar-chart') {
-            artifacts.push(event);
-        } else if (event.type === 'ai' && index === lastAiMessageIndex) {
-            finalAiMessage = event;
-        } else {
-            intermediateMessages.push(event);
+    events.forEach((event) => {
+        if (!('error' in event) && event.type === 'user') {
+            // Start a new turn when we see a user message
+            if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.artifacts.length > 0 || currentTurn.finalAiMessage) {
+                conversationTurns.push(currentTurn);
+                currentTurn = {
+                    userMessages: [],
+                    intermediateMessages: [],
+                    artifacts: [],
+                    finalAiMessage: null,
+                };
+            }
+            currentTurn.userMessages.push(event);
+        } else if ('error' in event) {
+            currentTurn.intermediateMessages.push(event);
+        } else if (!('error' in event) && event.type === 'bar-chart') {
+            currentTurn.artifacts.push(event);
+        } else if (!('error' in event) && event.type === 'ai') {
+            currentTurn.intermediateMessages.push(event);
+        } else if (!('error' in event) && event.type === 'tool') {
+            currentTurn.intermediateMessages.push(event);
+        }
+    });
+
+    if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.artifacts.length > 0 || currentTurn.finalAiMessage) {
+        conversationTurns.push(currentTurn);
+    }
+
+    conversationTurns.forEach((turn, turnIndex) => {
+        const isLastTurn = turnIndex === conversationTurns.length - 1;
+
+        if (status === 'streaming' && isLastTurn) {
+            return;
+        }
+
+        let lastAiMessageIdx = -1;
+        for (let i = turn.intermediateMessages.length - 1; i >= 0; i--) {
+            const msg = turn.intermediateMessages[i];
+            if (!('error' in msg) && msg.type === 'ai') {
+                lastAiMessageIdx = i;
+                break;
+            }
+        }
+
+        if (lastAiMessageIdx !== -1) {
+            turn.finalAiMessage = turn.intermediateMessages[lastAiMessageIdx];
+            turn.intermediateMessages.splice(lastAiMessageIdx, 1);
         }
     });
 
@@ -119,71 +164,86 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
 
     return (
         <>
-            {intermediateMessages.length > 0 && (
-                <details className={styles.reasoningDropdown}>
-                    <summary className={styles.reasoningSummary}>
-                        {getSummaryText()}
-                    </summary>
-                    <div className={styles.reasoningContent}>
-                        {intermediateMessages.map((event, index) => {
-                            const messageId = event.id || `intermediate-${index}`;
+            {conversationTurns.map((turn, turnIndex) => (
+                <div key={`turn-${turnIndex}`}>
+                    {/* Render user messages */}
+                    {turn.userMessages.map((event, index) => {
+                        const messageId = event.id || `user-${turnIndex}-${index}`;
+                        return (
+                            <div key={messageId} className={styles.userMessage}>
+                                {!('error' in event) && event.type === 'user' && event.content}
+                            </div>
+                        );
+                    })}
 
-                            return (
-                                <div key={messageId} className={styles.intermediateMessage}>
-                                    {'error' in event ? (
-                                        <div>Error: {event.error}</div>
-                                    ) : (
-                                        <details>
-                                            <summary className={styles.toolSummary}>
-                                                {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
-                                            </summary>
-                                            <div className={styles.toolContent}>
-                                                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
-                                                <div className={styles.copyRow}>
-                                                    <CopyButton content={event.content} />
-                                                </div>
-                                            </div>
-                                        </details>
-                                    )}
+                    {/* Render intermediate messages (reasoning/tool calls) */}
+                    {turn.intermediateMessages.length > 0 && (
+                        <details className={styles.reasoningDropdown}>
+                            <summary className={styles.reasoningSummary}>
+                                {getSummaryText()}
+                            </summary>
+                            <div className={styles.reasoningContent}>
+                                {turn.intermediateMessages.map((event, index) => {
+                                    const messageId = event.id || `intermediate-${turnIndex}-${index}`;
+
+                                    return (
+                                        <div key={messageId} className={styles.intermediateMessage}>
+                                            {'error' in event ? (
+                                                <div>Error: {event.error}</div>
+                                            ) : (
+                                                <details>
+                                                    <summary className={styles.toolSummary}>
+                                                        {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                    </summary>
+                                                    <div className={styles.toolContent}>
+                                                        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
+                                                        <CopyButton content={event.content} />
+                                                    </div>
+                                                </details>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </details>
+                    )}
+
+                    {/* Render artifacts (charts) */}
+                    {turn.artifacts.map((event, index) => {
+                        const messageId = event.id || `artifact-${turnIndex}-${index}`;
+                        return (
+                            <div key={messageId} className={styles.artifact}>
+                                {!('error' in event) && event.type === 'bar-chart' && (
+                                    <>
+                                        <BarChart
+                                            data={JSON.parse(event.content)}
+                                            metadata={event.metadata}
+                                        />
+                                        <div className={styles.copyRow}>
+                                            <CopyButton content={event.content} />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        );
+                    })}
+
+                    {/* Render final AI message */}
+                    {(() => {
+                        if (!isAiMessage(turn.finalAiMessage)) return null;
+                        return (
+                            <div className={styles.aiMessage}>
+                                <div className={styles.aiContent}>
+                                    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{(turn.finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
                                 </div>
-                            );
-                        })}
-                    </div>
-                </details>
-            )}
-
-            {artifacts.map((event, index) => {
-                const messageId = event.id || `artifact-${index}`;
-                return (
-                    <div key={messageId} className={styles.artifact}>
-                        {!('error' in event) && event.type === 'bar-chart' && (
-                            <>
-                                <BarChart
-                                    data={JSON.parse(event.content)}
-                                    metadata={event.metadata}
-                                />
                                 <div className={styles.copyRow}>
-                                    <CopyButton content={event.content} />
+                                    <CopyButton content={(turn.finalAiMessage as AiResponseMessage).content} />
                                 </div>
-                            </>
-                        )}
-                    </div>
-                );
-            })}
-
-            {(() => {
-                if (!isAiMessage(finalAiMessage)) return null;
-                return (
-                    <div className={styles.aiMessage}>
-                        <div className={styles.aiContent}>
-                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{(finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
-                        </div>
-                        <div className={styles.copyRow}>
-                            <CopyButton content={(finalAiMessage as AiResponseMessage).content} />
-                        </div>
-                    </div>
-                );
-            })()}
+                            </div>
+                        );
+                    })()}
+                </div>
+            ))}
         </>
     );
 }

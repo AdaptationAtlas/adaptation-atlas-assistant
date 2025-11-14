@@ -45,12 +45,19 @@ export const useChatStore = create<ChatUIState>()(
       (set, get) => ({
         ...initialState,
         startStreaming: (query: string) => {
-          const baseState = createInitialState();
+          const { events, threadId } = get();
+          const userMessage = {
+            id: `user-${Date.now()}`,
+            timestamp: Date.now(),
+            type: 'user' as const,
+            content: query,
+          };
           set(
             {
-              ...baseState,
               status: 'streaming',
               userQuery: query,
+              threadId,
+              events: [...events, userMessage],
             },
             false,
             CHAT_ACTION_TYPES.startStreaming,
