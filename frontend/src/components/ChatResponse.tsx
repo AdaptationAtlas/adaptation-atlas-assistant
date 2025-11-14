@@ -126,22 +126,23 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
         conversationTurns.push(currentTurn);
     }
 
-    // for each turn, find the last AI message and move it to finalAiMessage
-    conversationTurns.forEach((turn) => {
-        let lastAiMessageIdx = -1;
-        for (let i = turn.intermediateMessages.length - 1; i >= 0; i--) {
-            const msg = turn.intermediateMessages[i];
-            if (!('error' in msg) && msg.type === 'ai') {
-                lastAiMessageIdx = i;
-                break;
+    if (status !== 'streaming') {
+        conversationTurns.forEach((turn) => {
+            let lastAiMessageIdx = -1;
+            for (let i = turn.intermediateMessages.length - 1; i >= 0; i--) {
+                const msg = turn.intermediateMessages[i];
+                if (!('error' in msg) && msg.type === 'ai') {
+                    lastAiMessageIdx = i;
+                    break;
+                }
             }
-        }
 
-        if (lastAiMessageIdx !== -1) {
-            turn.finalAiMessage = turn.intermediateMessages[lastAiMessageIdx];
-            turn.intermediateMessages.splice(lastAiMessageIdx, 1);
-        }
-    });
+            if (lastAiMessageIdx !== -1) {
+                turn.finalAiMessage = turn.intermediateMessages[lastAiMessageIdx];
+                turn.intermediateMessages.splice(lastAiMessageIdx, 1);
+            }
+        });
+    }
 
     const getSummaryText = () => {
         if (status === 'streaming') {
