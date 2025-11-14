@@ -74,9 +74,15 @@ function CopyButton({ content, className = '' }: CopyButtonProps) {
             aria-label="Copy raw markdown"
         >
             {copied ? (
-                <CheckIcon className={styles.copyIcon} />
+                <>
+                    <CheckIcon className={styles.copyIcon} />
+                    <span className={styles.copyLabel}>Copied</span>
+                </>
             ) : (
-                <CopyIcon className={styles.copyIcon} />
+                <>
+                    <CopyIcon className={styles.copyIcon} />
+                    <span className={styles.copyLabel}>Copy</span>
+                </>
             )}
         </button>
     );
@@ -211,13 +217,13 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                             <div key={messageId} className={styles.artifact}>
                                 {!('error' in event) && event.type === 'bar-chart' && (
                                     <>
-                                        <div className={styles.artifactHeader}>
-                                            <CopyButton content={event.content} />
-                                        </div>
                                         <BarChart
                                             data={JSON.parse(event.content)}
                                             metadata={event.metadata}
                                         />
+                                        <div className={styles.copyRow}>
+                                            <CopyButton content={event.content} />
+                                        </div>
                                     </>
                                 )}
                             </div>
@@ -229,11 +235,11 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                         if (!isAiMessage(turn.finalAiMessage)) return null;
                         return (
                             <div className={styles.aiMessage}>
-                                <div className={styles.aiMessageHeader}>
-                                    <CopyButton content={(turn.finalAiMessage as AiResponseMessage).content} />
-                                </div>
                                 <div className={styles.aiContent}>
                                     <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{(turn.finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
+                                </div>
+                                <div className={styles.copyRow}>
+                                    <CopyButton content={(turn.finalAiMessage as AiResponseMessage).content} />
                                 </div>
                             </div>
                         );
@@ -243,4 +249,3 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
         </>
     );
 }
-
