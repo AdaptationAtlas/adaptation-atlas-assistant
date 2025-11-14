@@ -214,3 +214,16 @@
     color: #374151;
 }
 
+.userMessage {
+    background-color: #F3F4F6;
+    margin-left: auto;
+    padding: 0.5rem 1rem;
+    border-radius: 16px 16px 0 16px;
+    margin-bottom: 1rem;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
