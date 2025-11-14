@@ -195,11 +195,11 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                                                     <summary className={styles.toolSummary}>
                                                         <div className={styles.messageHeader}>
                                                             <span>{event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}</span>
-                                                            <CopyButton content={event.content} />
                                                         </div>
                                                     </summary>
                                                     <div className={styles.toolContent}>
                                                         <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
+                                                        <CopyButton content={event.content} />
                                                     </div>
                                                 </details>
                                             )}
