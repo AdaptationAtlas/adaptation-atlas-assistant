@@ -87,7 +87,6 @@
     max-width: 812px;
     margin: 0 auto;
     width: 100%;
-    overflow-y: auto;
     position: relative;
 }
 
@@ -110,6 +109,7 @@
 .contentArea {
     /* padding: 2rem; */
     padding-bottom: calc(2rem + 120px);
+    overflow-y: auto;
 }
 
 /* Responsive adjustments */
