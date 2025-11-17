@@ -87,7 +87,6 @@
     max-width: 812px;
     margin: 0 auto;
     width: 100%;
-    overflow-y: auto;
     position: relative;
 }
 
@@ -110,19 +109,7 @@
 .contentArea {
     /* padding: 2rem; */
     padding-bottom: calc(2rem + 120px);
-}
-
-.userMessage {
-    background-color: #F3F4F6;
-    margin-left: auto;
-    padding: 0.5rem 1rem;
-    border-radius: 16px 16px 0 16px;
-    margin-bottom: 1rem;
-    display: block;
-    width: fit-content;
-    max-width: 100%;
-    word-wrap: break-word;
-    white-space: normal;
+    overflow-y: auto;
 }
 
 /* Responsive adjustments */
