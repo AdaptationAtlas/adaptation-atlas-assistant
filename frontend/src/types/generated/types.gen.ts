@@ -29,6 +29,26 @@ export type AiResponseMessage = {
 };
 
 /**
+ * Asset
+ *
+ * A STAC asset, with only the fields we need
+ */
+export type Asset = {
+    /**
+     * Href
+     */
+    href: string;
+    /**
+     * Type
+     */
+    type?: string | null;
+    /**
+     * Title
+     */
+    title?: string | null;
+};
+
+/**
  * BarChartMetadata
  *
  * Data to create a bar chart
@@ -50,29 +70,6 @@ export type BarChartMetadata = {
      * Grouping Column
      */
     grouping_column: string | null;
-};
-
-/**
- * BarChartResponseMessage
- *
- * The agent has created a bar chart and here it is.
- *
- * The message content is the data as a JSON string.
- */
-export type BarChartResponseMessage = {
-    /**
-     * Content
-     */
-    content: string;
-    /**
-     * Thread Id
-     */
-    thread_id: string;
-    /**
-     * Type
-     */
-    type?: 'bar-chart';
-    metadata: BarChartMetadata;
 };
 
 /**
@@ -122,6 +119,90 @@ export type ChatRequest = {
 };
 
 /**
+ * Dataset
+ *
+ * A parquet dataset, which is an asset.
+ *
+ * We include the item in case we want to look information up there.
+ */
+export type Dataset = {
+    item: Item;
+    /**
+     * Asset Key
+     */
+    asset_key: string;
+};
+
+/**
+ * GenerateBarChartMetadataResponseMessage
+ *
+ * The response from generate_bar_chart_metadata
+ */
+export type GenerateBarChartMetadataResponseMessage = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'tool';
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Status
+     */
+    status: string;
+    bar_chart_metadata: BarChartMetadata | null;
+    /**
+     * Data
+     */
+    data: string | null;
+};
+
+/**
+ * GenerateTableResponseMessage
+ *
+ * The response from generate_table
+ */
+export type GenerateTableResponseMessage = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'tool';
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Data
+     */
+    data: string | null;
+    /**
+     * Sql Query
+     */
+    sql_query: string | null;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -129,6 +210,100 @@ export type HttpValidationError = {
      * Detail
      */
     detail?: Array<ValidationError>;
+};
+
+/**
+ * Item
+ *
+ * A STAC item, with only the fields we need.
+ */
+export type Item = {
+    /**
+     * Id
+     */
+    id: string;
+    properties: Properties;
+    /**
+     * Assets
+     */
+    assets: {
+        [key: string]: Asset;
+    };
+};
+
+/**
+ * Properties
+ *
+ * STAC item properties, the ones we use
+ *
+ * Some fields are required here but are not required on a STAC item.
+ */
+export type Properties = {
+    /**
+     * Description
+     */
+    description: string;
+    /**
+     * Table:Columns
+     */
+    'table:columns': Array<TableColumn>;
+    /**
+     * Atlas Assistant:Sql Instructions
+     */
+    'atlas_assistant:sql_instructions'?: Array<string> | null;
+};
+
+/**
+ * SelectDatasetResponseMessage
+ *
+ * The response from select_dataset
+ */
+export type SelectDatasetResponseMessage = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'tool';
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Status
+     */
+    status: string;
+    dataset: Dataset;
+};
+
+/**
+ * TableColumn
+ *
+ * A table column, from the table extension: https://github.com/stac-extensions/table
+ */
+export type TableColumn = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Type
+     */
+    type: string;
+    /**
+     * Values
+     */
+    values?: Array<string | number | null> | null;
 };
 
 /**
@@ -168,7 +343,7 @@ export type ToolResponseMessage = {
     /**
      * Name
      */
-    name: string | null;
+    name: string;
     /**
      * Status
      */
@@ -274,7 +449,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | AiResponseMessage | BarChartResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | AiResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];
