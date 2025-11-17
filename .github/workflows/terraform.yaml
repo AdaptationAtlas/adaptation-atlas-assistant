@@ -11,6 +11,11 @@ on:
       - 'terraform/**'
       - '.github/workflows/terraform.yml'
 
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  TF_IN_AUTOMATION: 1
+  TF_INPUT: 0
+
 jobs:
   terraform-plan:
     if: github.event_name == 'pull_request'
@@ -19,7 +24,9 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      TFVARS_FILE: tfvars/production.tfvars
+      TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
+      TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
+      TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
     defaults:
       run:
         working-directory: terraform/aws
@@ -28,6 +35,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.13.5"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE }}
 
       - name: Terraform fmt
         id: fmt
@@ -83,7 +97,9 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      TFVARS_FILE: terraform/tfvars/production.tfvars
+      TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
+      TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
+      TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
     defaults:
       run:
         working-directory: terraform
@@ -91,6 +107,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.13.5"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE }}
 
       - name: Terraform Init
         id: init

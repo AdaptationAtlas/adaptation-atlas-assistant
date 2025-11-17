@@ -1,4 +1,5 @@
 terraform {
+  required_version = "~> 1.13.5"
   backend "s3" {
     region       = "us-east-1"
     bucket       = "tfstate-atlas"
