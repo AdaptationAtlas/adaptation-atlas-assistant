@@ -150,7 +150,7 @@ class GenerateBarChartMetadataResponseMessage(ToolResponseMessage):
 
     name: str = "generate_bar_chart_metadata"
 
-    bart_chart_metadata: BarChartMetadata | None
+    bar_chart_metadata: BarChartMetadata | None
     """The bar chart metadata"""
 
 
