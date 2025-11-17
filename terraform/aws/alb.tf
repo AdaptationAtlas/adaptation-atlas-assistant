@@ -60,7 +60,7 @@ module "alb" {
         enabled             = true
         healthy_threshold   = 5
         interval            = 30
-        path                = "/docs"
+        path                = "/health"
         timeout             = 5
         unhealthy_threshold = 2
       }
