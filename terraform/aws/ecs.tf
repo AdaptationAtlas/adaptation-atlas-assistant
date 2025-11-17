@@ -19,6 +19,16 @@ module "ecs" {
       memory = 4096
 
       enable_execute_command = true
+      deployment_circuit_breaker = {
+        enable   = true
+        rollback = true
+      }
+      task_exec_iam_role_name = "atlas-backend-taskexec"
+      tasks_iam_role_name     = "atlas-backend-tasks"
+      task_exec_secret_arns = [
+        aws_secretsmanager_secret.backend_secrets.arn,
+      ]
+
       container_definitions = {
 
         api = {
@@ -27,7 +37,7 @@ module "ecs" {
           essential         = true
           image             = join(":", [module.ecr.repository_url, "latest"])
           memoryReservation = 100
-          command           = [
+          command = [
             "uvicorn",
             "src.atlas_assistant.api:app",
             "--host",
@@ -41,6 +51,13 @@ module "ecs" {
             }
           ]
           readonlyRootFilesystem = false
+          secrets = [
+            for k in keys(local.env) :
+            {
+              name      = k
+              valueFrom = join(":", [aws_secretsmanager_secret.backend_secrets.arn, "${k}::"])
+            }
+          ]
         }
       }
 
@@ -52,7 +69,7 @@ module "ecs" {
         }
       }
 
-      subnet_ids = module.vpc.public_subnets
+      subnet_ids = module.vpc.private_subnets
 
       security_group_ingress_rules = {
         ecs_alb = {

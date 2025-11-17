@@ -37,16 +37,6 @@ variable "tags" {
   EOT
 }
 
-variable "permissions_boundary" {
-  type        = string
-  default     = null
-  sensitive   = true
-  description = <<-EOT
-  (Optional) ARN of the policy that is used to set the permissions boundary for
-  the role.
-  EOT
-}
-
 variable "domain_name" {
   type        = string
   default     = ""
@@ -59,6 +49,7 @@ variable "mistral_api_key" {
   type        = string
   default     = ""
   sensitive   = true
+  ephemeral   = true
   description = <<-EOT
   Key for Mistral agent
   EOT
@@ -75,7 +66,17 @@ variable "chat_model_size" {
 variable "jwt_key" {
   type        = string
   default     = ""
+  sensitive   = true
+  ephemeral   = true
   description = <<-EOT
   API key
+  EOT
+}
+
+variable "cors_origins" {
+  type        = string
+  default     = ""
+  description = <<-EOT
+  Allowed CORS origins
   EOT
 }
