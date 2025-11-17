@@ -34,7 +34,7 @@ export function Chat() {
     const { isAuthenticated, logout } = useAuth();
 
     // Chat store
-    const { status, events, userQuery, threadId, startStreaming, addEvent, finishStreaming, setError, setThreadId } = useChatStore();
+    const { status, events, threadId, startStreaming, addEvent, finishStreaming, setError, setThreadId } = useChatStore();
 
 
     const handlePromptSubmit = useCallback(async (value: string) => {
@@ -136,11 +136,6 @@ export function Chat() {
 
                 {status !== 'idle' && (
                     <div className={styles.contentArea}>
-                        {userQuery && (
-                            <div className={styles.userMessage}>
-                                {userQuery}
-                            </div>
-                        )}
                         <ChatResponse events={events} status={status} />
                     </div>
                 )}
