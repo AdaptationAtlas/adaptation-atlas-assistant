@@ -27,7 +27,14 @@ module "ecs" {
           essential         = true
           image             = join(":", [module.ecr.repository_url, "latest"])
           memoryReservation = 100
-          command           = ["uv", "run", "--no-sync", "uvicorn", "src.atlas_assistant.api:app", "--host", "0.0.0.0", "--port", "8000"]
+          command           = [
+            "uvicorn",
+            "src.atlas_assistant.api:app",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8000"
+          ]
           portMappings = [
             {
               containerPort = local.container_port
