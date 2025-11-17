@@ -100,4 +100,3 @@ def test_chat_two_responses(
         json={"query": "Can you make a bar chart out of that?"},
     )
     _ = response.raise_for_status()
-
