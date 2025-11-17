@@ -1,0 +1,189 @@
+import { useState } from 'react';
+import { BarChart } from './Charts/Bar';
+import type { AiResponseMessage } from '../types/generated';
+import type { StreamEvent, ChatStatus } from '../types/chat';
+import styles from './ChatResponse.module.css';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { CopyIcon, CheckIcon } from '../assets/icons';
+import { copyToClipboard } from '../utils/clipboard';
+
+interface ChatResponseProps {
+    events: StreamEvent[];
+    status: ChatStatus;
+}
+
+function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { id?: string; timestamp?: number } {
+    if (!event) return false;
+    if ('error' in event) return false;
+    return event.type === 'ai';
+}
+
+const markdownComponents = {
+    pre: ({ children, ...props }: React.ComponentPropsWithoutRef<'pre'>) => {
+        return (
+            <div className={styles.codeBlock}>
+                <pre {...props}>{children}</pre>
+            </div>
+        );
+    },
+    code: ({ children, ...props }: React.ComponentPropsWithoutRef<'code'>) => {
+        return <code className={styles.inlineCode} {...props}>{children}</code>;
+    },
+    table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => {
+        return <table className={styles.table} {...props}>{children}</table>;
+    },
+    thead: ({ children, ...props }: React.ComponentPropsWithoutRef<'thead'>) => {
+        return <thead className={styles.thead} {...props}>{children}</thead>;
+    },
+    tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => {
+        return <tbody className={styles.tbody} {...props}>{children}</tbody>;
+    },
+    tr: ({ children, ...props }: React.ComponentPropsWithoutRef<'tr'>) => {
+        return <tr className={styles.tr} {...props}>{children}</tr>;
+    },
+    th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => {
+        return <th className={styles.th} {...props}>{children}</th>;
+    },
+    td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => {
+        return <td className={styles.td} {...props}>{children}</td>;
+    }
+};
+
+interface CopyButtonProps {
+    content: string;
+    className?: string;
+}
+
+function CopyButton({ content, className = '' }: CopyButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const success = await copyToClipboard(content);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <button
+            onClick={handleCopy}
+            className={`${styles.copyButton} ${className}`}
+            title="Copy raw markdown"
+            aria-label="Copy raw markdown"
+        >
+            {copied ? (
+                <>
+                    <CheckIcon className={styles.copyIcon} />
+                    <span className={styles.copyLabel}>Copied</span>
+                </>
+            ) : (
+                <>
+                    <CopyIcon className={styles.copyIcon} />
+                    <span className={styles.copyLabel}>Copy</span>
+                </>
+            )}
+        </button>
+    );
+}
+
+export function ChatResponse({ events, status }: ChatResponseProps) {
+    const intermediateMessages: typeof events = [];
+    const artifacts: typeof events = [];
+    let finalAiMessage: typeof events[0] | null = null;
+
+    const lastAiMessageIndex = events.map((e, i) => !('error' in e) && e.type === 'ai' ? i : -1)
+        .filter(i => i !== -1)
+        .pop();
+
+    events.forEach((event, index) => {
+        if ('error' in event) {
+            intermediateMessages.push(event);
+        } else if (event.type === 'bar-chart') {
+            artifacts.push(event);
+        } else if (event.type === 'ai' && index === lastAiMessageIndex) {
+            finalAiMessage = event;
+        } else {
+            intermediateMessages.push(event);
+        }
+    });
+
+    const getSummaryText = () => {
+        if (status === 'streaming') {
+            return `Working...`;
+        } else {
+            return 'View steps';
+        }
+    };
+
+    return (
+        <>
+            {intermediateMessages.length > 0 && (
+                <details className={styles.reasoningDropdown}>
+                    <summary className={styles.reasoningSummary}>
+                        {getSummaryText()}
+                    </summary>
+                    <div className={styles.reasoningContent}>
+                        {intermediateMessages.map((event, index) => {
+                            const messageId = event.id || `intermediate-${index}`;
+
+                            return (
+                                <div key={messageId} className={styles.intermediateMessage}>
+                                    {'error' in event ? (
+                                        <div>Error: {event.error}</div>
+                                    ) : (
+                                        <details>
+                                            <summary className={styles.toolSummary}>
+                                                {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                            </summary>
+                                            <div className={styles.toolContent}>
+                                                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
+                                                <div className={styles.copyRow}>
+                                                    <CopyButton content={event.content} />
+                                                </div>
+                                            </div>
+                                        </details>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </details>
+            )}
+
+            {artifacts.map((event, index) => {
+                const messageId = event.id || `artifact-${index}`;
+                return (
+                    <div key={messageId} className={styles.artifact}>
+                        {!('error' in event) && event.type === 'bar-chart' && (
+                            <>
+                                <BarChart
+                                    data={JSON.parse(event.content)}
+                                    metadata={event.metadata}
+                                />
+                                <div className={styles.copyRow}>
+                                    <CopyButton content={event.content} />
+                                </div>
+                            </>
+                        )}
+                    </div>
+                );
+            })}
+
+            {(() => {
+                if (!isAiMessage(finalAiMessage)) return null;
+                return (
+                    <div className={styles.aiMessage}>
+                        <div className={styles.aiContent}>
+                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{(finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
+                        </div>
+                        <div className={styles.copyRow}>
+                            <CopyButton content={(finalAiMessage as AiResponseMessage).content} />
+                        </div>
+                    </div>
+                );
+            })()}
+        </>
+    );
+}

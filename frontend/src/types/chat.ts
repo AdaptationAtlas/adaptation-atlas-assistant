@@ -1,4 +1,4 @@
-import type { AiResponseMessage, ToolResponseMessage } from './generated';
+import type { AiResponseMessage, BarChartResponseMessage, ToolResponseMessage } from './generated';
 
 export type ChatStatus = 'idle' | 'streaming' | 'complete' | 'error';
 
@@ -11,5 +11,6 @@ export type ErrorEvent = {
 export type StreamEvent = (
     | (AiResponseMessage & { id?: string; timestamp?: number })
     | (ToolResponseMessage & { id?: string; timestamp?: number })
+    | (BarChartResponseMessage & { id?: string; timestamp?: number })
     | ErrorEvent
 );

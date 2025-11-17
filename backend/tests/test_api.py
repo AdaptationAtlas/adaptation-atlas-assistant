@@ -84,3 +84,20 @@ def test_create_response_message(message: BaseMessage) -> None:
         message, "a-thread-id"
     )
     assert response_message
+
+
+@pytest.mark.integration
+def test_chat_two_responses(
+    authenticated_client: TestClient,
+) -> None:
+    response = authenticated_client.post(
+        "/chat",
+        json={"query": "What crops are being grown in Kenya?"},
+    )
+    _ = response.raise_for_status()
+    response = authenticated_client.post(
+        "/chat",
+        json={"query": "Can you make a bar chart out of that?"},
+    )
+    _ = response.raise_for_status()
+
