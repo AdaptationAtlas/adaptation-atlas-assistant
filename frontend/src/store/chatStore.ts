@@ -7,10 +7,12 @@ export interface ChatUIState {
     status: ChatStatus;
     events: StreamEvent[];
     userQuery: string;
+    threadId: string | null;
     startStreaming: (query: string) => void;
     addEvent: (event: StreamEvent) => void;
     finishStreaming: () => void;
     setError: (message: string) => void;
+    setThreadId: (threadId: string) => void;
     reset: () => void;
 }
 
@@ -19,6 +21,7 @@ const CHAT_ACTION_TYPES = {
   addEvent: 'chat/addEvent',
   finishStreaming: 'chat/finishStreaming',
   setError: 'chat/setError',
+  setThreadId: 'chat/setThreadId',
   reset: 'chat/reset',
   anonymous: 'chat/anonymous',
 } as const;
@@ -26,11 +29,12 @@ const CHAT_ACTION_TYPES = {
 
 const createInitialState = (): Omit<
   ChatUIState,
-  'startStreaming' | 'addEvent' | 'finishStreaming' | 'setError' | 'reset'
+  'startStreaming' | 'addEvent' | 'finishStreaming' | 'setError' | 'setThreadId' | 'reset'
 > => ({
     status: 'idle',
     events: [],
     userQuery: '',
+    threadId: null,
 });
 
 const initialState = createInitialState();
@@ -41,12 +45,19 @@ export const useChatStore = create<ChatUIState>()(
       (set, get) => ({
         ...initialState,
         startStreaming: (query: string) => {
-          const baseState = createInitialState();
+          const { events, threadId } = get();
+          const userMessage = {
+            id: `user-${Date.now()}`,
+            timestamp: Date.now(),
+            type: 'user' as const,
+            content: query,
+          };
           set(
             {
-              ...baseState,
               status: 'streaming',
               userQuery: query,
+              threadId,
+              events: [...events, userMessage],
             },
             false,
             CHAT_ACTION_TYPES.startStreaming,
@@ -83,6 +94,15 @@ export const useChatStore = create<ChatUIState>()(
             },
             false,
             CHAT_ACTION_TYPES.setError,
+          );
+        },
+        setThreadId: (threadId: string) => {
+          set(
+            {
+              threadId,
+            },
+            false,
+            CHAT_ACTION_TYPES.setThreadId,
           );
         },
         reset: () => {

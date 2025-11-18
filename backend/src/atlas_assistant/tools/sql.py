@@ -123,7 +123,7 @@ def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[
             "Data returned:",
             cast(str, data_frame.to_markdown(index=False)),
         ]
-        data = data_frame.to_json()
+        data = data_frame.to_json(orient="records")
     return Command(
         update={
             "messages": [

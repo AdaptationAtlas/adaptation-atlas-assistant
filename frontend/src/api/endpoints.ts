@@ -53,14 +53,19 @@ export async function getCurrentUser(): Promise<User> {
  * Send a chat message and receive streaming responses
  *
  * @param query - The user's question/message
+ * @param threadId - Optional conversation thread ID for multi-turn conversations
  * @param options - Streaming options (onMessage, onError, onComplete)
  * @param useSSE - Whether to use Server-Sent Events (true) or NDJSON (false). Default: true
  */
 export async function sendChatMessage(
   query: string,
+  threadId: string | null,
   options: StreamOptions,
 ): Promise<void> {
-  const requestBody: ChatRequest = { query };
+  const requestBody: ChatRequest = {
+    query,
+    thread_id: threadId,
+  };
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

@@ -21,3 +21,19 @@ def test_chat(authenticated_client: TestClient, headers: dict[str, str] | None) 
         "/chat", json={"query": "What crops are being grown in Kenya?"}, headers=headers
     )
     _ = response.raise_for_status()
+
+
+@pytest.mark.integration
+def test_chat_two_responses(
+    authenticated_client: TestClient,
+) -> None:
+    response = authenticated_client.post(
+        "/chat",
+        json={"query": "What crops are being grown in Kenya?"},
+    )
+    _ = response.raise_for_status()
+    response = authenticated_client.post(
+        "/chat",
+        json={"query": "Can you make a bar chart out of that?"},
+    )
+    _ = response.raise_for_status()
