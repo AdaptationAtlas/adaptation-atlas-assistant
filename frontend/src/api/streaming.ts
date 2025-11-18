@@ -4,11 +4,18 @@
 
 import type {
   AiResponseMessage,
-  BarChartResponseMessage,
   ToolResponseMessage,
+  SelectDatasetResponseMessage,
+  GenerateTableResponseMessage,
+  GenerateBarChartMetadataResponseMessage,
 } from '../types/generated';
 
-export type ChatMessage = AiResponseMessage | ToolResponseMessage | BarChartResponseMessage;
+export type ChatMessage =
+  | AiResponseMessage
+  | ToolResponseMessage
+  | SelectDatasetResponseMessage
+  | GenerateTableResponseMessage
+  | GenerateBarChartMetadataResponseMessage;
 
 export interface StreamOptions {
   onMessage: (message: ChatMessage) => void;

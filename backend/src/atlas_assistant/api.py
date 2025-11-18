@@ -153,6 +153,9 @@ class GenerateBarChartMetadataResponseMessage(ToolResponseMessage):
     bar_chart_metadata: BarChartMetadata | None
     """The bar chart metadata"""
 
+    data: str | None
+    """The table data as a JSON string"""
+
 
 class AiResponseMessage(ResponseMessage):
     """The response from the AI"""
@@ -321,11 +324,15 @@ def create_response_message(
                     sql_query=artifact.get("sql_query"),
                 )
             case "generate_bar_chart_metadata":
+                artifact = message.artifact or {}
                 return GenerateBarChartMetadataResponseMessage(
                     content=message.content,
                     status=message.status,
                     thread_id=thread_id,
-                    bart_chart_metadata=message.artifact,
+                    bar_chart_metadata=artifact.get("bar_chart_metadata")
+                    if isinstance(artifact, dict)
+                    else artifact,
+                    data=artifact.get("data") if isinstance(artifact, dict) else None,
                 )
             case None:
                 logger.warning(

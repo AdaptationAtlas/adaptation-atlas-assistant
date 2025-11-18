@@ -387,7 +387,7 @@
             "type": "string",
             "title": "Status"
           },
-          "bart_chart_metadata": {
+          "bar_chart_metadata": {
             "anyOf": [
               {
                 "$ref": "#/components/schemas/BarChartMetadata"
@@ -396,6 +396,17 @@
                 "type": "null"
               }
             ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
           }
         },
         "type": "object",
@@ -403,7 +414,8 @@
           "content",
           "thread_id",
           "status",
-          "bart_chart_metadata"
+          "bar_chart_metadata",
+          "data"
         ],
         "title": "GenerateBarChartMetadataResponseMessage",
         "description": "The response from generate_bar_chart_metadata"

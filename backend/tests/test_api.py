@@ -52,12 +52,15 @@ def message(request: FixtureRequest, dataset: Dataset) -> BaseMessage:
             return ToolMessage(
                 name="generate_bar_chart_metadata",
                 tool_call_id="foo",
-                artifact=BarChartMetadata(
-                    title="A title",
-                    x_column="foo",
-                    y_column="bar",
-                    grouping_column=None,
-                ),
+                artifact={
+                    "data": "{}",
+                    "bar_chart_metadata": BarChartMetadata(
+                        title="A title",
+                        x_column="foo",
+                        y_column="bar",
+                        grouping_column=None,
+                    ),
+                },
             )
         case "generate_bar_chart_metadata_error":
             return ToolMessage(
