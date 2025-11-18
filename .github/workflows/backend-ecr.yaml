@@ -5,6 +5,7 @@ on:
     branches: [ "main"]
     paths:
       - 'backend/**'
+      - 'terraform/**'
       - '.github/workflows/backend-ecr.yaml'
 
 env:
