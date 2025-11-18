@@ -1,4 +1,4 @@
-name: Terraform
+name: Terraform Workflow
 
 on:
   push:
@@ -31,7 +31,6 @@ jobs:
     defaults:
       run:
         working-directory: terraform/aws
-        shell: bash -euo pipefail {0}
 
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +58,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: |
+          set -e
           terraform plan -no-color -input=false -var-file=${{ env.TFVARS_FILE }} | tee plan.txt
           echo "stdout<<EOF" >> $GITHUB_OUTPUT
           cat plan.txt >> $GITHUB_OUTPUT
@@ -105,7 +105,6 @@ jobs:
     defaults:
       run:
         working-directory: terraform
-        shell: bash -euo pipefail {0}
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
@@ -124,6 +123,7 @@ jobs:
       - name: Terraform Apply
         id: apply
         run: |
+          set -e
           terraform apply -no-color -input=false -var-file=${{ env.TFVARS_FILE }} | tee apply.txt
           echo "stdout<<EOF" >> $GITHUB_OUTPUT
           cat apply.txt >> $GITHUB_OUTPUT
