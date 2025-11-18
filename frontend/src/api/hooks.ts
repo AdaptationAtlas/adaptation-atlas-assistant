@@ -101,6 +101,7 @@ export function useChat() {
       try {
         await sendChatMessage(
           query,
+          null,
           {
             onMessage: (message) => {
               setMessages((prev) => [...prev, message]);
@@ -166,6 +167,7 @@ export function useSimpleChat() {
     try {
       await sendChatMessage(
         query,
+        null,
         {
           onMessage: (message) => {
             setResponses((prev) => [...prev, message]);

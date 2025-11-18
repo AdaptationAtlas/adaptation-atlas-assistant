@@ -15,6 +15,10 @@ export type AiResponseMessage = {
      */
     content: string;
     /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
      * Type
      */
     type?: 'ai';
@@ -22,6 +26,53 @@ export type AiResponseMessage = {
      * Finish Reason
      */
     finish_reason: string;
+};
+
+/**
+ * BarChartMetadata
+ *
+ * Data to create a bar chart
+ */
+export type BarChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Grouping Column
+     */
+    grouping_column: string | null;
+};
+
+/**
+ * BarChartResponseMessage
+ *
+ * The agent has created a bar chart and here it is.
+ *
+ * The message content is the data as a JSON string.
+ */
+export type BarChartResponseMessage = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'bar-chart';
+    metadata: BarChartMetadata;
 };
 
 /**
@@ -64,6 +115,10 @@ export type ChatRequest = {
      * Query
      */
     query: string;
+    /**
+     * Thread Id
+     */
+    thread_id?: string | null;
 };
 
 /**
@@ -102,6 +157,10 @@ export type ToolResponseMessage = {
      * Content
      */
     content: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
     /**
      * Type
      */
@@ -215,7 +274,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | AiResponseMessage;
+    200: ToolResponseMessage | AiResponseMessage | BarChartResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];

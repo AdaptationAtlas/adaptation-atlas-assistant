@@ -46,7 +46,7 @@ export function PromptBox({
                     onFocus={() => setFocused(true)}
                     onBlur={() => setFocused(false)}
                     onKeyUp={handleKeyPress}
-                    rows={1}
+                    rows={3}
                 />
 
                 <div className={styles.controls}>
