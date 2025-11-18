@@ -7,19 +7,14 @@ services:
       - "8000:8000"
     command:
       [
-        "uv",
-        "run",
-        "uvicorn",
-        "src.atlas_assistant.api:app",
-        "--reload",
-        "--reload-exclude",
-        "*data*",
-        "--host",
-        "0.0.0.0",
+        "sh",
+        "-c",
+        "uv run python scripts/embed_stac.py && uv run uvicorn src.atlas_assistant.api:app --reload --reload-exclude *data* --host 0.0.0.0",
       ]
     volumes:
       - ./backend/.env:/app/.env
       - ./backend/src:/app/src
+      - ./backend/scripts:/app/scripts
       - ./backend/chainlit:/app/chainlit
       - ./backend/data:/app/data
       - ./backend/.chainlit:/app/.chainlit
