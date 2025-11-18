@@ -1,5 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
+from langchain.messages import ToolMessage
+from langgraph.graph.message import BaseMessage
+from pytest import FixtureRequest
+
+import atlas_assistant.api
+from atlas_assistant.dataset import Dataset
+from atlas_assistant.state import BarChartMetadata
 
 
 def test_unauthorized(client: TestClient) -> None:
@@ -21,6 +28,65 @@ def test_chat(authenticated_client: TestClient, headers: dict[str, str] | None) 
         "/chat", json={"query": "What crops are being grown in Kenya?"}, headers=headers
     )
     _ = response.raise_for_status()
+
+
+@pytest.fixture
+def message(request: FixtureRequest, dataset: Dataset) -> BaseMessage:
+    match request.param:
+        case "select_dataset":
+            return ToolMessage(
+                name="select_dataset", tool_call_id="foo", artifact=dataset
+            )
+        case "generate_table":
+            return ToolMessage(
+                name="generate_table",
+                tool_call_id="foo",
+                artifact={"data": "{}", "sql_query": "SELECT * FROM 'file.parquet'"},
+            )
+        case "generate_table_error":
+            return ToolMessage(
+                name="generate_table",
+                tool_call_id="foo",
+            )
+        case "generate_bar_chart_metadata":
+            return ToolMessage(
+                name="generate_bar_chart_metadata",
+                tool_call_id="foo",
+                artifact={
+                    "data": "{}",
+                    "bar_chart_metadata": BarChartMetadata(
+                        title="A title",
+                        x_column="foo",
+                        y_column="bar",
+                        grouping_column=None,
+                    ),
+                },
+            )
+        case "generate_bar_chart_metadata_error":
+            return ToolMessage(
+                name="generate_bar_chart_metadata",
+                tool_call_id="foo",
+            )
+        case _:
+            raise NotImplementedError
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "select_dataset",
+        "generate_table",
+        "generate_table_error",
+        "generate_bar_chart_metadata",
+        "generate_bar_chart_metadata_error",
+    ],
+    indirect=True,
+)
+def test_create_response_message(message: BaseMessage) -> None:
+    response_message = atlas_assistant.api.create_response_message(
+        message, "a-thread-id"
+    )
+    assert response_message
 
 
 @pytest.mark.integration
