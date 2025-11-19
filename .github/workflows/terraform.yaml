@@ -59,15 +59,10 @@ jobs:
         id: plan
         run: |
           set -e
-          terraform plan -no-color -input=false -var-file=${{ env.TFVARS_FILE }} | tee plan.txt
-          echo "stdout<<EOF" >> $GITHUB_OUTPUT
-          cat plan.txt >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          terraform plan -no-color -input=false -var-file=${{ env.TFVARS_FILE }}
 
       - uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
-        env:
-          PLAN: ${{ steps.plan.outputs.stdout }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -79,7 +74,7 @@ jobs:
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
             \`\`\`
-            ${process.env.PLAN}
+            ${{ steps.plan.outputs.stdout }}
             \`\`\`
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ github.workspace }}\`, Workflow: \`${{ github.workflow }}\`*`;
