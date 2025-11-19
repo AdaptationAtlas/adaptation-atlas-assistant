@@ -31,4 +31,5 @@
 .icon {
   display: inline-flex;
   align-items: center;
+  margin-left: .5rem;
 }
