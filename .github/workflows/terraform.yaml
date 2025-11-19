@@ -104,7 +104,7 @@ jobs:
       TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform/aws
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
