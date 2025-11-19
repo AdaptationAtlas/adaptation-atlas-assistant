@@ -233,7 +233,6 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "duckdb", specifier = ">=1.4.1" },
-    { name = "fastapi", specifier = ">=0.116.2" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.2" },
     { name = "langchain", specifier = ">=1.0.2" },
     { name = "langchain-chroma", specifier = ">=1.0.0" },

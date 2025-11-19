@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "duckdb>=1.4.1",
-    "fastapi>=0.116.2",
     "fastapi[standard]>=0.116.2",
     "langchain-chroma>=1.0.0",
     "langchain-mistralai>=1.0.0",
