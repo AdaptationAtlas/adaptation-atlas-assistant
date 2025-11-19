@@ -10,7 +10,7 @@ services:
     command:
       [
         "uvicorn",
-        "src.atlas_assistant.api:app",
+        "atlas_assistant.api:app",
         "--reload",
         "--reload-exclude",
         "*data*",

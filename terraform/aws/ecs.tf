@@ -39,7 +39,7 @@ module "ecs" {
           memoryReservation = 100
           command = [
             "uvicorn",
-            "src.atlas_assistant.api:app",
+            "atlas_assistant.api:app",
             "--host",
             "0.0.0.0",
             "--port",
