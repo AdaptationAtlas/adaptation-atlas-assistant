@@ -7,6 +7,7 @@ import { SliderWithSteps } from './SliderWithSteps';
 import { TwoButtonToggle } from './TwoButtonToggle';
 import { ThreeButtonToggle } from './ThreeButtonToggle';
 import { Button } from './Button';
+import { Pill } from './Pill';
 
 interface SidebarSectionProps {
     section: {
@@ -33,6 +34,7 @@ export function SidebarSection({
             </button>
             {isActive && (
                 <div className={styles.content}>
+                    <Pill icon={<span>🇺🇸</span>} onRemove={() => {}}>pill</Pill>
                     <Select
                         label="Label"
                         placeholder="Select an option"
