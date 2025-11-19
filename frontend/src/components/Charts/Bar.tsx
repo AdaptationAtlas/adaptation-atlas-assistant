@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import * as Plot from '@observablehq/plot';
 import type { BarChartMetadata } from '../../types/generated';
 import { Chart, type ChartProps } from './Main';
+import { Button } from '../Button';
 import styles from './Bar.module.css';
 
 export interface BarChartProps {
@@ -111,13 +112,12 @@ export const BarChart = ({ data, metadata }: BarChartProps) => {
     return (
         <div className={styles.chartWrapper}>
             <div className={styles.toolbar}>
-                <button
-                    type="button"
-                    className={styles.toggleButton}
+                <Button
+                    variant="outline"
                     onClick={() => setIsFlipped((prev) => !prev)}
                 >
-                    {'Flip axes'}
-                </button>
+                    Flip axes
+                </Button>
             </div>
             <Chart data={data} spec={spec} title={metadata.title} />
         </div>
