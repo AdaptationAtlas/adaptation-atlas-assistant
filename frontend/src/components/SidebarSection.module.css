@@ -40,6 +40,33 @@
 
 .content {
     padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.subsection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--neutral-100);
+}
+
+.subsection:last-child {
+    border-bottom: none;
+}
+
+.subsectionTitle {
+    font-family:
+        'IBM Plex Sans',
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--neutral-800);
+    margin: 0;
 }
 
 .sidebarDivider {
