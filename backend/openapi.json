@@ -5,6 +5,22 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health Check",
@@ -53,14 +69,14 @@
         "tags": [
           "auth"
         ],
-        "summary": "Login",
+        "summary": "Token",
         "description": "Logs in a user with a username and password.",
-        "operationId": "login_token_post",
+        "operationId": "token_token_post",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/Body_login_token_post"
+                "$ref": "#/components/schemas/Body_token_token_post"
               }
             }
           },
@@ -263,7 +279,7 @@
         "title": "BarChartResponseMessage",
         "description": "The agent has created a bar chart and here it is.\n\nThe message content is the data as a JSON string."
       },
-      "Body_login_token_post": {
+      "Body_token_token_post": {
         "properties": {
           "grant_type": {
             "anyOf": [
@@ -320,7 +336,7 @@
           "username",
           "password"
         ],
-        "title": "Body_login_token_post"
+        "title": "Body_token_token_post"
       },
       "ChatRequest": {
         "properties": {

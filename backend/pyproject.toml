@@ -5,9 +5,11 @@ description = "Africa Agriculture Adaptation Atlas Assistant"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "authlib>=1.6.5",
     "duckdb>=1.4.1",
     "fastapi>=0.116.2",
     "fastapi[standard]>=0.116.2",
+    "itsdangerous>=2.2.0",
     "langchain-chroma>=1.0.0",
     "langchain-mistralai>=1.0.0",
     "langchain>=1.0.2",

@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     )
     users: dict[str, str] = DEFAULT_USERS
     cors_origins: list[str] = ["http://localhost:5173"]
+    cognito_pool_endpoint: SecretStr
+    cognito_client_id: SecretStr
+    cognito_client_secret: SecretStr
 
     model_config = SettingsConfigDict(env_file=".env")  # pyright: ignore[reportUnannotatedClassAttribute]
 

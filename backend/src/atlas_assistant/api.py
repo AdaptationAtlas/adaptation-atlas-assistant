@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated, Any, Literal
 
 import jwt
+from authlib.integrations.starlette_client import OAuth
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
@@ -51,7 +52,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth: Any = OAuth()
+oauth.register(
+    "oidc",
+    client_id=settings.get_settings().cognito_client_id.get_secret_value(),
+    client_secret=settings.get_settings().cognito_client_secret.get_secret_value(),
+    server_metadata_url=f"{settings.get_settings().cognito_pool_endpoint.get_secret_value()}/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # TODO
 
 
 def get_settings() -> Settings:
@@ -154,6 +163,32 @@ class Error(BaseModel):
     """The error message"""
 
 
+@app.get("/")
+def root(request: Request):
+    return {"api_docs": f"{str(request.url)}docs"}
+
+
+# @app.route("/login")
+# async def login(request: Request):
+#     redirect_uri = request.url_for("authorize")
+#     return await oauth.oidc.authorize_redirect(request, redirect_uri)
+
+
+# @app.route("/authorize")
+# async def authorize(request: Request):
+#     token = await oauth.oidc.authorize_access_token(request)
+#     # user = await oauth.oidc.parse_id_token(request, token)
+#     user = token["userinfo"]
+#     request.session["user"] = user
+#     return user
+
+
+# @app.route("/logout")
+# def logout(request: Request):
+#     request.session.pop("user", None)
+#     return request.redirect(request.url_for("root"))
+
+
 def authenticate_user(
     username: str, password: str, users: dict[str, str]
 ) -> User | None:
@@ -196,7 +231,7 @@ async def me(current_user: Annotated[User, Depends(get_current_user)]) -> User:
 
 
 @app.post("/token", tags=["auth"])
-async def login(
+async def token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> Token:

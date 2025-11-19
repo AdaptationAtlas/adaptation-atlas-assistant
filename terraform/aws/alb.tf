@@ -23,7 +23,7 @@ module "alb" {
   security_group_egress_rules = {
     all = {
       ip_protocol = "-1"
-      cidr_ipv4   = module.vpc.vpc_cidr_block
+      cidr_ipv4   = "0.0.0.0/0"
     }
   }
 
@@ -43,6 +43,15 @@ module "alb" {
       ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
       certificate_arn = module.acm.acm_certificate_arn
 
+      authenticate_cognito = {
+        on_unauthenticated_request = "authenticate"
+        session_cookie_name        = "session-atlas"
+        session_timeout            = 3600
+        user_pool_arn              = aws_cognito_user_pool.atlas_pool.arn
+        user_pool_client_id        = aws_cognito_user_pool_client.atlas_pool_client.id
+        user_pool_domain           = aws_cognito_user_pool_domain.main.domain
+        scope                      = "openid"
+      }
       forward = {
         target_group_key = "ecs_tg"
       }
