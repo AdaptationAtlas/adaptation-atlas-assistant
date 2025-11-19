@@ -10,8 +10,25 @@
   background-color: #f9fafb;
 }
 
+.buttonHoverSlide {
+  transition: all 0.2s ease;
+}
+
+.buttonHoverSlide:hover {
+  background-color: rgba(46, 118, 54, 0.05);
+  transform: translateX(2px);
+}
+
+.buttonItalic {
+  font-style: italic;
+}
+
+.buttonAlignLeft {
+  justify-content: flex-start;
+  text-align: left;
+}
+
 .icon {
   display: inline-flex;
   align-items: center;
-  margin-right: 0.5rem;
 }
