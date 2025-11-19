@@ -38,6 +38,10 @@
     white-space: nowrap;
 }
 
+.content {
+    padding: 16px;
+}
+
 .sidebarDivider {
     height: 1px;
     background-color: #d2d6db;
