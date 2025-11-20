@@ -12,6 +12,7 @@ export interface ButtonToggleProps {
   value?: string
   onValueChange?: (value: string) => void
   defaultValue?: string
+  isDisabled?: boolean
 }
 
 export function ButtonToggle({
@@ -20,6 +21,7 @@ export function ButtonToggle({
   value,
   onValueChange,
   defaultValue,
+  isDisabled = false
 }: ButtonToggleProps) {
   return (
     <div className={styles.container}>
@@ -30,6 +32,7 @@ export function ButtonToggle({
         onValueChange={onValueChange}
         defaultValue={defaultValue}
         className={styles.toggleGroup}
+        disabled={isDisabled ?? false}
       >
         {options.map((option) => (
           <ToggleGroupItem
