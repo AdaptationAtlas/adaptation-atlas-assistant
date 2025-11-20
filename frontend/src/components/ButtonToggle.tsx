@@ -1,26 +1,26 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import styles from './TwoButtonToggle.module.css'
+import styles from './ButtonToggle.module.css'
 
 export interface ToggleOption {
   value: string
   label: string
 }
 
-export interface TwoButtonToggleProps {
+export interface ButtonToggleProps {
   label: string
-  options: [ToggleOption, ToggleOption]
+  options: ToggleOption[]
   value?: string
   onValueChange?: (value: string) => void
   defaultValue?: string
 }
 
-export function TwoButtonToggle({
+export function ButtonToggle({
   label,
   options,
   value,
   onValueChange,
   defaultValue,
-}: TwoButtonToggleProps) {
+}: ButtonToggleProps) {
   return (
     <div className={styles.container}>
       <label className={styles.label}>{label}</label>
@@ -31,12 +31,15 @@ export function TwoButtonToggle({
         defaultValue={defaultValue}
         className={styles.toggleGroup}
       >
-        <ToggleGroupItem value={options[0].value} className={styles.toggleItem}>
-          {options[0].label}
-        </ToggleGroupItem>
-        <ToggleGroupItem value={options[1].value} className={styles.toggleItem}>
-          {options[1].label}
-        </ToggleGroupItem>
+        {options.map((option) => (
+          <ToggleGroupItem
+            key={option.value}
+            value={option.value}
+            className={styles.toggleItem}
+          >
+            {option.label}
+          </ToggleGroupItem>
+        ))}
       </ToggleGroup>
     </div>
   )

@@ -8,7 +8,6 @@ import {
 } from '../../constants/sidebar';
 import { Select } from '../Select';
 import { Slider } from '../Slider';
-import { SingleSliderWithSteps } from '../SingleSliderWithSteps';
 import styles from '../SidebarSection.module.css';
 
 export function ExposureSection() {
@@ -42,14 +41,15 @@ export function ExposureSection() {
                 {crop.name !== 'None' && (
                     <Slider
                         label="Economic yield: $/ha"
+                        isSingleHandle={false}
                         min={EXPOSURE_RANGES.crop.min}
                         max={EXPOSURE_RANGES.crop.max}
                         value={[
                             crop.rangeMin ?? EXPOSURE_RANGES.crop.min,
                             crop.rangeMax ?? EXPOSURE_RANGES.crop.max,
                         ]}
-                        onValueChange={(values: [number, number]) =>
-                            setExposureRange('crop', values[0], values[1])
+                        onValueChange={(values) =>
+                            setExposureRange('crop', (values as [number, number])[0], (values as [number, number])[1])
                         }
                         minLabel={String(EXPOSURE_RANGES.crop.min)}
                         maxLabel={`>${EXPOSURE_RANGES.crop.max}`}
@@ -72,14 +72,15 @@ export function ExposureSection() {
                 {livestock.name !== 'None' && (
                     <Slider
                         label="Economic yield: $/km²"
+                        isSingleHandle={false}
                         min={EXPOSURE_RANGES.livestock.min}
                         max={EXPOSURE_RANGES.livestock.max}
                         value={[
                             livestock.rangeMin ?? EXPOSURE_RANGES.livestock.min,
                             livestock.rangeMax ?? EXPOSURE_RANGES.livestock.max,
                         ]}
-                        onValueChange={(values: [number, number]) =>
-                            setExposureRange('livestock', values[0], values[1])
+                        onValueChange={(values) =>
+                            setExposureRange('livestock', (values as [number, number])[0], (values as [number, number])[1])
                         }
                         minLabel={String(EXPOSURE_RANGES.livestock.min)}
                         maxLabel={`>${EXPOSURE_RANGES.livestock.max / 1000}K`}
@@ -102,14 +103,15 @@ export function ExposureSection() {
                 {population.name !== 'None' && (
                     <Slider
                         label="Density: people/km²"
+                        isSingleHandle={false}
                         min={EXPOSURE_RANGES.population.min}
                         max={EXPOSURE_RANGES.population.max}
                         value={[
                             population.rangeMin ?? EXPOSURE_RANGES.population.min,
                             population.rangeMax ?? EXPOSURE_RANGES.population.max,
                         ]}
-                        onValueChange={(values: [number, number]) =>
-                            setExposureRange('population', values[0], values[1])
+                        onValueChange={(values) =>
+                            setExposureRange('population', (values as [number, number])[0], (values as [number, number])[1])
                         }
                         minLabel={String(EXPOSURE_RANGES.population.min)}
                         maxLabel={`>${EXPOSURE_RANGES.population.max}`}
@@ -120,15 +122,16 @@ export function ExposureSection() {
             {/* Farm Size - only show if crop or livestock is selected */}
             {showFarmSize && (
                 <div className={styles.subsection}>
-                    <SingleSliderWithSteps
+                    <Slider
                         label="Farm Size (maximum ha)"
+                        isSingleHandle={true}
                         steps={[...FARM_SIZES].map((size, index) => ({
                             value: index,
                             label: `0 to ${size.value}ha`,
                         }))}
                         value={FARM_SIZES.findIndex((s) => s.value === maxFarmSize)}
-                        onValueChange={(value: number) => {
-                            const farmSize = FARM_SIZES[value];
+                        onValueChange={(value) => {
+                            const farmSize = FARM_SIZES[value as number];
                             if (farmSize) {
                                 setMaxFarmSize(farmSize.value);
                             }

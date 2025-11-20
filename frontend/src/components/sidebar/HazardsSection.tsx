@@ -9,8 +9,7 @@ import {
 } from '../../constants/sidebar';
 import { Select } from '../Select';
 import { Slider } from '../Slider';
-import { TwoButtonToggle } from '../TwoButtonToggle';
-import { ThreeButtonToggle } from '../ThreeButtonToggle';
+import { ButtonToggle } from '../ButtonToggle';
 import styles from '../SidebarSection.module.css';
 
 export function HazardsSection() {
@@ -41,11 +40,12 @@ export function HazardsSection() {
                 {heat.name !== 'None' && (
                     <Slider
                         label="Stress Level"
+                        isSingleHandle={false}
                         min={1}
                         max={4}
                         value={[heat.severityMin, heat.severityMax]}
-                        onValueChange={(values: [number, number]) =>
-                            setHazardSeverity('heat', values[0], values[1])
+                        onValueChange={(values) =>
+                            setHazardSeverity('heat', (values as [number, number])[0], (values as [number, number])[1])
                         }
                         minLabel={
                             SEVERITY_MARKS.find((m) => m.value === 1)?.label ||
@@ -74,11 +74,12 @@ export function HazardsSection() {
                 {drought.name !== 'None' && (
                     <Slider
                         label="Stress Level"
+                        isSingleHandle={false}
                         min={1}
                         max={4}
                         value={[drought.severityMin, drought.severityMax]}
-                        onValueChange={(values: [number, number]) =>
-                            setHazardSeverity('drought', values[0], values[1])
+                        onValueChange={(values) =>
+                            setHazardSeverity('drought', (values as [number, number])[0], (values as [number, number])[1])
                         }
                         minLabel={
                             SEVERITY_MARKS.find((m) => m.value === 1)?.label ||
@@ -107,11 +108,12 @@ export function HazardsSection() {
                 {flood.name !== 'None' && (
                     <Slider
                         label="Stress Level"
+                        isSingleHandle={false}
                         min={1}
                         max={4}
                         value={[flood.severityMin, flood.severityMax]}
-                        onValueChange={(values: [number, number]) =>
-                            setHazardSeverity('flood', values[0], values[1])
+                        onValueChange={(values) =>
+                            setHazardSeverity('flood', (values as [number, number])[0], (values as [number, number])[1])
                         }
                         minLabel={
                             SEVERITY_MARKS.find((m) => m.value === 1)?.label ||
@@ -124,8 +126,8 @@ export function HazardsSection() {
                     />
                 )}
 
-                {/* Time Period Selection - using 3 periods for ThreeButtonToggle */}
-                <ThreeButtonToggle
+                {/* Time Period Selection */}
+                <ButtonToggle
                     label="Over Period"
                     options={[
                         { value: String(TIME_PERIODS[0].value), label: TIME_PERIODS[0].label },
@@ -136,9 +138,9 @@ export function HazardsSection() {
                     onValueChange={(value: string) => setYear(Number(value))}
                 />
 
-                {/* Scenario Selection - only show if year is not 2000, using 2 scenarios for TwoButtonToggle */}
+                {/* Scenario Selection - only show if year is not 2000 */}
                 {year !== 2000 && (
-                    <TwoButtonToggle
+                    <ButtonToggle
                         label="Under Scenario"
                         options={[
                             { value: SCENARIOS[0].value, label: SCENARIOS[0].label },

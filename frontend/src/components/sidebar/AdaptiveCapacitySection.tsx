@@ -35,6 +35,7 @@ export function AdaptiveCapacitySection() {
             {name !== 'None' && currentRange && (
                 <Slider
                     label={currentLabel}
+                    isSingleHandle={false}
                     min={currentRange.min}
                     max={currentRange.max}
                     step={currentRange.step}
@@ -42,8 +43,8 @@ export function AdaptiveCapacitySection() {
                         rangeMin ?? currentRange.min,
                         rangeMax ?? currentRange.max,
                     ]}
-                    onValueChange={(values: [number, number]) =>
-                        setAdaptiveCapacityRange(values[0], values[1])
+                    onValueChange={(values) =>
+                        setAdaptiveCapacityRange((values as [number, number])[0], (values as [number, number])[1])
                     }
                     minLabel={String(currentRange.min)}
                     maxLabel={`>${currentRange.max}`}
