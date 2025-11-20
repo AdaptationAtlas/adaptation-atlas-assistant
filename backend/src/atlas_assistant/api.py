@@ -207,6 +207,11 @@ def get_current_user(
         )
 
 
+@app.get("/health")
+def health_check():
+    return {"status": "OK"}
+
+
 @app.get("/me", tags=["auth"])
 async def me(current_user: Annotated[User, Depends(get_current_user)]) -> User:
     """Returns information about the currently logged-in user."""
