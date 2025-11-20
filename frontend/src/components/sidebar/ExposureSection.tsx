@@ -8,7 +8,7 @@ import {
 } from '../../constants/sidebar';
 import { Select } from '../Select';
 import { Slider } from '../Slider';
-import { SliderWithSteps } from '../SliderWithSteps';
+import { SingleSliderWithSteps } from '../SingleSliderWithSteps';
 import styles from '../SidebarSection.module.css';
 
 export function ExposureSection() {
@@ -120,15 +120,15 @@ export function ExposureSection() {
             {/* Farm Size - only show if crop or livestock is selected */}
             {showFarmSize && (
                 <div className={styles.subsection}>
-                    <SliderWithSteps
+                    <SingleSliderWithSteps
                         label="Farm Size (maximum ha)"
                         steps={[...FARM_SIZES].map((size, index) => ({
                             value: index,
                             label: `0 to ${size.value}ha`,
                         }))}
-                        value={[FARM_SIZES.findIndex((s) => s.value === maxFarmSize), FARM_SIZES.findIndex((s) => s.value === maxFarmSize)]}
-                        onValueChange={(value: [number, number]) => {
-                            const farmSize = FARM_SIZES[value[0]];
+                        value={FARM_SIZES.findIndex((s) => s.value === maxFarmSize)}
+                        onValueChange={(value: number) => {
+                            const farmSize = FARM_SIZES[value];
                             if (farmSize) {
                                 setMaxFarmSize(farmSize.value);
                             }
