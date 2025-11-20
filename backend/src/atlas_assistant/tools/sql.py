@@ -130,6 +130,10 @@ def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[
                 ToolMessage(
                     content="\n\n".join(content_parts),
                     tool_call_id=runtime.tool_call_id,
+                    artifact={
+                        "data": data,
+                        "sql_query": sql_query.query,
+                    },
                 ),
             ],
             "sql_query": sql_query,

@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { BarChart } from './Charts/Bar';
-import type { AiResponseMessage } from '../types/generated';
+import type {
+    AiResponseMessage,
+    GenerateBarChartMetadataResponseMessage,
+} from '../types/generated';
 import type { StreamEvent, ChatStatus } from '../types/chat';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
@@ -17,6 +20,11 @@ function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { 
     if (!event) return false;
     if ('error' in event) return false;
     return event.type === 'ai';
+}
+
+function isGenerateBarChartMetadataMessage(event: StreamEvent): event is GenerateBarChartMetadataResponseMessage & { id?: string; timestamp?: number } {
+    if (!event || 'error' in event) return false;
+    return event.type === 'tool' && 'name' in event && event.name === 'generate_bar_chart_metadata';
 }
 
 const markdownComponents = {
@@ -92,7 +100,7 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
     interface ConversationTurn {
         userMessages: typeof events;
         intermediateMessages: typeof events;
-        artifacts: typeof events;
+        artifacts: GenerateBarChartMetadataResponseMessage[];
         finalAiMessage: typeof events[0] | null;
     }
 
@@ -119,8 +127,12 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
             currentTurn.userMessages.push(event);
         } else if ('error' in event) {
             currentTurn.intermediateMessages.push(event);
-        } else if (!('error' in event) && event.type === 'bar-chart') {
-            currentTurn.artifacts.push(event);
+        } else if (isGenerateBarChartMetadataMessage(event)) {
+            // only add artifact if not null 
+            if (event.data && event.bar_chart_metadata) {
+                currentTurn.artifacts.push(event);
+            }
+            currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'ai') {
             currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'tool') {
@@ -209,21 +221,23 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                     )}
 
                     {/* Render artifacts (charts) */}
-                    {turn.artifacts.map((event, index) => {
-                        const messageId = event.id || `artifact-${turnIndex}-${index}`;
+                    {turn.artifacts.map((artifact, index) => {
+                        const messageId = `artifact-${turnIndex}-${index}`;
+
+                        const data = artifact.data ? JSON.parse(artifact.data) : [];
+                        const metadata = artifact.bar_chart_metadata;
+
+                        if (!metadata) return null;
+
                         return (
                             <div key={messageId} className={styles.artifact}>
-                                {!('error' in event) && event.type === 'bar-chart' && (
-                                    <>
-                                        <BarChart
-                                            data={JSON.parse(event.content)}
-                                            metadata={event.metadata}
-                                        />
-                                        <div className={styles.copyRow}>
-                                            <CopyButton content={event.content} />
-                                        </div>
-                                    </>
-                                )}
+                                <BarChart
+                                    data={data}
+                                    metadata={metadata}
+                                />
+                                <div className={styles.copyRow}>
+                                    <CopyButton content={artifact.data || ''} />
+                                </div>
                             </div>
                         );
                     })}
