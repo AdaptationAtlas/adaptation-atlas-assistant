@@ -16,7 +16,7 @@ export interface HazardsState {
   heat: HazardLayer;
   drought: HazardLayer;
   flood: HazardLayer;
-  year: number;
+  year: number | null;
   scenario: string;
 }
 
@@ -31,7 +31,7 @@ export interface ExposureState {
   crop: ExposureLayer;
   livestock: ExposureLayer;
   population: ExposureLayer;
-  maxFarmSize: number;
+  maxFarmSize: number | null;
 }
 
 

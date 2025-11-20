@@ -87,7 +87,7 @@ const initialSidebarState: SidebarState = {
       severityMin: 1,
       severityMax: 4,
     },
-    year: 2020,
+    year: null,
     scenario: '',
   },
   exposure: {
@@ -106,7 +106,7 @@ const initialSidebarState: SidebarState = {
       rangeMin: null,
       rangeMax: null,
     },
-    maxFarmSize: 20,
+    maxFarmSize: null,
   },
   adaptiveCapacity: {
     name: 'None',
