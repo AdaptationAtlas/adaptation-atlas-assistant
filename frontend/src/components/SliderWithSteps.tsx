@@ -24,10 +24,17 @@ export function SliderWithSteps({
   const min = steps[0]?.value ?? 0
   const max = steps[steps.length - 1]?.value ?? 0
 
+  const currentValue = value || defaultValue || [min, max]
+
+  // Find the step labels for the current values
+  const minStepLabel = steps.find(s => s.value === currentValue[0])?.label ?? currentValue[0]
+  const maxStepLabel = steps.find(s => s.value === currentValue[1])?.label ?? currentValue[1]
+  const displayValue = `${minStepLabel} - ${maxStepLabel}`
+
   return (
     <div className={styles.container}>
       <div className={styles.labelRow}>
-        <span className={styles.label}>{label}</span>
+        <span className={styles.label}>{label}: {displayValue}</span>
       </div>
       <div className={styles.sliderWrapper}>
         <SliderPrimitive

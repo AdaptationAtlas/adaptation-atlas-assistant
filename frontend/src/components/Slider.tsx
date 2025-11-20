@@ -24,10 +24,15 @@ export function Slider({
   minLabel,
   maxLabel,
 }: SliderProps) {
+  const currentValue = value || defaultValue || [min, max]
+  const displayValue = currentValue.length === 2
+    ? `${currentValue[0]} - ${currentValue[1]}`
+    : currentValue[0]
+
   return (
     <div className={styles.container}>
       <div className={styles.labelRow}>
-        <span className={styles.label}>{label}</span>
+        <span className={styles.label}>{label}: {displayValue}</span>
       </div>
       <SliderPrimitive
         defaultValue={defaultValue}
