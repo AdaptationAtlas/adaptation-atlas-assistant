@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { ChatStatus, StreamEvent } from '../types/chat';
 import type { SidebarState, SidebarActions, Geography } from '../types/sidebar';
-import { GEOGRAPHIES } from '../constants/sidebar';
+import { GEOGRAPHIES, COUNTRIES } from '../constants/sidebar';
 
 export interface ChatUIState extends SidebarActions {
     status: ChatStatus;
@@ -26,10 +26,11 @@ const CHAT_ACTION_TYPES = {
   setError: 'chat/setError',
   setThreadId: 'chat/setThreadId',
   reset: 'chat/reset',
-  
+
   // Sidebar actions
   toggleSidebarSection: 'chat/toggleSidebarSection',
   setGeography: 'chat/setGeography',
+  removeGeography: 'chat/removeGeography',
   setHazardLayer: 'chat/setHazardLayer',
   setHazardSeverity: 'chat/setHazardSeverity',
   setYear: 'chat/setYear',
@@ -40,6 +41,7 @@ const CHAT_ACTION_TYPES = {
   setAdaptiveCapacityLayer: 'chat/setAdaptiveCapacityLayer',
   setAdaptiveCapacityRange: 'chat/setAdaptiveCapacityRange',
   resetSidebar: 'chat/resetSidebar',
+  removeTag: 'chat/removeTag',
   anonymous: 'chat/anonymous',
 } as const;
 
@@ -57,8 +59,11 @@ const deriveCountryCodes = (geographies: Geography[]): string[] => {
         countryCodes.push(...codes);
       }
     } else if (geography.group === 'Country') {
-      // TOOD: need COUNTRIES list
-      countryCodes.push(geography.label);
+      // Map country name to gadml0 code
+      const country = COUNTRIES.find(c => c.name === geography.label);
+      if (country) {
+        countryCodes.push(country.gadml0);
+      }
     }
   });
 
@@ -125,6 +130,7 @@ const createInitialState = (): Omit<
   | 'reset'
   | 'toggleSidebarSection'
   | 'setGeography'
+  | 'removeGeography'
   | 'setHazardLayer'
   | 'setHazardSeverity'
   | 'setYear'
@@ -135,6 +141,7 @@ const createInitialState = (): Omit<
   | 'setAdaptiveCapacityLayer'
   | 'setAdaptiveCapacityRange'
   | 'resetSidebar'
+  | 'removeTag'
 > => ({
     status: 'idle',
     events: [],
@@ -249,6 +256,26 @@ export const useChatStore = create<ChatUIState>()(
           );
         },
 
+        removeGeography: (label: string) => {
+          const { sidebar } = get();
+          const filtered = sidebar.geography.selected.filter(
+            (geo) => geo.label !== label,
+          );
+          set(
+            {
+              sidebar: {
+                ...sidebar,
+                geography: {
+                  selected: filtered,
+                  countryCodes: deriveCountryCodes(filtered),
+                },
+              },
+            },
+            false,
+            CHAT_ACTION_TYPES.removeGeography,
+          );
+        },
+
         setHazardLayer: (
           type: 'heat' | 'drought' | 'flood',
           name: string,
@@ -297,7 +324,7 @@ export const useChatStore = create<ChatUIState>()(
           );
         },
 
-        setYear: (year: number) => {
+        setYear: (year: number | null) => {
           const { sidebar } = get();
           set(
             {
@@ -306,7 +333,7 @@ export const useChatStore = create<ChatUIState>()(
                 hazards: {
                   ...sidebar.hazards,
                   year,
-                  scenario: year === 2000 ? '' : sidebar.hazards.scenario
+                  scenario: year === 2000 || year === null ? '' : sidebar.hazards.scenario
                 },
               },
             },
@@ -380,7 +407,7 @@ export const useChatStore = create<ChatUIState>()(
           );
         },
 
-        setMaxFarmSize: (size: number) => {
+        setMaxFarmSize: (size: number | null) => {
           const { sidebar } = get();
           set(
             {
@@ -445,6 +472,51 @@ export const useChatStore = create<ChatUIState>()(
             CHAT_ACTION_TYPES.resetSidebar,
           );
         },
+
+        removeTag: (tagId: string) => {
+          const { sidebar } = get();
+
+          const [section, type] = tagId.split('-');
+
+          switch (section) {
+            case 'geography': {
+              // tagId format: "geography-{index}"
+              const index = parseInt(type, 10);
+              if (!isNaN(index) && index >= 0 && index < sidebar.geography.selected.length) {
+                const label = sidebar.geography.selected[index].label;
+                get().removeGeography(label);
+              }
+              break;
+            }
+
+            case 'hazards': {
+              if (type === 'heat' || type === 'drought' || type === 'flood') {
+                get().setHazardLayer(type, 'None');
+              } else if (type === 'year') {
+                get().setYear(null);
+              } else if (type === 'scenario') {
+                get().setScenario('');
+              }
+              break;
+            }
+
+            case 'exposure': {
+              if (type === 'crop' || type === 'livestock' || type === 'population') {
+                get().setExposureLayer(type, 'None');
+              } else if (type === 'farmsize') {
+                get().setMaxFarmSize(null);
+              }
+              break;
+            }
+
+            case 'capacity': {
+              if (type === 'layer') {
+                get().setAdaptiveCapacityLayer('None');
+              }
+              break;
+            }
+          }
+        }
       }),
       {
         name: 'ChatStore',

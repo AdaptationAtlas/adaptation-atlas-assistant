@@ -21,18 +21,34 @@ export function GeographySection() {
     ];
 
     // Convert selected geographies to combobox values
-    const selectedValues = sidebar.geography.selected.map((geo) =>
-        geo.group === 'Region' ? `region:${geo.label}` : `country:${geo.label}`,
-    );
+    const selectedValues = sidebar.geography.selected.map((geo) => {
+        if (geo.group === 'Region') {
+            return `region:${geo.label}`;
+        } else {
+            // For countries, find the gadml0 code by country name
+            const country = COUNTRIES.find(c => c.name === geo.label);
+            return `country:${country?.gadml0 || geo.label}`;
+        }
+    });
 
     const handleChange = (values: string[]) => {
         // Convert combobox values back to Geography objects
         const geographies: Geography[] = values.map((value) => {
-            const [group, label] = value.split(':');
-            return {
-                group: group === 'region' ? 'Region' : 'Country',
-                label,
-            } as Geography;
+            const [group, code] = value.split(':');
+
+            if (group === 'region') {
+                return {
+                    group: 'Region',
+                    label: code, // For regions, code is the region name
+                } as Geography;
+            } else {
+                // For countries, look up the country name by gadml0 code
+                const country = COUNTRIES.find(c => c.gadml0 === code);
+                return {
+                    group: 'Country',
+                    label: country?.name || code, // Use country name, fallback to code
+                } as Geography;
+            }
         });
 
         setGeography(geographies);

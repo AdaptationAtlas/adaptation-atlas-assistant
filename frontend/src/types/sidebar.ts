@@ -54,10 +54,17 @@ export interface SidebarState {
 }
 
 
+export interface PromptContextTag {
+  id: string;
+  label: string;
+}
+
+
 export interface SidebarActions {
   toggleSidebarSection: (sectionId: string) => void;
 
   setGeography: (geographies: Geography[]) => void;
+  removeGeography: (label: string) => void;
 
   setHazardLayer: (
     type: 'heat' | 'drought' | 'flood',
@@ -68,7 +75,7 @@ export interface SidebarActions {
     min: number,
     max: number,
   ) => void;
-  setYear: (year: number) => void;
+  setYear: (year: number | null) => void;
   setScenario: (scenario: string) => void;
 
   setExposureLayer: (
@@ -80,7 +87,7 @@ export interface SidebarActions {
     min: number | null,
     max: number | null,
   ) => void;
-  setMaxFarmSize: (size: number) => void;
+  setMaxFarmSize: (size: number | null) => void;
 
   setAdaptiveCapacityLayer: (name: string) => void;
   setAdaptiveCapacityRange: (
@@ -89,4 +96,5 @@ export interface SidebarActions {
   ) => void;
 
   resetSidebar: () => void;
+  removeTag: (tagId: string) => void;
 }
