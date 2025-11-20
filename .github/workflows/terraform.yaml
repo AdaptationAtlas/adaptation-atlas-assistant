@@ -11,20 +11,19 @@ on:
       - 'terraform/**'
       - '.github/workflows/terraform.yml'
 
-env:
-  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
-  TF_IN_AUTOMATION: 1
-  TF_INPUT: 0
 
 jobs:
   terraform-plan:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    environment: dev
     permissions:
       id-token: write
       contents: write
       pull-requests: write
     env:
+      TF_IN_AUTOMATION: 1
+      TF_INPUT: 0
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
       TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
       TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
@@ -40,7 +39,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE }}
 
       - name: Terraform fmt
@@ -111,11 +110,14 @@ jobs:
   terraform-apply:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: dev
     permissions:
       id-token: write
       contents: write
       pull-requests: write
     env:
+      TF_IN_AUTOMATION: 1
+      TF_INPUT: 0
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
       TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
       TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
@@ -130,7 +132,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE }}
 
       - name: Terraform Init
