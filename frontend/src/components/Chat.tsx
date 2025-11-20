@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '../api/hooks';
+import { useAuth } from 'react-oidc-context';
 import { sendChatMessage, createStreamController } from '../api';
 import { useChatStore } from '../store/chatStore';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
@@ -31,45 +31,70 @@ export function Chat() {
         files?: number;
     }>({});
     const [showTooltip, setShowTooltip] = useState(false);
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, removeUser } = useAuth();
 
     // Chat store
-    const { status, events, threadId, startStreaming, addEvent, finishStreaming, setError, setThreadId } = useChatStore();
+    const {
+        status,
+        events,
+        threadId,
+        startStreaming,
+        addEvent,
+        finishStreaming,
+        setError,
+        setThreadId,
+    } = useChatStore();
+    
+    const handlePromptSubmit = useCallback(
+        async (value: string) => {
+            if (!value.trim()) return;
 
+            startStreaming(value);
 
-    const handlePromptSubmit = useCallback(async (value: string) => {
-        if (!value.trim()) return;
+            const controller = createStreamController();
 
-        startStreaming(value);
+            try {
+                await sendChatMessage(value, threadId, {
+                    onMessage: (message) => {
+                        if (
+                            !threadId &&
+                            'thread_id' in message &&
+                            typeof message.thread_id === 'string'
+                        ) {
+                            setThreadId(message.thread_id);
+                        }
 
-        const controller = createStreamController();
-
-        try {
-            await sendChatMessage(value, threadId, {
-                onMessage: (message) => {
-                    if (!threadId && 'thread_id' in message && typeof message.thread_id === 'string') {
-                        setThreadId(message.thread_id);
-                    }
-
-                    addEvent({
-                        ...message,
-                        id: `msg-${Date.now()}-${Math.random()}`,
-                        timestamp: Date.now(),
-                    });
-                },
-                onError: (error) => {
-                    setError(error.message);
-                },
-                onComplete: () => {
-                    finishStreaming();
-                },
-                signal: controller.signal,
-            });
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
-            setError(errorMessage);
-        }
-    }, [startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
+                        addEvent({
+                            ...message,
+                            id: `msg-${Date.now()}-${Math.random()}`,
+                            timestamp: Date.now(),
+                        });
+                    },
+                    onError: (error) => {
+                        setError(error.message);
+                    },
+                    onComplete: () => {
+                        finishStreaming();
+                    },
+                    signal: controller.signal,
+                });
+            } catch (error) {
+                const errorMessage =
+                    error instanceof Error
+                        ? error.message
+                        : 'Failed to send message';
+                setError(errorMessage);
+            }
+        },
+        [
+            startStreaming,
+            addEvent,
+            finishStreaming,
+            setError,
+            threadId,
+            setThreadId,
+        ]
+    );
 
     const handleExampleClick = (prompt: string) => {
         handlePromptSubmit(prompt);
@@ -85,11 +110,9 @@ export function Chat() {
 
     const handleAvatarClick = () => {
         if (isAuthenticated) {
-            logout();
+            removeUser();
         }
-        window.location.href = '/login';
     };
-
 
     return (
         <div className="relative flex h-screen w-full overflow-hidden bg-white">

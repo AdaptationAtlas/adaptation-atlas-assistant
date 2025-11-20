@@ -17,9 +17,11 @@
     "dependencies": {
         "@observablehq/plot": "^0.6.17",
         "@tailwindcss/vite": "^4.1.16",
+        "oidc-client-ts": "^3.4.1",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
         "react-markdown": "^10.1.0",
+        "react-oidc-context": "^3.3.0",
         "remark-gfm": "^4.0.1",
         "tailwindcss": "^4.1.16",
         "zustand": "^5.0.8"

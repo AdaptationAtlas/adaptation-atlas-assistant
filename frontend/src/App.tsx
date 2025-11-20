@@ -1,10 +1,20 @@
 import { Chat } from './components/Chat';
 import { Login } from './components/Login';
-import { useAuth } from './api/hooks';
 import './App.css';
+import { useAuth } from "react-oidc-context";
+import { apiClient } from './api';
+import { useEffect } from 'react';
 
 function App() {
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isAuthenticated, isLoading, user } = useAuth();
+    
+    useEffect(() => {
+      if (user) {
+        apiClient.setToken(user.access_token);
+      } else {
+        apiClient.clearToken();
+      }
+    }, [user])
 
     if (isLoading) {
         return (
@@ -18,7 +28,7 @@ function App() {
             </div>
         );
     }
-
+    
     return isAuthenticated ? <Chat /> : <Login />;
 }
 
