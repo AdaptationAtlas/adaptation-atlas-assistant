@@ -21,6 +21,7 @@ services:
       - ./backend/.env:/app/.env
       - ./backend/src:/app/src
       - ./backend/data:/app/data
+      - ./backend/tests:/app/tests
 
   chat:
     image: atlas/backend
