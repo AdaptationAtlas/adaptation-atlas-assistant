@@ -36,6 +36,24 @@
     color: #2e7636;
     text-transform: uppercase;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.countBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background-color: #2e7636;
+    color: white;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
 }
 
 .content {

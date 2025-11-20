@@ -5,6 +5,8 @@ import { HazardsSection } from './sidebar/HazardsSection';
 import { ExposureSection } from './sidebar/ExposureSection';
 import { AdaptiveCapacitySection } from './sidebar/AdaptiveCapacitySection';
 import { AttachmentsSection } from './sidebar/AttachmentsSection';
+import { useChatStore } from '../store/chatStore';
+import { getSectionCount } from '../utils/sidebarCounts';
 
 interface SidebarSectionProps {
     section: {
@@ -21,6 +23,10 @@ export function SidebarSection({
     isActive,
     onToggle,
 }: SidebarSectionProps) {
+    const count = useChatStore((state) =>
+        getSectionCount(section.id, state.sidebar),
+    );
+
     const renderSectionContent = () => {
         switch (section.id) {
             case 'geography':
@@ -44,7 +50,12 @@ export function SidebarSection({
                 <CaretRightIcon
                     className={`${styles.caretIcon} ${isActive ? styles.expanded : ''}`}
                 />
-                <span className={styles.sectionLabel}>{section.label}</span>
+                <span className={styles.sectionLabel}>
+                    {section.label}
+                    {count > 0 && (
+                        <span className={styles.countBadge}>{count}</span>
+                    )}
+                </span>
             </button>
             {isActive && (
                 <div className={styles.content}>{renderSectionContent()}</div>
