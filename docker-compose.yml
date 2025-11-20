@@ -53,5 +53,6 @@ services:
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/data:/app/data
+      - ./frontend/.env:/app/.env
     depends_on:
       - api

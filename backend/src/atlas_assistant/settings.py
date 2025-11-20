@@ -24,8 +24,10 @@ class Settings(BaseSettings):
     )
     users: dict[str, str] = DEFAULT_USERS
     cors_origins: list[str] = ["http://localhost:5173"]
+    oidc_url: str
+    oauth_client_id: str | None
 
-    model_config = SettingsConfigDict(env_file=".env")  # pyright: ignore[reportUnannotatedClassAttribute]
+    model_config = SettingsConfigDict(env_file=".env", extra="forbid")  # pyright: ignore[reportUnannotatedClassAttribute]
 
     def get_model(self) -> ChatMistralAI:
         """Returns the chat model as identified by these settings."""
