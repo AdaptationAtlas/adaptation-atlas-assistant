@@ -72,3 +72,11 @@ variable "cors_origins" {
   Allowed CORS origins
   EOT
 }
+
+variable "api_image_tag" {
+  type        = string
+  default     = "latest"
+  description = <<-EOT
+  Image tag to use in deployment
+  EOT
+}

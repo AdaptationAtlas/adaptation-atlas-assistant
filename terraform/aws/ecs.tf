@@ -35,7 +35,7 @@ module "ecs" {
           cpu               = 512
           memory            = 1024
           essential         = true
-          image             = join(":", [module.ecr.repository_url, "latest"])
+          image             = join(":", [module.ecr.repository_url, var.api_image_tag])
           memoryReservation = 100
           command = [
             "uvicorn",
