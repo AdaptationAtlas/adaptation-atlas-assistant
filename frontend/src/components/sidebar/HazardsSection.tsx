@@ -139,17 +139,16 @@ export function HazardsSection() {
                 />
 
                 {/* Scenario Selection - only show if year is not 2000 */}
-                {year !== 2000 && (
-                    <ButtonToggle
-                        label="Under Scenario"
-                        options={[
-                            { value: SCENARIOS[0].value, label: SCENARIOS[0].label },
-                            { value: SCENARIOS[2].value, label: SCENARIOS[2].label },
-                        ]}
-                        value={scenario}
-                        onValueChange={(value: string) => setScenario(value)}
-                    />
-                )}
+                <ButtonToggle
+                    isDisabled={year === 2000}
+                    label="Under Scenario"
+                    options={[
+                        { value: SCENARIOS[0].value, label: SCENARIOS[0].label },
+                        { value: SCENARIOS[2].value, label: SCENARIOS[2].label },
+                    ]}
+                    value={scenario}
+                    onValueChange={(value: string) => setScenario(value)}
+                />
             </div>
         </>
     );

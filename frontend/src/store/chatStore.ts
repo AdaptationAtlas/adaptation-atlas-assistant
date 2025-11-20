@@ -88,7 +88,7 @@ const initialSidebarState: SidebarState = {
       severityMax: 4,
     },
     year: 2020,
-    scenario: 'ssp245',
+    scenario: '',
   },
   exposure: {
     crop: {
@@ -306,6 +306,7 @@ export const useChatStore = create<ChatUIState>()(
                 hazards: {
                   ...sidebar.hazards,
                   year,
+                  scenario: year === 2000 ? '' : sidebar.hazards.scenario
                 },
               },
             },
