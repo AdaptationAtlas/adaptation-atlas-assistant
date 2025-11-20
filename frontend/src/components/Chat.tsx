@@ -6,6 +6,7 @@ import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
 import { ChatResponse } from './ChatResponse';
+import { SIDEBAR_SECTIONS } from '../constants/sidebar';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
 
@@ -15,16 +16,7 @@ const examplePrompts = [
     'Compare adaptive capacity between smallholder farmers in Malawi and Zambia',
 ];
 
-const sidebarSections = [
-    { id: 'geography', label: 'GEOGRAPHY', expanded: false },
-    { id: 'hazards', label: 'CLIMATE HAZARDS', expanded: false },
-    { id: 'exposure', label: 'EXPOSURE', expanded: false },
-    { id: 'capacity', label: 'ADAPTIVE CAPACITY', expanded: false },
-    { id: 'attachments', label: 'ATTACHMENTS', expanded: false },
-];
-
 export function Chat() {
-    const [activeSections, setActiveSections] = useState<string[]>([]);
     const [selectedContext] = useState<{
         location?: string;
         crop?: string;
@@ -33,8 +25,19 @@ export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
     const { isAuthenticated, logout } = useAuth();
 
-    // Chat store
-    const { status, events, threadId, startStreaming, addEvent, finishStreaming, setError, setThreadId } = useChatStore();
+    // Chat store - includes chat state and sidebar state
+    const {
+        status,
+        events,
+        threadId,
+        sidebar,
+        startStreaming,
+        addEvent,
+        finishStreaming,
+        setError,
+        setThreadId,
+        toggleSidebarSection,
+    } = useChatStore();
 
 
     const handlePromptSubmit = useCallback(async (value: string) => {
@@ -75,14 +78,6 @@ export function Chat() {
         handlePromptSubmit(prompt);
     };
 
-    const toggleSection = (sectionId: string) => {
-        setActiveSections((prev) =>
-            prev.includes(sectionId)
-                ? prev.filter((id) => id !== sectionId)
-                : [...prev, sectionId]
-        );
-    };
-
     const handleAvatarClick = () => {
         if (isAuthenticated) {
             logout();
@@ -121,9 +116,12 @@ export function Chat() {
             </div>
 
             <PromptBuilderSidebar
-                sections={sidebarSections}
-                activeSections={activeSections}
-                onToggleSection={toggleSection}
+                sections={SIDEBAR_SECTIONS.map((section) => ({
+                    ...section,
+                    expanded: sidebar.expandedSections.includes(section.id),
+                }))}
+                activeSections={sidebar.expandedSections}
+                onToggleSection={toggleSidebarSection}
             />
 
             <main className={styles.mainContent}>
