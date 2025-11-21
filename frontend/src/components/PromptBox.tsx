@@ -1,17 +1,21 @@
 import { useState } from 'react';
-import { ArrowUpIcon, XIcon, PaperclipIcon } from '../assets/icons';
+import { ArrowUpIcon } from '../assets/icons';
+import { Pill } from './Pill';
 import styles from './PromptBox.module.css';
+import type { PromptContextTag } from '../types/sidebar';
 
 interface PromptBoxProps {
     className?: string;
     onSubmit?: (value: string) => void;
-    context?: { location?: string; crop?: string; files?: number };
+    context?: PromptContextTag[];
+    onRemoveTag?: (tagId: string) => void;
 }
 
 export function PromptBox({
     className = '',
     onSubmit,
     context,
+    onRemoveTag,
 }: PromptBoxProps) {
     const [value, setValue] = useState('');
     const [focused, setFocused] = useState(false);
@@ -30,8 +34,7 @@ export function PromptBox({
         }
     };
 
-    const hasContext =
-        context && (context.location || context.crop || context.files);
+    const hasContext = context && context.length > 0;
 
     return (
         <div className={`${styles.container} ${className}`}>
@@ -52,36 +55,14 @@ export function PromptBox({
                 <div className={styles.controls}>
                     {hasContext && (
                         <div className={styles.contextTags}>
-                            {context.location && (
-                                <div className={styles.tag}>
-                                    {context.location}
-                                    <button
-                                        className={styles.tagClose}
-                                        aria-label="Remove location"
-                                    >
-                                        <XIcon className={styles.tagIcon} />
-                                    </button>
-                                </div>
-                            )}
-                            {context.crop && (
-                                <div className={styles.tag}>
-                                    {context.crop}
-                                    <button
-                                        className={styles.tagClose}
-                                        aria-label="Remove crop"
-                                    >
-                                        <XIcon className={styles.tagIcon} />
-                                    </button>
-                                </div>
-                            )}
-                            {context.files && context.files > 0 && (
-                                <div className={styles.tag}>
-                                    <PaperclipIcon
-                                        className={styles.attachIcon}
-                                    />
-                                    {context.files}
-                                </div>
-                            )}
+                            {context.map((tag: PromptContextTag) => (
+                                <Pill
+                                    key={tag.id}
+                                    onRemove={onRemoveTag ? () => onRemoveTag(tag.id) : undefined}
+                                >
+                                    {tag.label}
+                                </Pill>
+                            ))}
                         </div>
                     )}
 

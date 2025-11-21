@@ -1,0 +1,48 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 4px;
+  background-color: #F3F4F6;
+  border: 1px solid #D2D6DB;
+  color: #111927;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.leftIcon {
+  display: inline-flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.text {
+  line-height: 1.2;
+}
+
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #656e7b;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.removeButton:hover {
+  color: #111927;
+}
+
+.removeIcon {
+  width: 14px;
+  height: 14px;
+}
