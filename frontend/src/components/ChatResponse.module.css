@@ -183,9 +183,9 @@
     margin: 0 rem 0;
 }
 
-.li > .p {
+.aiContent .li > .p,
+.toolContent .li > .p {
     margin: 0;
-    display: inline;
 }
 
 .aiContent > .p,
