@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { ChatStatus, StreamEvent } from '../types/chat';
-import type { SidebarState, SidebarActions, Geography } from '../types/sidebar';
+import type { SidebarState, SidebarActions, Geography, SeverityLevel } from '../types/sidebar';
 import { GEOGRAPHIES, COUNTRIES } from '../constants/sidebar';
 
 export interface ChatUIState extends SidebarActions {
@@ -79,18 +79,18 @@ const initialSidebarState: SidebarState = {
   hazards: {
     heat: {
       name: 'None',
-      severityMin: 1,
-      severityMax: 4,
+      severityMin: 'None',
+      severityMax: 'Extreme',
     },
     drought: {
       name: 'None',
-      severityMin: 1,
-      severityMax: 4,
+      severityMin: 'None',
+      severityMax: 'Extreme',
     },
     flood: {
       name: 'None',
-      severityMin: 1,
-      severityMax: 4,
+      severityMin: 'None',
+      severityMax: 'Extreme',
     },
     year: null,
     scenario: '',
@@ -301,8 +301,8 @@ export const useChatStore = create<ChatUIState>()(
 
         setHazardSeverity: (
           type: 'heat' | 'drought' | 'flood',
-          min: number,
-          max: number,
+          min: SeverityLevel,
+          max: SeverityLevel,
         ) => {
           const { sidebar } = get();
           set(

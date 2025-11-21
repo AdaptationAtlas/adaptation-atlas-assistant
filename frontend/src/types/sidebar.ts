@@ -5,10 +5,12 @@ export interface Geography {
 }
 
 
+export type SeverityLevel = 'None' | 'Moderate' | 'Severe' | 'Extreme';
+
 export interface HazardLayer {
   name: string;
-  severityMin: number;
-  severityMax: number;
+  severityMin: SeverityLevel;
+  severityMax: SeverityLevel;
 }
 
 export interface HazardsState {
@@ -72,8 +74,8 @@ export interface SidebarActions {
   ) => void;
   setHazardSeverity: (
     type: 'heat' | 'drought' | 'flood',
-    min: number,
-    max: number,
+    min: SeverityLevel,
+    max: SeverityLevel,
   ) => void;
   setYear: (year: number | null) => void;
   setScenario: (scenario: string) => void;

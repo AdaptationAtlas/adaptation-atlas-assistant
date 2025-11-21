@@ -7,10 +7,27 @@ import {
     TIME_PERIODS,
     SCENARIOS,
 } from '../../constants/sidebar';
+import type { SeverityLevel } from '../../types/sidebar';
+import type { Step } from '../Slider';
 import { Select } from '../Select';
 import { Slider } from '../Slider';
 import { ButtonToggle } from '../ButtonToggle';
 import styles from '../SidebarSection.module.css';
+
+// Convert readonly SEVERITY_MARKS to mutable Step[] for Slider component
+const SEVERITY_STEPS: Step[] = [...SEVERITY_MARKS];
+
+// Helper to convert severity string to numeric value for slider
+const severityToNumber = (severity: SeverityLevel): number => {
+    const mark = SEVERITY_MARKS.find(m => m.label === severity);
+    return mark?.value ?? 1;
+};
+
+// Helper to convert numeric slider value to severity string
+const numberToSeverity = (value: number): SeverityLevel => {
+    const mark = SEVERITY_MARKS.find(m => m.value === value);
+    return (mark?.label ?? 'None') as SeverityLevel;
+};
 
 export function HazardsSection() {
     const {
@@ -41,20 +58,12 @@ export function HazardsSection() {
                     <Slider
                         label="Stress Level"
                         isSingleHandle={false}
-                        min={1}
-                        max={4}
-                        value={[heat.severityMin, heat.severityMax]}
-                        onValueChange={(values) =>
-                            setHazardSeverity('heat', (values as [number, number])[0], (values as [number, number])[1])
-                        }
-                        minLabel={
-                            SEVERITY_MARKS.find((m) => m.value === 1)?.label ||
-                            'None'
-                        }
-                        maxLabel={
-                            SEVERITY_MARKS.find((m) => m.value === 4)?.label ||
-                            'Extreme'
-                        }
+                        steps={SEVERITY_STEPS}
+                        value={[severityToNumber(heat.severityMin), severityToNumber(heat.severityMax)]}
+                        onValueChange={(values) => {
+                            const [min, max] = values as [number, number];
+                            setHazardSeverity('heat', numberToSeverity(min), numberToSeverity(max));
+                        }}
                     />
                 )}
             </div>
@@ -75,20 +84,12 @@ export function HazardsSection() {
                     <Slider
                         label="Stress Level"
                         isSingleHandle={false}
-                        min={1}
-                        max={4}
-                        value={[drought.severityMin, drought.severityMax]}
-                        onValueChange={(values) =>
-                            setHazardSeverity('drought', (values as [number, number])[0], (values as [number, number])[1])
-                        }
-                        minLabel={
-                            SEVERITY_MARKS.find((m) => m.value === 1)?.label ||
-                            'None'
-                        }
-                        maxLabel={
-                            SEVERITY_MARKS.find((m) => m.value === 4)?.label ||
-                            'Extreme'
-                        }
+                        steps={SEVERITY_STEPS}
+                        value={[severityToNumber(drought.severityMin), severityToNumber(drought.severityMax)]}
+                        onValueChange={(values) => {
+                            const [min, max] = values as [number, number];
+                            setHazardSeverity('drought', numberToSeverity(min), numberToSeverity(max));
+                        }}
                     />
                 )}
             </div>
@@ -109,20 +110,12 @@ export function HazardsSection() {
                     <Slider
                         label="Stress Level"
                         isSingleHandle={false}
-                        min={1}
-                        max={4}
-                        value={[flood.severityMin, flood.severityMax]}
-                        onValueChange={(values) =>
-                            setHazardSeverity('flood', (values as [number, number])[0], (values as [number, number])[1])
-                        }
-                        minLabel={
-                            SEVERITY_MARKS.find((m) => m.value === 1)?.label ||
-                            'None'
-                        }
-                        maxLabel={
-                            SEVERITY_MARKS.find((m) => m.value === 4)?.label ||
-                            'Extreme'
-                        }
+                        steps={SEVERITY_STEPS}
+                        value={[severityToNumber(flood.severityMin), severityToNumber(flood.severityMax)]}
+                        onValueChange={(values) => {
+                            const [min, max] = values as [number, number];
+                            setHazardSeverity('flood', numberToSeverity(min), numberToSeverity(max));
+                        }}
                     />
                 )}
 
