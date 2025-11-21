@@ -722,6 +722,12 @@ export const EXPOSURE_RANGES = {
   population: { min: 0, max: 45 },
 } as const;
 
+export const EXPOSURE_UNITS = {
+  crop: '$/ha',
+  livestock: '$/km²',
+  population: 'people/km²',
+} as const;
+
 /**
  * TODO: confirm real values.
  */
@@ -736,6 +742,16 @@ export const ADAPTIVE_CAPACITY_RANGES: Record<
   'Banking Access': { min: 0, max: 0.9, step: 0.1 },
   'Mobile Broadband': { min: 0, max: 50 },
   'Market Access': { min: 0, max: 300 },
+};
+
+export const ADAPTIVE_CAPACITY_UNITS: Record<string, string> = {
+  'Education Years': 'index (0-1)',
+  'Health Facility Access': 'minutes',
+  'Gender Equity': 'index (0-1)',
+  'Wealth': 'index (0-100)',
+  'Banking Access': 'proportion (0-1)',
+  'Mobile Broadband': 'Mb/s',
+  'Market Access': 'minutes',
 };
 
 export const SIDEBAR_SECTIONS = [
