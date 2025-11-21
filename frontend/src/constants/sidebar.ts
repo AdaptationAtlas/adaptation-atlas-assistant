@@ -1,35 +1,605 @@
-/**
- * TODO: Import actual regions data
- */
-export const REGIONS: string[] = [
-  'East Africa',
-  'West Africa',
-  'Southern Africa',
-  'Central Africa',
-  'North Africa',
-  // ...
-];
-
-/**
- * TODO: Import actual countries data
- */
-export const COUNTRIES: Array<{ name: string; gadml0: string }> = [
-  { name: 'Kenya', gadml0: 'KEN' },
-  { name: 'Ethiopia', gadml0: 'ETH' },
-  { name: 'Tanzania', gadml0: 'TZA' },
-  // Add more countries as needed
-];
-
-/**
- * TODO: Import actual geography data
- */
-export const GEOGRAPHIES: Array<{
-  label: string;
-  value: Array<{ gadml0: string }>;
-}> = [
+export const GEOGRAPHIES = [
   {
-    label: 'East Africa',
-    value: [{ gadml0: 'KEN' }, { gadml0: 'ETH' }, { gadml0: 'TZA' }],
+    label: 'Sub-Saharan Africa',
+    value: [
+      {
+        gadml0: 'AGO',
+        name: 'Angola',
+      },
+      {
+        gadml0: 'BDI',
+        name: 'Burundi',
+      },
+      {
+        gadml0: 'BEN',
+        name: 'Benin',
+      },
+      {
+        gadml0: 'BFA',
+        name: 'Burkina Faso',
+      },
+      {
+        gadml0: 'BWA',
+        name: 'Botswana',
+      },
+      {
+        gadml0: 'CAF',
+        name: 'Central African Republic',
+      },
+      {
+        gadml0: 'CIV',
+        name: "Côte d'Ivoire",
+      },
+      {
+        gadml0: 'CMR',
+        name: 'Cameroon',
+      },
+      {
+        gadml0: 'COD',
+        name: 'Democratic Republic of the Congo',
+      },
+      {
+        gadml0: 'COG',
+        name: 'Republic of Congo',
+      },
+      {
+        gadml0: 'DJI',
+        name: 'Djibouti',
+      },
+      {
+        gadml0: 'ERI',
+        name: 'Eritrea',
+      },
+      {
+        gadml0: 'ETH',
+        name: 'Ethiopia',
+      },
+      {
+        gadml0: 'GAB',
+        name: 'Gabon',
+      },
+      {
+        gadml0: 'GHA',
+        name: 'Ghana',
+      },
+      {
+        gadml0: 'GIN',
+        name: 'Guinea',
+      },
+      {
+        gadml0: 'GMB',
+        name: 'Gambia',
+      },
+      {
+        gadml0: 'GNB',
+        name: 'Guinea-Bissau',
+      },
+      {
+        gadml0: 'GNQ',
+        name: 'Equatorial Guinea',
+      },
+      {
+        gadml0: 'KEN',
+        name: 'Kenya',
+      },
+      {
+        gadml0: 'LBR',
+        name: 'Liberia',
+      },
+      {
+        gadml0: 'LSO',
+        name: 'Lesotho',
+      },
+      {
+        gadml0: 'MDG',
+        name: 'Madagascar',
+      },
+      {
+        gadml0: 'MLI',
+        name: 'Mali',
+      },
+      {
+        gadml0: 'MOZ',
+        name: 'Mozambique',
+      },
+      {
+        gadml0: 'MRT',
+        name: 'Mauritania',
+      },
+      {
+        gadml0: 'MWI',
+        name: 'Malawi',
+      },
+      {
+        gadml0: 'NAM',
+        name: 'Namibia',
+      },
+      {
+        gadml0: 'NER',
+        name: 'Niger',
+      },
+      {
+        gadml0: 'NGA',
+        name: 'Nigeria',
+      },
+      {
+        gadml0: 'RWA',
+        name: 'Rwanda',
+      },
+      {
+        gadml0: 'SEN',
+        name: 'Senegal',
+      },
+      {
+        gadml0: 'SLE',
+        name: 'Sierra Leone',
+      },
+      {
+        gadml0: 'SOM',
+        name: 'Somalia',
+      },
+      {
+        gadml0: 'SSD',
+        name: 'South Sudan',
+      },
+      {
+        gadml0: 'SWZ',
+        name: 'Swaziland',
+      },
+      {
+        gadml0: 'TCD',
+        name: 'Chad',
+      },
+      {
+        gadml0: 'TGO',
+        name: 'Togo',
+      },
+      {
+        gadml0: 'TZA',
+        name: 'Tanzania',
+      },
+      {
+        gadml0: 'UGA',
+        name: 'Uganda',
+      },
+      {
+        gadml0: 'ZAF',
+        name: 'South Africa',
+      },
+      {
+        gadml0: 'ZMB',
+        name: 'Zambia',
+      },
+      {
+        gadml0: 'ZWE',
+        name: 'Zimbabwe',
+      },
+    ],
+  },
+  {
+    label: 'Central Africa',
+    value: [
+      {
+        gadml0: 'AGO',
+        name: 'Angola',
+      },
+      {
+        gadml0: 'CMR',
+        name: 'Cameroon',
+      },
+      {
+        gadml0: 'CAF',
+        name: 'Central African Republic',
+      },
+      {
+        gadml0: 'TCD',
+        name: 'Chad',
+      },
+      {
+        gadml0: 'COD',
+        name: 'Democratic Republic of the Congo',
+      },
+      {
+        gadml0: 'GNQ',
+        name: 'Equatorial Guinea',
+      },
+      {
+        gadml0: 'GAB',
+        name: 'Gabon',
+      },
+      {
+        gadml0: 'COG',
+        name: 'Republic of Congo',
+      },
+    ],
+  },
+  {
+    label: 'Eastern Africa',
+    value: [
+      {
+        gadml0: 'BDI',
+        name: 'Burundi',
+      },
+      {
+        gadml0: 'DJI',
+        name: 'Djibouti',
+      },
+      {
+        gadml0: 'ERI',
+        name: 'Eritrea',
+      },
+      {
+        gadml0: 'ETH',
+        name: 'Ethiopia',
+      },
+      {
+        gadml0: 'KEN',
+        name: 'Kenya',
+      },
+      {
+        gadml0: 'MDG',
+        name: 'Madagascar',
+      },
+      {
+        gadml0: 'MWI',
+        name: 'Malawi',
+      },
+      {
+        gadml0: 'MOZ',
+        name: 'Mozambique',
+      },
+      {
+        gadml0: 'RWA',
+        name: 'Rwanda',
+      },
+      {
+        gadml0: 'SOM',
+        name: 'Somalia',
+      },
+      {
+        gadml0: 'SSD',
+        name: 'South Sudan',
+      },
+      {
+        gadml0: 'TZA',
+        name: 'Tanzania',
+      },
+      {
+        gadml0: 'UGA',
+        name: 'Uganda',
+      },
+      {
+        gadml0: 'ZMB',
+        name: 'Zambia',
+      },
+      {
+        gadml0: 'ZWE',
+        name: 'Zimbabwe',
+      },
+    ],
+  },
+  {
+    label: 'Southern Africa',
+    value: [
+      {
+        gadml0: 'BWA',
+        name: 'Botswana',
+      },
+      {
+        gadml0: 'LSO',
+        name: 'Lesotho',
+      },
+      {
+        gadml0: 'NAM',
+        name: 'Namibia',
+      },
+      {
+        gadml0: 'ZAF',
+        name: 'South Africa',
+      },
+      {
+        gadml0: 'SWZ',
+        name: 'Swaziland',
+      },
+    ],
+  },
+  {
+    label: 'Western Africa',
+    value: [
+      {
+        gadml0: 'BEN',
+        name: 'Benin',
+      },
+      {
+        gadml0: 'BFA',
+        name: 'Burkina Faso',
+      },
+      {
+        gadml0: 'CIV',
+        name: "Côte d'Ivoire",
+      },
+      {
+        gadml0: 'GMB',
+        name: 'Gambia',
+      },
+      {
+        gadml0: 'GHA',
+        name: 'Ghana',
+      },
+      {
+        gadml0: 'GIN',
+        name: 'Guinea',
+      },
+      {
+        gadml0: 'GNB',
+        name: 'Guinea-Bissau',
+      },
+      {
+        gadml0: 'LBR',
+        name: 'Liberia',
+      },
+      {
+        gadml0: 'MLI',
+        name: 'Mali',
+      },
+      {
+        gadml0: 'MRT',
+        name: 'Mauritania',
+      },
+      {
+        gadml0: 'NER',
+        name: 'Niger',
+      },
+      {
+        gadml0: 'NGA',
+        name: 'Nigeria',
+      },
+      {
+        gadml0: 'SEN',
+        name: 'Senegal',
+      },
+      {
+        gadml0: 'SLE',
+        name: 'Sierra Leone',
+      },
+      {
+        gadml0: 'TGO',
+        name: 'Togo',
+      },
+    ],
+  },
+  {
+    label: 'AGRA',
+    value: [
+      {
+        gadml0: 'BFA',
+        name: 'Burkina Faso',
+      },
+      {
+        gadml0: 'ETH',
+        name: 'Ethiopia',
+      },
+      {
+        gadml0: 'GHA',
+        name: 'Ghana',
+      },
+      {
+        gadml0: 'KEN',
+        name: 'Kenya',
+      },
+      {
+        gadml0: 'MLI',
+        name: 'Mali',
+      },
+      {
+        gadml0: 'MOZ',
+        name: 'Mozambique',
+      },
+      {
+        gadml0: 'MWI',
+        name: 'Malawi',
+      },
+      {
+        gadml0: 'NGA',
+        name: 'Nigeria',
+      },
+      {
+        gadml0: 'RWA',
+        name: 'Rwanda',
+      },
+      {
+        gadml0: 'TZA',
+        name: 'Tanzania',
+      },
+      {
+        gadml0: 'UGA',
+        name: 'Uganda',
+      },
+    ],
+  },
+];
+
+export const REGIONS = [
+  'Central Africa',
+  'Sub-Saharan Africa',
+  'Eastern Africa',
+  'Southern Africa',
+  'Western Africa',
+  'AGRA',
+];
+
+export const COUNTRIES = [
+  {
+    gadml0: 'AGO',
+    name: 'Angola',
+  },
+  {
+    gadml0: 'BDI',
+    name: 'Burundi',
+  },
+  {
+    gadml0: 'BEN',
+    name: 'Benin',
+  },
+  {
+    gadml0: 'BWA',
+    name: 'Botswana',
+  },
+  {
+    gadml0: 'CAF',
+    name: 'Central African Republic',
+  },
+  {
+    gadml0: 'CIV',
+    name: "Côte d'Ivoire",
+  },
+  {
+    gadml0: 'CMR',
+    name: 'Cameroon',
+  },
+  {
+    gadml0: 'COD',
+    name: 'Democratic Republic of the Congo',
+  },
+  {
+    gadml0: 'COG',
+    name: 'Republic of Congo',
+  },
+  {
+    gadml0: 'DJI',
+    name: 'Djibouti',
+  },
+  {
+    gadml0: 'ERI',
+    name: 'Eritrea',
+  },
+  {
+    gadml0: 'ETH',
+    name: 'Ethiopia',
+  },
+  {
+    gadml0: 'GAB',
+    name: 'Gabon',
+  },
+  {
+    gadml0: 'GHA',
+    name: 'Ghana',
+  },
+  {
+    gadml0: 'GIN',
+    name: 'Guinea',
+  },
+  {
+    gadml0: 'GMB',
+    name: 'Gambia',
+  },
+  {
+    gadml0: 'GNB',
+    name: 'Guinea-Bissau',
+  },
+  {
+    gadml0: 'GNQ',
+    name: 'Equatorial Guinea',
+  },
+  {
+    gadml0: 'KEN',
+    name: 'Kenya',
+  },
+  {
+    gadml0: 'LBR',
+    name: 'Liberia',
+  },
+  {
+    gadml0: 'LSO',
+    name: 'Lesotho',
+  },
+  {
+    gadml0: 'MDG',
+    name: 'Madagascar',
+  },
+  {
+    gadml0: 'MLI',
+    name: 'Mali',
+  },
+  {
+    gadml0: 'MOZ',
+    name: 'Mozambique',
+  },
+  {
+    gadml0: 'MRT',
+    name: 'Mauritania',
+  },
+  {
+    gadml0: 'MWI',
+    name: 'Malawi',
+  },
+  {
+    gadml0: 'NAM',
+    name: 'Namibia',
+  },
+  {
+    gadml0: 'NER',
+    name: 'Niger',
+  },
+  {
+    gadml0: 'NGA',
+    name: 'Nigeria',
+  },
+  {
+    gadml0: 'RWA',
+    name: 'Rwanda',
+  },
+  {
+    gadml0: 'SEN',
+    name: 'Senegal',
+  },
+  {
+    gadml0: 'SLE',
+    name: 'Sierra Leone',
+  },
+  {
+    gadml0: 'SOM',
+    name: 'Somalia',
+  },
+  {
+    gadml0: 'SSD',
+    name: 'South Sudan',
+  },
+  {
+    gadml0: 'SWZ',
+    name: 'Swaziland',
+  },
+  {
+    gadml0: 'TCD',
+    name: 'Chad',
+  },
+  {
+    gadml0: 'TGO',
+    name: 'Togo',
+  },
+  {
+    gadml0: 'TZA',
+    name: 'Tanzania',
+  },
+  {
+    gadml0: 'UGA',
+    name: 'Uganda',
+  },
+  {
+    gadml0: 'ZAF',
+    name: 'South Africa',
+  },
+  {
+    gadml0: 'ZMB',
+    name: 'Zambia',
+  },
+  {
+    gadml0: 'ZWE',
+    name: 'Zimbabwe',
+  },
+  {
+    gadml0: 'BFA',
+    name: 'Burkina Faso',
   },
 ];
 
