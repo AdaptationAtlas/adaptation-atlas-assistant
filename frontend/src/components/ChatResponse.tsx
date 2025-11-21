@@ -55,6 +55,18 @@ const markdownComponents = {
     },
     td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => {
         return <td className={styles.td} {...props}>{children}</td>;
+    },
+    ul: ({ children, ...props }: React.ComponentPropsWithoutRef<'ul'>) => {
+        return <ul className={styles.ul} {...props}>{children}</ul>;
+    },
+    ol: ({ children, ...props }: React.ComponentPropsWithoutRef<'ol'>) => {
+        return <ol className={styles.ol} {...props}>{children}</ol>;
+    },
+    li: ({ children, ...props }: React.ComponentPropsWithoutRef<'li'>) => {
+        return <li className={styles.li} {...props}>{children}</li>;
+    },
+    p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => {
+        return <p className={styles.p} {...props}>{children}</p>;
     }
 };
 
