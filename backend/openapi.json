@@ -587,12 +587,6 @@
         ],
         "title": "ValidationError"
       }
-    },
-    "securitySchemes": {
-      "OpenIdConnect": {
-        "type": "openIdConnect",
-        "openIdConnectUrl": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_8VGoEWFWT/.well-known/openid-configuration"
-      }
     }
   }
 }
