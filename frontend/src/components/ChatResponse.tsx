@@ -5,6 +5,7 @@ import type {
     GenerateBarChartMetadataResponseMessage,
 } from '../types/generated';
 import type { StreamEvent, ChatStatus } from '../types/chat';
+import { Button } from './Button';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -75,7 +76,7 @@ interface CopyButtonProps {
     className?: string;
 }
 
-function CopyButton({ content, className = '' }: CopyButtonProps) {
+function CopyButton({ content }: CopyButtonProps) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -87,24 +88,13 @@ function CopyButton({ content, className = '' }: CopyButtonProps) {
     };
 
     return (
-        <button
+        <Button
+            variant="outline"
             onClick={handleCopy}
-            className={`${styles.copyButton} ${className}`}
-            title="Copy raw markdown"
-            aria-label="Copy raw markdown"
+            icon={copied ? <CheckIcon /> : <CopyIcon />}
         >
-            {copied ? (
-                <>
-                    <CheckIcon className={styles.copyIcon} />
-                    <span className={styles.copyLabel}>Copied</span>
-                </>
-            ) : (
-                <>
-                    <CopyIcon className={styles.copyIcon} />
-                    <span className={styles.copyLabel}>Copy</span>
-                </>
-            )}
-        </button>
+            {copied ? 'Copied' : 'Copy'}
+        </Button>
     );
 }
 

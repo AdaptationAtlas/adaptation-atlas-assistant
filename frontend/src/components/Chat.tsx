@@ -2,10 +2,13 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '../api/hooks';
 import { sendChatMessage, createStreamController } from '../api';
 import { useChatStore } from '../store/chatStore';
+import { contextTagsToText } from '../utils/tagFormatting';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
 import { ChatResponse } from './ChatResponse';
+import { SIDEBAR_SECTIONS, EXPOSURE_UNITS, ADAPTIVE_CAPACITY_UNITS } from '../constants/sidebar';
+import type { SidebarState, PromptContextTag } from '../types/sidebar';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
 
@@ -15,37 +18,118 @@ const examplePrompts = [
     'Compare adaptive capacity between smallholder farmers in Malawi and Zambia',
 ];
 
-const sidebarSections = [
-    { id: 'geography', label: 'GEOGRAPHY', expanded: false },
-    { id: 'hazards', label: 'CLIMATE HAZARDS', expanded: false },
-    { id: 'exposure', label: 'EXPOSURE', expanded: false },
-    { id: 'capacity', label: 'ADAPTIVE CAPACITY', expanded: false },
-    { id: 'attachments', label: 'ATTACHMENTS', expanded: false },
-];
+function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
+    const tags: PromptContextTag[] = [];
+
+    sidebar.geography.selected.forEach((geo, index) => {
+        tags.push({
+            id: `geography-${index}`,
+            label: geo.label,
+        });
+    });
+
+    const hazardTypes = ['heat', 'drought', 'flood'] as const;
+    hazardTypes.forEach((type) => {
+        const hazard = sidebar.hazards[type];
+        if (hazard.name !== 'None') {
+            tags.push({
+                id: `hazards-${type}`,
+                label: `${hazard.name}: ${hazard.severityMin}-${hazard.severityMax}`,
+            });
+        }
+    });
+
+    if (sidebar.hazards.year !== null) {
+        tags.push({
+            id: 'hazards-year',
+            label: `Year: ${sidebar.hazards.year}`,
+        });
+    }
+
+    if (sidebar.hazards.scenario && sidebar.hazards.scenario !== '') {
+        tags.push({
+            id: 'hazards-scenario',
+            label: `Scenario: ${sidebar.hazards.scenario}`,
+        });
+    }
+
+    const exposureTypes = ['crop', 'livestock', 'population'] as const;
+    exposureTypes.forEach((type) => {
+        const exposure = sidebar.exposure[type];
+        if (exposure.name !== 'None') {
+            const hasRange = exposure.rangeMin !== null && exposure.rangeMax !== null;
+            const unit = EXPOSURE_UNITS[type];
+            const label = hasRange
+                ? `${exposure.name}: ${exposure.rangeMin}-${exposure.rangeMax} ${unit}`
+                : exposure.name;
+            tags.push({
+                id: `exposure-${type}`,
+                label,
+            });
+        }
+    });
+
+    if (sidebar.exposure.maxFarmSize !== null) {
+        tags.push({
+            id: 'exposure-farmsize',
+            label: `Farm Size: ${sidebar.exposure.maxFarmSize} ha`,
+        });
+    }
+
+    if (sidebar.adaptiveCapacity.name !== 'None') {
+        const hasRange = sidebar.adaptiveCapacity.rangeMin !== null && sidebar.adaptiveCapacity.rangeMax !== null;
+        const unit = ADAPTIVE_CAPACITY_UNITS[sidebar.adaptiveCapacity.name] || '';
+        const label = hasRange && unit
+            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax} ${unit}`
+            : hasRange
+            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax}`
+            : sidebar.adaptiveCapacity.name;
+        tags.push({
+            id: 'capacity-layer',
+            label,
+        });
+    }
+
+    return tags;
+}
 
 export function Chat() {
-    const [activeSections, setActiveSections] = useState<string[]>([]);
-    const [selectedContext] = useState<{
-        location?: string;
-        crop?: string;
-        files?: number;
-    }>({});
     const [showTooltip, setShowTooltip] = useState(false);
     const { isAuthenticated, logout } = useAuth();
 
-    // Chat store
-    const { status, events, threadId, startStreaming, addEvent, finishStreaming, setError, setThreadId } = useChatStore();
+    // Chat store - includes chat state and sidebar state
+    const {
+        status,
+        events,
+        threadId,
+        sidebar,
+        startStreaming,
+        addEvent,
+        finishStreaming,
+        setError,
+        setThreadId,
+        toggleSidebarSection,
+        removeTag,
+    } = useChatStore();
 
+    // Convert sidebar state to context tags
+    const contextTags = sidebarToContextTags(sidebar);
 
     const handlePromptSubmit = useCallback(async (value: string) => {
         if (!value.trim()) return;
+
+        // Inject context tags as natural language into the query
+        const contextTagsAsText = contextTagsToText(contextTags);
+        const queryWithContext = contextTagsAsText
+            ? `${contextTagsAsText}\n\nQuestion: ${value}`
+            : value;
 
         startStreaming(value);
 
         const controller = createStreamController();
 
         try {
-            await sendChatMessage(value, threadId, {
+            await sendChatMessage(queryWithContext, threadId, {
                 onMessage: (message) => {
                     if (!threadId && 'thread_id' in message && typeof message.thread_id === 'string') {
                         setThreadId(message.thread_id);
@@ -69,18 +153,10 @@ export function Chat() {
             const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
             setError(errorMessage);
         }
-    }, [startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
+    }, [contextTags, startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
 
     const handleExampleClick = (prompt: string) => {
         handlePromptSubmit(prompt);
-    };
-
-    const toggleSection = (sectionId: string) => {
-        setActiveSections((prev) =>
-            prev.includes(sectionId)
-                ? prev.filter((id) => id !== sectionId)
-                : [...prev, sectionId]
-        );
     };
 
     const handleAvatarClick = () => {
@@ -121,9 +197,12 @@ export function Chat() {
             </div>
 
             <PromptBuilderSidebar
-                sections={sidebarSections}
-                activeSections={activeSections}
-                onToggleSection={toggleSection}
+                sections={SIDEBAR_SECTIONS.map((section) => ({
+                    ...section,
+                    expanded: sidebar.expandedSections.includes(section.id),
+                }))}
+                activeSections={sidebar.expandedSections}
+                onToggleSection={toggleSidebarSection}
             />
 
             <main className={styles.mainContent}>
@@ -143,7 +222,8 @@ export function Chat() {
                 <div className={styles.promptContainer}>
                     <PromptBox
                         onSubmit={handlePromptSubmit}
-                        context={selectedContext}
+                        context={contextTags}
+                        onRemoveTag={removeTag}
                     />
                 </div>
             </main>

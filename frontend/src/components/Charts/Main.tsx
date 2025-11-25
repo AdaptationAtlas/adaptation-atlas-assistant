@@ -16,31 +16,32 @@ export function Chart({ data, spec, title, className }: ChartProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!containerRef.current || !data || data.length === 0) return;
+        const container = containerRef.current;
+        if (!container || !data || data.length === 0) return;
 
         try {
             // Create the plot with the provided spec
             const plot = Plot.plot({
                 ...spec,
-                width: containerRef.current.clientWidth,
+                width: container.clientWidth,
                 height: spec.height || 400,
             });
 
             // Clear previous content and append new plot
-            containerRef.current.innerHTML = '';
-            containerRef.current.appendChild(plot);
+            container.innerHTML = '';
+            container.appendChild(plot);
         } catch (error) {
             console.error('Error rendering chart:', error);
-            if (containerRef.current) {
-                containerRef.current.innerHTML =
+            if (container) {
+                container.innerHTML =
                     '<p className={styles.error}>Error rendering chart</p>';
             }
         }
 
         // Cleanup function
         return () => {
-            if (containerRef.current) {
-                containerRef.current.innerHTML = '';
+            if (container) {
+                container.innerHTML = '';
             }
         };
     }, [data, spec]);
