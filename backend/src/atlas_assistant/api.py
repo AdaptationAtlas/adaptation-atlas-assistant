@@ -251,7 +251,8 @@ async def login(
     | SelectDatasetResponseMessage
     | GenerateTableResponseMessage
     | GenerateBarChartMetadataResponseMessage
-    | AiResponseMessage,
+    | AiResponseMessage
+    | OutputResponseMessage,
 )
 async def chat(
     request: Request,
