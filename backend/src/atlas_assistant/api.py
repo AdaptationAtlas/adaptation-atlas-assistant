@@ -25,7 +25,7 @@ from starlette import status
 from atlas_assistant.state import BarChartMetadata
 
 from . import settings
-from .agent import Agent, create_agent
+from .agent import Agent, Output, create_agent
 from .context import Context
 from .dataset import Dataset
 from .settings import Settings
@@ -101,7 +101,7 @@ class User(BaseModel):
 class ResponseMessage(BaseModel):
     """A response message from our API while chatting."""
 
-    content: str
+    content: str | None
     """The content of the message"""
 
     thread_id: str
@@ -109,6 +109,18 @@ class ResponseMessage(BaseModel):
 
     def to_event_stream(self) -> str:
         return "data: " + self.model_dump_json()
+
+
+class OutputResponseMessage(ResponseMessage):
+    """The response from an output"""
+
+    content: str | None = None
+
+    type: Literal["output"] = "output"
+    """The type of the response"""
+
+    output: Output
+    """The output"""
 
 
 class ToolResponseMessage(ResponseMessage):
@@ -288,16 +300,31 @@ async def query_agent(
         for value in update.values():
             if messages := value.get("messages"):
                 for msg in messages:
-                    if msg.content and (
-                        response_message := create_response_message(
-                            msg,
-                            thread_id,
-                        )
-                    ):
+                    response_message = maybe_create_response_message(msg, thread_id)
+                    if response_message:
                         if event_stream:
                             yield response_message.to_event_stream() + "\n\n"
                         else:
                             yield response_message.model_dump_json() + "\n"
+
+
+def maybe_create_response_message(
+    message: BaseMessage, thread_id: str
+) -> ResponseMessage | None:
+    additional_kwargs = message.to_json().get("kwargs", {}).get("additional_kwargs")
+    if additional_kwargs and (tool_calls := additional_kwargs.get("tool_calls")):
+        for tool_call in tool_calls:
+            function = tool_call.get("function")
+            if function.get("name") == "Output":
+                return OutputResponseMessage(
+                    output=Output.model_validate_json(function.get("arguments")),
+                    thread_id=thread_id,
+                )
+    if message.content:
+        return create_response_message(
+            message,
+            thread_id,
+        )
 
 
 def create_response_message(
