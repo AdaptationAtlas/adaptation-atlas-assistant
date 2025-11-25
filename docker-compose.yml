@@ -1,16 +1,16 @@
 services:
   api:
     image: atlas/backend
+    platform: linux/amd64
     build:
       context: backend
+      target: local
     ports:
       - "8000:8000"
     command:
       [
-        "uv",
-        "run",
         "uvicorn",
-        "src.atlas_assistant.api:app",
+        "atlas_assistant.api:app",
         "--reload",
         "--reload-exclude",
         "*data*",
@@ -20,17 +20,14 @@ services:
     volumes:
       - ./backend/.env:/app/.env
       - ./backend/src:/app/src
-      - ./backend/chainlit:/app/chainlit
       - ./backend/data:/app/data
-      - ./backend/.chainlit:/app/.chainlit
+      - ./backend/tests:/app/tests
 
   chat:
     image: atlas/backend
     pull_policy: never
     command:
       [
-        "uv",
-        "run",
         "chainlit",
         "run",
         "chainlit/app.py",
@@ -42,6 +39,9 @@ services:
       - "8501:8501"
     volumes_from:
       - api
+    volumes:
+      - ./backend/chainlit:/app/chainlit
+      - ./backend/.chainlit:/app/.chainlit
 
   frontend:
     image: atlas/frontend
