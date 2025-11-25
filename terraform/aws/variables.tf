@@ -67,7 +67,7 @@ variable "jwt_key" {
 
 variable "cors_origins" {
   type        = string
-  default     = ""
+  default     = "[]"
   description = <<-EOT
   Allowed CORS origins
   EOT
@@ -78,5 +78,13 @@ variable "api_image_tag" {
   default     = "latest"
   description = <<-EOT
   Image tag to use in deployment
+  EOT
+}
+
+variable "mfa_sender_email" {
+  type        = string
+  default     = "ali@developmentseed.org"
+  description = <<-EOT
+  Used to create + manage an SES Identity for MFA emails
   EOT
 }
