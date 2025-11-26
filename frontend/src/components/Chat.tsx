@@ -136,7 +136,7 @@ export function Chat() {
 
                 {status !== 'idle' && (
                     <div className={styles.contentArea}>
-                        <ChatResponse events={events} status={status} />
+                        <ChatResponse events={events} status={status} onSuggestionClick={handlePromptSubmit} />
                     </div>
                 )}
 

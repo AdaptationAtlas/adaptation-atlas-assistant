@@ -3,7 +3,9 @@ import { BarChart } from './Charts/Bar';
 import type {
     AiResponseMessage,
     GenerateBarChartMetadataResponseMessage,
+    OutputResponseMessage,
 } from '../types/generated';
+import { ExamplePrompts } from './ExamplePrompts';
 import type { StreamEvent, ChatStatus } from '../types/chat';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
@@ -14,6 +16,7 @@ import { copyToClipboard } from '../utils/clipboard';
 interface ChatResponseProps {
     events: StreamEvent[];
     status: ChatStatus;
+    onSuggestionClick?: (query: string) => void;
 }
 
 function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { id?: string; timestamp?: number } {
@@ -25,6 +28,12 @@ function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { 
 function isGenerateBarChartMetadataMessage(event: StreamEvent): event is GenerateBarChartMetadataResponseMessage & { id?: string; timestamp?: number } {
     if (!event || 'error' in event) return false;
     return event.type === 'tool' && 'name' in event && event.name === 'generate_bar_chart_metadata';
+}
+
+function isOutputMessage(event: StreamEvent | null): event is OutputResponseMessage & { id?: string; timestamp?: number } {
+    if (!event) return false;
+    if ('error' in event) return false;
+    return event.type === 'output';
 }
 
 const markdownComponents = {
@@ -108,7 +117,7 @@ function CopyButton({ content, className = '' }: CopyButtonProps) {
     );
 }
 
-export function ChatResponse({ events, status }: ChatResponseProps) {
+export function ChatResponse({ events, status, onSuggestionClick }: ChatResponseProps) {
     interface ConversationTurn {
         userMessages: typeof events;
         intermediateMessages: typeof events;
@@ -147,6 +156,8 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
             currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'ai') {
             currentTurn.intermediateMessages.push(event);
+        } else if (!('error' in event) && event.type === 'output') {
+            currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'tool') {
             currentTurn.intermediateMessages.push(event);
         }
@@ -163,18 +174,18 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
             return;
         }
 
-        let lastAiMessageIdx = -1;
+        let lastFinalMessageIdx = -1;
         for (let i = turn.intermediateMessages.length - 1; i >= 0; i--) {
             const msg = turn.intermediateMessages[i];
-            if (!('error' in msg) && msg.type === 'ai') {
-                lastAiMessageIdx = i;
+            if (!('error' in msg) && (msg.type === 'ai' || msg.type === 'output')) {
+                lastFinalMessageIdx = i;
                 break;
             }
         }
 
-        if (lastAiMessageIdx !== -1) {
-            turn.finalAiMessage = turn.intermediateMessages[lastAiMessageIdx];
-            turn.intermediateMessages.splice(lastAiMessageIdx, 1);
+        if (lastFinalMessageIdx !== -1) {
+            turn.finalAiMessage = turn.intermediateMessages[lastFinalMessageIdx];
+            turn.intermediateMessages.splice(lastFinalMessageIdx, 1);
         }
     });
 
@@ -220,8 +231,8 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                                                         {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
                                                     </summary>
                                                     <div className={styles.toolContent}>
-                                                        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content}</ReactMarkdown>
-                                                        <CopyButton content={event.content} />
+                                                        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
+                                                        <CopyButton content={event.content ?? ''} />
                                                     </div>
                                                 </details>
                                             )}
@@ -254,19 +265,44 @@ export function ChatResponse({ events, status }: ChatResponseProps) {
                         );
                     })}
 
-                    {/* Render final AI message */}
+                    {/* Render final message (AI or Output) */}
                     {(() => {
-                        if (!isAiMessage(turn.finalAiMessage)) return null;
-                        return (
-                            <div className={styles.aiMessage}>
-                                <div className={styles.aiContent}>
-                                    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{(turn.finalAiMessage as AiResponseMessage).content}</ReactMarkdown>
+                        if (isOutputMessage(turn.finalAiMessage)) {
+                            const output = turn.finalAiMessage.output;
+                            return (
+                                <div className={styles.aiMessage}>
+                                    <div className={styles.aiContent}>
+                                        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+                                            {output.answer}
+                                        </ReactMarkdown>
+                                    </div>
+                                    <div className={styles.copyRow}>
+                                        <CopyButton content={output.answer} />
+                                    </div>
+                                    {output.queries.length > 0 && onSuggestionClick && (
+                                        <ExamplePrompts
+                                            prompts={output.queries}
+                                            onExampleClick={onSuggestionClick}
+                                        />
+                                    )}
                                 </div>
-                                <div className={styles.copyRow}>
-                                    <CopyButton content={(turn.finalAiMessage as AiResponseMessage).content} />
+                            );
+                        }
+                        if (isAiMessage(turn.finalAiMessage)) {
+                            return (
+                                <div className={styles.aiMessage}>
+                                    <div className={styles.aiContent}>
+                                        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+                                            {turn.finalAiMessage.content ?? ''}
+                                        </ReactMarkdown>
+                                    </div>
+                                    <div className={styles.copyRow}>
+                                        <CopyButton content={turn.finalAiMessage.content ?? ''} />
+                                    </div>
                                 </div>
-                            </div>
-                        );
+                            );
+                        }
+                        return null;
                     })()}
                 </div>
             ))}

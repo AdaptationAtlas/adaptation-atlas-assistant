@@ -4,6 +4,7 @@ import type {
     SelectDatasetResponseMessage,
     GenerateTableResponseMessage,
     GenerateBarChartMetadataResponseMessage,
+    OutputResponseMessage,
 } from './generated';
 
 export type ChatStatus = 'idle' | 'streaming' | 'complete' | 'error';
@@ -27,6 +28,7 @@ export type StreamEvent = (
     | (SelectDatasetResponseMessage & { id?: string; timestamp?: number })
     | (GenerateTableResponseMessage & { id?: string; timestamp?: number })
     | (GenerateBarChartMetadataResponseMessage & { id?: string; timestamp?: number })
+    | (OutputResponseMessage & { id?: string; timestamp?: number })
     | UserMessage
     | ErrorEvent
 );
