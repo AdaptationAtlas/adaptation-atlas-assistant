@@ -5,6 +5,7 @@ import type {
     GenerateBarChartMetadataResponseMessage,
 } from '../types/generated';
 import type { StreamEvent, ChatStatus } from '../types/chat';
+import { Button } from './Button';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -55,6 +56,18 @@ const markdownComponents = {
     },
     td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => {
         return <td className={styles.td} {...props}>{children}</td>;
+    },
+    ul: ({ children, ...props }: React.ComponentPropsWithoutRef<'ul'>) => {
+        return <ul className={styles.ul} {...props}>{children}</ul>;
+    },
+    ol: ({ children, ...props }: React.ComponentPropsWithoutRef<'ol'>) => {
+        return <ol className={styles.ol} {...props}>{children}</ol>;
+    },
+    li: ({ children, ...props }: React.ComponentPropsWithoutRef<'li'>) => {
+        return <li className={styles.li} {...props}>{children}</li>;
+    },
+    p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => {
+        return <p className={styles.p} {...props}>{children}</p>;
     }
 };
 
@@ -63,7 +76,7 @@ interface CopyButtonProps {
     className?: string;
 }
 
-function CopyButton({ content, className = '' }: CopyButtonProps) {
+function CopyButton({ content }: CopyButtonProps) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -75,24 +88,13 @@ function CopyButton({ content, className = '' }: CopyButtonProps) {
     };
 
     return (
-        <button
+        <Button
+            variant="outline"
             onClick={handleCopy}
-            className={`${styles.copyButton} ${className}`}
-            title="Copy raw markdown"
-            aria-label="Copy raw markdown"
+            icon={copied ? <CheckIcon /> : <CopyIcon />}
         >
-            {copied ? (
-                <>
-                    <CheckIcon className={styles.copyIcon} />
-                    <span className={styles.copyLabel}>Copied</span>
-                </>
-            ) : (
-                <>
-                    <CopyIcon className={styles.copyIcon} />
-                    <span className={styles.copyLabel}>Copy</span>
-                </>
-            )}
-        </button>
+            {copied ? 'Copied' : 'Copy'}
+        </Button>
     );
 }
 

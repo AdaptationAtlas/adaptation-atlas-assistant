@@ -1,22 +1,57 @@
-FROM --platform=linux/amd64 python:3.13-slim
+ARG PYTHON_VERSION=3.13
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+FROM python:${PYTHON_VERSION}-slim AS build
 
-RUN adduser atlas
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PYTHON_DOWNLOADS=0
 
 #0.9.5
 COPY --from=ghcr.io/astral-sh/uv@sha256:f459f6f73a8c4ef5d69f4e6fbbdb8af751d6fa40ec34b39a1ab469acd6e289b7 /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY ./pyproject.toml ./uv.lock ./README.md /app/
-COPY ./data /app/data
-COPY ./chainlit /app/chainlit
-COPY ./.chainlit /app/.chainlit
-COPY ./src /app/src
+COPY pyproject.toml uv.lock README.md /app
 
-RUN uv sync --frozen --no-dev
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync \
+        --frozen \
+        --no-dev \
+        --no-editable \
+        --no-install-project
 
-RUN chown -R atlas:atlas /app
-USER atlas
+COPY src /app/src
+COPY data /app/data
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync \
+        --frozen \
+        --no-dev \
+        --no-editable \
+        --compile-bytecode
+
+###################################
+# DEVELOPMENT (--target local)
+###################################
+FROM build AS local
+
+COPY . .
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+
+ENV PATH=/app/.venv/bin:$PATH
+
+###################################
+# PRODUCTION (--target prod)
+###################################
+FROM python:${PYTHON_VERSION}-slim AS prod
+
+COPY --from=build --chown=app:app /app /app
+
+ENV PYTHONUNBUFFERED=1
+ENV PATH=/app/.venv/bin:$PATH
+
+WORKDIR /app

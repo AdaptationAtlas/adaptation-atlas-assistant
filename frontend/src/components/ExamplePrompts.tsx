@@ -1,4 +1,5 @@
 import { MagicWandIcon } from '../assets/icons';
+import { Button } from './Button';
 import styles from './ExamplePrompts.module.css';
 
 interface ExamplePromptsProps {
@@ -22,14 +23,16 @@ export function ExamplePrompts({
 
             <div className={styles.examplesList}>
                 {prompts.map((prompt, index) => (
-                    <button
+                    <Button
                         key={index}
-                        className={styles.examplePrompt}
                         onClick={() => onExampleClick(prompt)}
+                        icon={<MagicWandIcon />}
+                        hoverSlide={true}
+                        italic={true}
+                        align="left"
                     >
-                        <MagicWandIcon className={styles.exampleIcon} />
-                        <span className={styles.exampleText}>{prompt}</span>
-                    </button>
+                        {prompt}
+                    </Button>
                 ))}
             </div>
         </div>

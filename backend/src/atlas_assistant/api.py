@@ -157,6 +157,11 @@ class Error(BaseModel):
     """The error message"""
 
 
+@app.get("/health")
+def health_check():
+    return {"status": "OK"}
+
+
 @app.post(
     "/chat",
     tags=["chat"],
