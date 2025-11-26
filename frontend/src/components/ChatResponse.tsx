@@ -36,6 +36,11 @@ function isOutputMessage(event: StreamEvent | null): event is OutputResponseMess
     return event.type === 'output';
 }
 
+function isOutputToolEvent(event: StreamEvent): boolean {
+    if (!event || 'error' in event) return false;
+    return event.type === 'tool' && 'name' in event && event.name?.toLowerCase() === 'output';
+}
+
 const markdownComponents = {
     pre: ({ children, ...props }: React.ComponentPropsWithoutRef<'pre'>) => {
         return (
@@ -212,36 +217,42 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                     })}
 
                     {/* Render intermediate messages (reasoning/tool calls) */}
-                    {turn.intermediateMessages.length > 0 && (
-                        <details className={styles.reasoningDropdown}>
-                            <summary className={styles.reasoningSummary}>
-                                {getSummaryText()}
-                            </summary>
-                            <div className={styles.reasoningContent}>
-                                {turn.intermediateMessages.map((event, index) => {
-                                    const messageId = event.id || `intermediate-${turnIndex}-${index}`;
+                    {(() => {
+                        const toolCallMessages = turn.intermediateMessages.filter((event) => !isOutputToolEvent(event));
 
-                                    return (
-                                        <div key={messageId} className={styles.intermediateMessage}>
-                                            {'error' in event ? (
-                                                <div>Error: {event.error}</div>
-                                            ) : (
-                                                <details>
-                                                    <summary className={styles.toolSummary}>
-                                                        {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
-                                                    </summary>
-                                                    <div className={styles.toolContent}>
-                                                        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
-                                                        <CopyButton content={event.content ?? ''} />
-                                                    </div>
-                                                </details>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </details>
-                    )}
+                        if (toolCallMessages.length === 0) return null;
+
+                        return (
+                            <details className={styles.reasoningDropdown}>
+                                <summary className={styles.reasoningSummary}>
+                                    {getSummaryText()}
+                                </summary>
+                                <div className={styles.reasoningContent}>
+                                    {toolCallMessages.map((event, index) => {
+                                        const messageId = event.id || `intermediate-${turnIndex}-${index}`;
+
+                                        return (
+                                            <div key={messageId} className={styles.intermediateMessage}>
+                                                {'error' in event ? (
+                                                    <div>Error: {event.error}</div>
+                                                ) : (
+                                                    <details>
+                                                        <summary className={styles.toolSummary}>
+                                                            {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                        </summary>
+                                                        <div className={styles.toolContent}>
+                                                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
+                                                            <CopyButton content={event.content ?? ''} />
+                                                        </div>
+                                                    </details>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </details>
+                        );
+                    })()}
 
                     {/* Render artifacts (charts) */}
                     {turn.artifacts.map((artifact, index) => {
