@@ -1,8 +1,3 @@
-# Verified SES Identity is required when using email MFA, cannot use Cognito default
-resource "aws_ses_email_identity" "email_mfa" {
-  email = var.mfa_sender_email
-}
-
 resource "aws_cognito_user_pool" "atlas_pool" {
   name = "atlas-backend"
 
@@ -13,7 +8,8 @@ resource "aws_cognito_user_pool" "atlas_pool" {
 
   email_configuration {
     email_sending_account = "DEVELOPER"
-    source_arn            = aws_ses_email_identity.email_mfa.arn
+    source_arn            = var.email_source_arn
+    from_email_address    = var.from_email_address
   }
   email_mfa_configuration {}
 
