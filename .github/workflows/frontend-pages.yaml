@@ -45,9 +45,9 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         env:
-          # Set via Repository Settings > Secrets and variables > Actions > Variables
-          # Add VITE_API_URL variable with your production API endpoint
-          VITE_API_URL: ${{ vars.VITE_API_URL || '//api.example.com' }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_COGNITO_AUTHORITY: ${{ vars.COGNITO_AUTHORITY }}
+          VITE_COGNITO_CLIENT_ID: ${{ vars.COGNITO_CLIENT_ID }}
         run: npm run build
 
       - name: Setup Pages

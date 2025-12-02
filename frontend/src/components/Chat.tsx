@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '../api/hooks';
+import { useAuth } from 'react-oidc-context';
 import { sendChatMessage, createStreamController } from '../api';
 import { useChatStore } from '../store/chatStore';
 import { contextTagsToText } from '../utils/tagFormatting';
@@ -95,7 +95,7 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
 
 export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
-    const { isAuthenticated, logout } = useAuth();
+      const { isAuthenticated, removeUser } = useAuth();
 
     // Chat store - includes chat state and sidebar state
     const {
@@ -161,9 +161,8 @@ export function Chat() {
 
     const handleAvatarClick = () => {
         if (isAuthenticated) {
-            logout();
+            removeUser();
         }
-        window.location.href = '/login';
     };
 
 

@@ -1,86 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
-import type { User } from '../types/generated';
+import { useState, useCallback } from 'react';
 import {
-  login as apiLogin,
-  logout as apiLogout,
-  getCurrentUser,
   sendChatMessage,
-  isAuthenticated as checkAuthenticated,
 } from './endpoints';
 import { createStreamController, type ChatMessage } from './streaming';
-
-export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(checkAuthenticated());
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const login = useCallback(async (username: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      await apiLogin(username, password);
-      setIsAuthenticated(true);
-      return true;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Login failed';
-      setError(errorMessage);
-      setIsAuthenticated(false);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const logout = useCallback(() => {
-    apiLogout();
-    setIsAuthenticated(false);
-    setError(null);
-  }, []);
-
-  return {
-    isAuthenticated,
-    login,
-    logout,
-    isLoading,
-    error,
-  };
-}
-
-export function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchUser = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const userData = await getCurrentUser();
-      setUser(userData);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to fetch user';
-      setError(errorMessage);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (checkAuthenticated()) {
-      fetchUser();
-    }
-  }, [fetchUser]);
-
-  return {
-    user,
-    isLoading,
-    error,
-    refetch: fetchUser,
-  };
-}
 
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
