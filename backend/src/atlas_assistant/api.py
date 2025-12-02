@@ -25,7 +25,7 @@ from starlette import status
 from atlas_assistant.state import BarChartMetadata
 
 from . import settings
-from .agent import Agent, create_agent
+from .agent import Agent, Output, create_agent
 from .context import Context
 from .dataset import Dataset
 from .settings import Settings
@@ -101,7 +101,7 @@ class User(BaseModel):
 class ResponseMessage(BaseModel):
     """A response message from our API while chatting."""
 
-    content: str
+    content: str | None
     """The content of the message"""
 
     thread_id: str
@@ -109,6 +109,18 @@ class ResponseMessage(BaseModel):
 
     def to_event_stream(self) -> str:
         return "data: " + self.model_dump_json()
+
+
+class OutputResponseMessage(ResponseMessage):
+    """The response from an output"""
+
+    content: str | None = None
+
+    type: Literal["output"] = "output"
+    """The type of the response"""
+
+    output: Output
+    """The output"""
 
 
 class ToolResponseMessage(ResponseMessage):
@@ -244,7 +256,8 @@ async def login(
     | SelectDatasetResponseMessage
     | GenerateTableResponseMessage
     | GenerateBarChartMetadataResponseMessage
-    | AiResponseMessage,
+    | AiResponseMessage
+    | OutputResponseMessage,
 )
 async def chat(
     request: Request,
@@ -284,6 +297,7 @@ async def query_agent(
     Each message is a JSON object on a new line.
     """
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
+    ensure_messages_ready_for_user(agent, config)
     async for update in agent.astream(
         {"messages": [HumanMessage(content=query)]},
         stream_mode="updates",
@@ -293,16 +307,31 @@ async def query_agent(
         for value in update.values():
             if messages := value.get("messages"):
                 for msg in messages:
-                    if msg.content and (
-                        response_message := create_response_message(
-                            msg,
-                            thread_id,
-                        )
-                    ):
+                    response_message = maybe_create_response_message(msg, thread_id)
+                    if response_message:
                         if event_stream:
                             yield response_message.to_event_stream() + "\n\n"
                         else:
                             yield response_message.model_dump_json() + "\n"
+
+
+def maybe_create_response_message(
+    message: BaseMessage, thread_id: str
+) -> ResponseMessage | None:
+    additional_kwargs = message.to_json().get("kwargs", {}).get("additional_kwargs")
+    if additional_kwargs and (tool_calls := additional_kwargs.get("tool_calls")):
+        for tool_call in tool_calls:
+            function = tool_call.get("function")
+            if function.get("name") == "Output":
+                return OutputResponseMessage(
+                    output=Output.model_validate_json(function.get("arguments")),
+                    thread_id=thread_id,
+                )
+    if message.content:
+        return create_response_message(
+            message,
+            thread_id,
+        )
 
 
 def create_response_message(
@@ -360,3 +389,21 @@ def create_response_message(
     else:
         logger.warning(f"No response messages created for message: {message.to_json()}")
         return None
+
+
+def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None:
+    """Mistrail fails when a tool message is followed by a user message.
+    Append a short assistant acknowledgement so the next user turn comes
+    after an assistant role.
+    """
+    state = agent.get_state(config)
+    messages = list(state.values.get("messages", []))
+    if messages and isinstance(messages[-1], ToolMessage):
+        last_tool = messages[-1]
+        acknowledgement = (
+            f"Noted the result from tool '{last_tool.name}'."
+            if getattr(last_tool, "name", None)
+            else "Noted the previous tool result."
+        )
+        messages.append(AIMessage(content=acknowledgement))
+        _ = agent.update_state(config, {"messages": messages})
