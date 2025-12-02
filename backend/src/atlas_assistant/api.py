@@ -40,15 +40,15 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[dict[str, Any]]:
 
 oidc = OpenIdConnect(openIdConnectUrl=settings.oidc_url)
 if settings.oauth_client_id:
-    swagger_ui_init_oath = {
+    swagger_ui_init_oauth = {
         "clientId": settings.oauth_client_id,
         "appName": "Adaptation Atlas Assistant",
         "scopes": "email openid phone",
     }
 else:
-    swagger_ui_init_oath = None
+    swagger_ui_init_oauth = None
 
-app = FastAPI(lifespan=lifespan, swagger_ui_init_oauth=swagger_ui_init_oath)
+app = FastAPI(lifespan=lifespan, swagger_ui_init_oauth=swagger_ui_init_oauth)
 
 # Configure CORS
 app.add_middleware(
