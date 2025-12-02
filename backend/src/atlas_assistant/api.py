@@ -292,6 +292,7 @@ async def query_agent(
     Each message is a JSON object on a new line.
     """
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
+    ensure_messages_ready_for_user(agent, config)
     async for update in agent.astream(
         {"messages": [HumanMessage(content=query)]},
         stream_mode="updates",
@@ -383,3 +384,21 @@ def create_response_message(
     else:
         logger.warning(f"No response messages created for message: {message.to_json()}")
         return None
+
+
+def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None:
+    """Mistrail fails when a tool message is followed by a user message.
+    Append a short assistant acknowledgement so the next user turn comes
+    after an assistant role.
+    """
+    state = agent.get_state(config)
+    messages = list(state.values.get("messages", []))
+    if messages and isinstance(messages[-1], ToolMessage):
+        last_tool = messages[-1]
+        acknowledgement = (
+            f"Noted the result from tool '{last_tool.name}'."
+            if getattr(last_tool, "name", None)
+            else "Noted the previous tool result."
+        )
+        messages.append(AIMessage(content=acknowledgement))
+        _ = agent.update_state(config, {"messages": messages})

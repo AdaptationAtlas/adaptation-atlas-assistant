@@ -13,7 +13,7 @@ export type AiResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -142,7 +142,7 @@ export type GenerateBarChartMetadataResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -175,7 +175,7 @@ export type GenerateTableResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -232,6 +232,41 @@ export type Item = {
 };
 
 /**
+ * Output
+ */
+export type Output = {
+    /**
+     * Answer
+     */
+    answer: string;
+    /**
+     * Queries
+     */
+    queries: Array<string>;
+};
+
+/**
+ * OutputResponseMessage
+ *
+ * The response from an output
+ */
+export type OutputResponseMessage = {
+    /**
+     * Content
+     */
+    content?: string | null;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'output';
+    output: Output;
+};
+
+/**
  * Properties
  *
  * STAC item properties, the ones we use
@@ -262,7 +297,7 @@ export type SelectDatasetResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -331,7 +366,7 @@ export type ToolResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -449,7 +484,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | AiResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];
