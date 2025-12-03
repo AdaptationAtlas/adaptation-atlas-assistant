@@ -51,27 +51,30 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+          BUILD_ID: ${{ github.run_id }}
         run: |
           SHORT_SHA="sha-${GITHUB_SHA::7}"
           IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}"
+          TAG="$IMAGE:$SHORT_SHA:$BUILD_ID"
+
           echo "Building and pushing $IMAGE:$SHORT_SHA"
 
-          docker build -t "$IMAGE:$SHORT_SHA" --platform linux/amd64 --target prod -f backend/Dockerfile backend
-          docker push "$IMAGE:$SHORT_SHA"
-          
-          echo "Pushed: $IMAGE:$SHORT_SHA"
-          
+          docker build -t "$TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
+          docker push "$TAG"
+
+          echo "Pushed: $TAG"
+
           if [ "${{ github.ref }}" = "refs/heads/build/add-ecr-workflow" ]; then
-            echo "Tagging $IMAGE:$SHORT_SHA as :latest"
-            docker tag "$IMAGE:$SHORT_SHA" "$IMAGE:latest"
+            echo "Tagging $TAG as :latest"
+            docker tag "$TAG" "$IMAGE:latest"
             docker push "$IMAGE:latest"
             echo "Pushed: $IMAGE:latest"
           fi
 
-      - name: Deployment to ECS
-        run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
+      # - name: Deployment to ECS
+      #   run: |
+      #     aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
             
-      - name: Wait for Service to Stabilize
-        run: |
-          aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --cli-connect-timeout 90 > /dev/null
+      # - name: Wait for Service to Stabilize
+      #   run: |
+      #     aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --cli-connect-timeout 90 > /dev/null
