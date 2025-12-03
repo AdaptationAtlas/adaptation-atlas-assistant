@@ -32,7 +32,7 @@ jobs:
       - name: Login to ECR
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
-        
+
       - name: Install uv based on the config files in the working-directory
         uses: astral-sh/setup-uv@v7
 
@@ -59,6 +59,8 @@ jobs:
           else
             FULL_TAG="dev-$TAG"
           fi
+
+          echo "Building and pushing image: $FULL_TAG"
 
           docker build -t "$FULL_TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
           docker push "$FULL_TAG"
