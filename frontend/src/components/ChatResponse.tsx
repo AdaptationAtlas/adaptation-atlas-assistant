@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { BarChart } from './Charts/Bar';
-import type { ChartProps } from './Charts/Main';
+import type { ChartProps, ChartRef } from './Charts/Main';
 import type {
     AiResponseMessage,
     GenerateBarChartMetadataResponseMessage,
@@ -12,7 +12,7 @@ import { Button } from './Button';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { CopyIcon, CheckIcon, CodeIcon } from '../assets/icons';
+import { CopyIcon, CheckIcon, CodeIcon, DownloadIcon } from '../assets/icons';
 import { copyToClipboard } from '../utils/clipboard';
 
 interface ChatResponseProps {
@@ -156,6 +156,42 @@ function GetCodeButton({ spec }: GetCodeButtonProps) {
     );
 }
 
+interface DownloadButtonProps {
+    chartRef: ChartRef | null;
+    title?: string;
+}
+
+function DownloadButton({ chartRef, title }: DownloadButtonProps) {
+    const handleDownload = () => {
+        if (!chartRef) return;
+
+        const svg = chartRef.getSvgElement();
+        if (!svg) return;
+
+        const clonedSvg = svg.cloneNode(true) as SVGElement;
+
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(clonedSvg);
+
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = title ? `${title.replace(/[^a-z0-9]/gi, '_')}.svg` : 'chart.svg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    return (
+        <Button variant="outline" onClick={handleDownload} icon={<DownloadIcon />}>
+            Download
+        </Button>
+    );
+}
+
 interface ArtifactWithControlsProps {
     data: unknown[];
     metadata: NonNullable<GenerateBarChartMetadataResponseMessage['bar_chart_metadata']>;
@@ -164,9 +200,14 @@ interface ArtifactWithControlsProps {
 
 function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsProps) {
     const [currentSpec, setCurrentSpec] = useState<ChartProps['spec'] | null>(null);
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
 
     const handleSpecChange = useCallback((spec: ChartProps['spec']) => {
         setCurrentSpec(spec);
+    }, []);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
     }, []);
 
     return (
@@ -175,9 +216,11 @@ function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsP
                 data={data}
                 metadata={metadata}
                 onSpecChange={handleSpecChange}
+                onChartRefChange={handleChartRefChange}
             />
             <div className={styles.copyRow}>
                 <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
                 <GetCodeButton spec={currentSpec} />
             </div>
         </div>

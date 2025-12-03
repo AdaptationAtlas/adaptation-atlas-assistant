@@ -1,7 +1,7 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import * as Plot from '@observablehq/plot';
 import type { BarChartMetadata } from '../../types/generated';
-import { Chart, type ChartProps } from './Main';
+import { Chart, type ChartProps, type ChartRef } from './Main';
 import { Button } from '../Button';
 import styles from './Bar.module.css';
 
@@ -9,6 +9,7 @@ export interface BarChartProps {
     data: unknown[];
     metadata: BarChartMetadata;
     onSpecChange?: (spec: ChartProps['spec']) => void;
+    onChartRefChange?: (ref: ChartRef | null) => void;
 }
 
 const truncateLabel = (label: string, maxLength = 15): string => {
@@ -22,8 +23,14 @@ const formatValue = (value: number): string => {
     return value.toString();
 };
 
-export const BarChart = ({ data, metadata, onSpecChange }: BarChartProps) => {
+export const BarChart = ({
+    data,
+    metadata,
+    onSpecChange,
+    onChartRefChange,
+}: BarChartProps) => {
     const [isFlipped, setIsFlipped] = useState(false);
+    const chartRef = useRef<ChartRef>(null);
 
     const spec: ChartProps['spec'] = useMemo(() => {
         const categoryField = metadata.x_column;
@@ -117,6 +124,12 @@ export const BarChart = ({ data, metadata, onSpecChange }: BarChartProps) => {
         }
     }, [spec, onSpecChange]);
 
+    useEffect(() => {
+        if (onChartRefChange) {
+            onChartRefChange(chartRef.current);
+        }
+    }, [onChartRefChange]);
+
     return (
         <div className={styles.chartWrapper}>
             <div className={styles.toolbar}>
@@ -127,7 +140,7 @@ export const BarChart = ({ data, metadata, onSpecChange }: BarChartProps) => {
                     Flip axes
                 </Button>
             </div>
-            <Chart data={data} spec={spec} title={metadata.title} />
+            <Chart ref={chartRef} data={data} spec={spec} title={metadata.title} />
         </div>
     );
 };

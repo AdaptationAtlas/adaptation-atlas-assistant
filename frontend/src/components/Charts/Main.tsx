@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import * as Plot from '@observablehq/plot';
 import styles from './Main.module.css';
 
@@ -10,10 +10,25 @@ export interface ChartProps {
     className?: string;
 }
 
+export interface ChartRef {
+    getSvgElement: () => SVGElement | null;
+}
+
 // To add a new chart, reference the main gallery
 // https://observablehq.com/@observablehq/plot-gallery
-export function Chart({ data, spec, title, className }: ChartProps) {
+export const Chart = forwardRef<ChartRef, ChartProps>(function Chart(
+    { data, spec, title, className },
+    ref
+) {
     const containerRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle(ref, () => ({
+        getSvgElement: () => {
+            const container = containerRef.current;
+            if (!container) return null;
+            return container.querySelector('svg');
+        },
+    }));
 
     useEffect(() => {
         const container = containerRef.current;
@@ -52,4 +67,4 @@ export function Chart({ data, spec, title, className }: ChartProps) {
             <div className={styles.chart} ref={containerRef} />
         </div>
     );
-}
+});
