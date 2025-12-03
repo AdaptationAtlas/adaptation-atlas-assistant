@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { BarChart } from './Charts/Bar';
+import type { ChartProps } from './Charts/Main';
 import type {
     AiResponseMessage,
     GenerateBarChartMetadataResponseMessage,
@@ -11,7 +12,7 @@ import { Button } from './Button';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { CopyIcon, CheckIcon } from '../assets/icons';
+import { CopyIcon, CheckIcon, CodeIcon } from '../assets/icons';
 import { copyToClipboard } from '../utils/clipboard';
 
 interface ChatResponseProps {
@@ -109,6 +110,77 @@ function CopyButton({ content }: CopyButtonProps) {
         >
             {copied ? 'Copied' : 'Copy'}
         </Button>
+    );
+}
+
+interface GetCodeButtonProps {
+    spec: ChartProps['spec'] | null;
+}
+
+// Custom JSON serializer that converts functions to their string representation
+function serializeSpec(spec: object): string {
+    return JSON.stringify(
+        spec,
+        (_key, value) => {
+            if (typeof value === 'function') {
+                return value.toString();
+            }
+            return value;
+        },
+        2
+    );
+}
+
+function GetCodeButton({ spec }: GetCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        if (!spec) return;
+
+        const specString = serializeSpec(spec);
+        const success = await copyToClipboard(specString);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
+interface ArtifactWithControlsProps {
+    data: unknown[];
+    metadata: NonNullable<GenerateBarChartMetadataResponseMessage['bar_chart_metadata']>;
+    rawData: string;
+}
+
+function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsProps) {
+    const [currentSpec, setCurrentSpec] = useState<ChartProps['spec'] | null>(null);
+
+    const handleSpecChange = useCallback((spec: ChartProps['spec']) => {
+        setCurrentSpec(spec);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <BarChart
+                data={data}
+                metadata={metadata}
+                onSpecChange={handleSpecChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <GetCodeButton spec={currentSpec} />
+            </div>
+        </div>
     );
 }
 
@@ -254,15 +326,12 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                         if (!metadata) return null;
 
                         return (
-                            <div key={messageId} className={styles.artifact}>
-                                <BarChart
-                                    data={data}
-                                    metadata={metadata}
-                                />
-                                <div className={styles.copyRow}>
-                                    <CopyButton content={artifact.data || ''} />
-                                </div>
-                            </div>
+                            <ArtifactWithControls
+                                key={messageId}
+                                data={data}
+                                metadata={metadata}
+                                rawData={artifact.data || ''}
+                            />
                         );
                     })}
 

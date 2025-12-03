@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import * as Plot from '@observablehq/plot';
 import type { BarChartMetadata } from '../../types/generated';
 import { Chart, type ChartProps } from './Main';
@@ -8,6 +8,7 @@ import styles from './Bar.module.css';
 export interface BarChartProps {
     data: unknown[];
     metadata: BarChartMetadata;
+    onSpecChange?: (spec: ChartProps['spec']) => void;
 }
 
 const truncateLabel = (label: string, maxLength = 15): string => {
@@ -21,7 +22,7 @@ const formatValue = (value: number): string => {
     return value.toString();
 };
 
-export const BarChart = ({ data, metadata }: BarChartProps) => {
+export const BarChart = ({ data, metadata, onSpecChange }: BarChartProps) => {
     const [isFlipped, setIsFlipped] = useState(false);
 
     const spec: ChartProps['spec'] = useMemo(() => {
@@ -108,6 +109,13 @@ export const BarChart = ({ data, metadata }: BarChartProps) => {
             ],
         };
     }, [data, isFlipped, metadata]);
+
+    // Notify parent when spec changes
+    useEffect(() => {
+        if (onSpecChange) {
+            onSpecChange(spec);
+        }
+    }, [spec, onSpecChange]);
 
     return (
         <div className={styles.chartWrapper}>
