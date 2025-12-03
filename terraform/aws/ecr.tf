@@ -25,6 +25,20 @@ module "ecr" {
           type = "expire"
         }
       }
+      {
+        rulePriority = 2,
+        description  = "Expire dev images after 1 day",
+        selection = {
+          tagStatus   = "tagged",
+          tagPrefixList = ["dev*"],
+          countType   = "sinceImagePushed",
+          countUnit   = "days",
+          countNumber = 1
+        },
+        action = {
+          type = "expire"
+        }
+      }
     ]
   })
 
