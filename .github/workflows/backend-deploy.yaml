@@ -1,13 +1,12 @@
-name: Build and push backend docker image 
-
+---
+name: Build and push backend docker image
 on:
   push:
-    branches: [ "build/add-ecr-workflow"]
+    branches: [build/add-ecr-workflow]
     paths:
-      - 'backend/**'
-      - 'terraform/**'
-      - '.github/workflows/backend-deploy.yaml'
-
+      - backend/**
+      - terraform/**
+      - .github/workflows/backend-deploy.yaml
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
 
@@ -22,10 +21,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -35,7 +32,7 @@ jobs:
       - name: Login to ECR
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
-
+        
       - name: Install uv based on the config files in the working-directory
         uses: astral-sh/setup-uv@v7
 
@@ -57,24 +54,25 @@ jobs:
           IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}"
           TAG="$IMAGE:$SHORT_SHA-$RUN_ATTEMPT"
 
-          echo "Building and pushing $TAG"
-
-          docker build -t "$TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
-          docker push "$TAG"
-
-          echo "Pushed: $TAG"
-
-          if [ "${{ github.ref }}" = "refs/heads/build/add-ecr-workflow" ]; then
-            echo "Tagging $TAG as :latest"
-            docker tag "$TAG" "$IMAGE:latest"
-            docker push "$IMAGE:latest"
-            echo "Pushed: $IMAGE:latest"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            FULL_TAG="main-$TAG"
+          else
+            FULL_TAG="dev-$TAG"
           fi
 
-      # - name: Deployment to ECS
-      #   run: |
-      #     aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
+          docker build -t "$FULL_TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
+          docker push "$FULL_TAG"
+          echo "Tagging $FULL_TAG as :latest"
+          docker tag "$FULL_TAG" "$IMAGE:latest"
+          docker push "$IMAGE:latest"
+          echo "Pushed: $IMAGE:latest"
+
+      - name: Deployment to ECS
+        if: github.ref == 'refs/heads/main'
+        run: |
+          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
             
-      # - name: Wait for Service to Stabilize
-      #   run: |
-      #     aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --cli-connect-timeout 90 > /dev/null
+      - name: Wait for Service to Stabilize
+        if: github.ref == 'refs/heads/main'
+        run: |-
+          aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
