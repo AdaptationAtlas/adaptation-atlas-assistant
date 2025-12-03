@@ -51,11 +51,11 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
-          BUILD_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
           SHORT_SHA="sha-${GITHUB_SHA::7}"
           IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}"
-          TAG="$IMAGE:$SHORT_SHA-$BUILD_ID"
+          TAG="$IMAGE:$SHORT_SHA-$RUN_ATTEMPT"
 
           echo "Building and pushing $TAG"
 
