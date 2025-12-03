@@ -24,7 +24,7 @@ module "ecr" {
         action = {
           type = "expire"
         }
-      }
+      },
       {
         rulePriority = 2,
         description  = "Expire dev images after 1 day",
