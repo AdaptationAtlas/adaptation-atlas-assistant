@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import { BarChart } from './Charts/Bar';
-import type { ChartProps, ChartRef } from './Charts/Main';
+import type { ChartRef } from './Charts/Main';
 import type {
     AiResponseMessage,
+    BarChartMetadata,
     GenerateBarChartMetadataResponseMessage,
     OutputResponseMessage,
 } from '../types/generated';
@@ -114,31 +115,66 @@ function CopyButton({ content }: CopyButtonProps) {
 }
 
 interface GetCodeButtonProps {
-    spec: ChartProps['spec'] | null;
+    metadata: BarChartMetadata;
+    isFlipped: boolean;
 }
 
-// Custom JSON serializer that converts functions to their string representation
-function serializeSpec(spec: object): string {
-    return JSON.stringify(
-        spec,
-        (_key, value) => {
-            if (typeof value === 'function') {
-                return value.toString();
-            }
-            return value;
-        },
-        2
-    );
+function generateObservableCode(metadata: BarChartMetadata, isFlipped: boolean): string {
+    const { x_column, y_column, grouping_column, title } = metadata;
+    const fill = grouping_column || x_column;
+
+    if (isFlipped) {
+        return `// ${title || 'Bar Chart'}
+Plot.plot({
+  marginBottom: 60,
+  marginLeft: 120,
+  x: {
+    label: "${y_column}",
+    grid: true,
+  },
+  y: {
+    label: "${x_column}",
+  },
+  marks: [
+    Plot.barX(data, {
+      y: "${x_column}",
+      x: "${y_column}",
+      fill: "${fill}",
+    }),
+    Plot.ruleX([0]),
+  ]
+})`;
+    }
+
+    return `// ${title || 'Bar Chart'}
+Plot.plot({
+  marginBottom: 90,
+  marginLeft: 60,
+  x: {
+    label: "${x_column}",
+    tickRotate: -45,
+  },
+  y: {
+    label: "${y_column}",
+    grid: true,
+  },
+  marks: [
+    Plot.barY(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      fill: "${fill}",
+    }),
+    Plot.ruleY([0]),
+  ]
+})`;
 }
 
-function GetCodeButton({ spec }: GetCodeButtonProps) {
+function GetCodeButton({ metadata, isFlipped }: GetCodeButtonProps) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
-        if (!spec) return;
-
-        const specString = serializeSpec(spec);
-        const success = await copyToClipboard(specString);
+        const code = generateObservableCode(metadata, isFlipped);
+        const success = await copyToClipboard(code);
         if (success) {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -199,15 +235,15 @@ interface ArtifactWithControlsProps {
 }
 
 function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsProps) {
-    const [currentSpec, setCurrentSpec] = useState<ChartProps['spec'] | null>(null);
     const [chartRef, setChartRef] = useState<ChartRef | null>(null);
-
-    const handleSpecChange = useCallback((spec: ChartProps['spec']) => {
-        setCurrentSpec(spec);
-    }, []);
+    const [isFlipped, setIsFlipped] = useState(false);
 
     const handleChartRefChange = useCallback((ref: ChartRef | null) => {
         setChartRef(ref);
+    }, []);
+
+    const handleFlippedChange = useCallback((flipped: boolean) => {
+        setIsFlipped(flipped);
     }, []);
 
     return (
@@ -215,13 +251,13 @@ function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsP
             <BarChart
                 data={data}
                 metadata={metadata}
-                onSpecChange={handleSpecChange}
                 onChartRefChange={handleChartRefChange}
+                onFlippedChange={handleFlippedChange}
             />
             <div className={styles.copyRow}>
                 <CopyButton content={rawData} />
                 <DownloadButton chartRef={chartRef} title={metadata.title} />
-                <GetCodeButton spec={currentSpec} />
+                <GetCodeButton metadata={metadata} isFlipped={isFlipped} />
             </div>
         </div>
     );

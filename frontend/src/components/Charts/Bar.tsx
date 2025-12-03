@@ -10,6 +10,7 @@ export interface BarChartProps {
     metadata: BarChartMetadata;
     onSpecChange?: (spec: ChartProps['spec']) => void;
     onChartRefChange?: (ref: ChartRef | null) => void;
+    onFlippedChange?: (isFlipped: boolean) => void;
 }
 
 const truncateLabel = (label: string, maxLength = 15): string => {
@@ -28,6 +29,7 @@ export const BarChart = ({
     metadata,
     onSpecChange,
     onChartRefChange,
+    onFlippedChange,
 }: BarChartProps) => {
     const [isFlipped, setIsFlipped] = useState(false);
     const chartRef = useRef<ChartRef>(null);
@@ -129,6 +131,12 @@ export const BarChart = ({
             onChartRefChange(chartRef.current);
         }
     }, [onChartRefChange]);
+
+    useEffect(() => {
+        if (onFlippedChange) {
+            onFlippedChange(isFlipped);
+        }
+    }, [isFlipped, onFlippedChange]);
 
     return (
         <div className={styles.chartWrapper}>
