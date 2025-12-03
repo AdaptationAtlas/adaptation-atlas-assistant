@@ -116,15 +116,20 @@ function CopyButton({ content }: CopyButtonProps) {
 
 interface GetCodeButtonProps {
     metadata: BarChartMetadata;
+    data: unknown[];
     isFlipped: boolean;
 }
 
-function generateObservableCode(metadata: BarChartMetadata, isFlipped: boolean): string {
+function generateObservableCode(metadata: BarChartMetadata, data: unknown[], isFlipped: boolean): string {
     const { x_column, y_column, grouping_column, title } = metadata;
     const fill = grouping_column || x_column;
+    const dataJson = JSON.stringify(data, null, 2);
 
     if (isFlipped) {
-        return `// ${title || 'Bar Chart'}
+        return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Bar Chart'}
 Plot.plot({
   marginBottom: 60,
   marginLeft: 120,
@@ -146,7 +151,10 @@ Plot.plot({
 })`;
     }
 
-    return `// ${title || 'Bar Chart'}
+    return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Bar Chart'}
 Plot.plot({
   marginBottom: 90,
   marginLeft: 60,
@@ -169,11 +177,11 @@ Plot.plot({
 })`;
 }
 
-function GetCodeButton({ metadata, isFlipped }: GetCodeButtonProps) {
+function GetCodeButton({ metadata, data, isFlipped }: GetCodeButtonProps) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
-        const code = generateObservableCode(metadata, isFlipped);
+        const code = generateObservableCode(metadata, data, isFlipped);
         const success = await copyToClipboard(code);
         if (success) {
             setCopied(true);
@@ -257,7 +265,7 @@ function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsP
             <div className={styles.copyRow}>
                 <CopyButton content={rawData} />
                 <DownloadButton chartRef={chartRef} title={metadata.title} />
-                <GetCodeButton metadata={metadata} isFlipped={isFlipped} />
+                <GetCodeButton metadata={metadata} data={data} isFlipped={isFlipped} />
             </div>
         </div>
     );
