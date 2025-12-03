@@ -74,4 +74,4 @@ jobs:
             
       - name: Wait for Service to Stabilize
         run: |
-          aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
+          aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --cli-connect-timeout 90 > /dev/null

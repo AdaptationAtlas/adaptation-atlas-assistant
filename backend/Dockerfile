@@ -49,7 +49,7 @@ ENV PATH=/app/.venv/bin:$PATH
 ###################################
 FROM python:${PYTHON_VERSION}-slim AS prod
 
-COPY --from=build --chown=app:app /app /app
+COPY --from=build --chown=app:app /app /foo
 
 ENV PYTHONUNBUFFERED=1
 ENV PATH=/app/.venv/bin:$PATH
