@@ -55,9 +55,9 @@ jobs:
         run: |
           SHORT_SHA="sha-${GITHUB_SHA::7}"
           IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}"
-          TAG="$IMAGE:$SHORT_SHA:$BUILD_ID"
+          TAG="$IMAGE:$SHORT_SHA-$BUILD_ID"
 
-          echo "Building and pushing $IMAGE:$SHORT_SHA"
+          echo "Building and pushing $TAG"
 
           docker build -t "$TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
           docker push "$TAG"
