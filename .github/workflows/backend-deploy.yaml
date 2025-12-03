@@ -52,21 +52,21 @@ jobs:
         run: |
           SHORT_SHA="sha-${GITHUB_SHA::7}"
           IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}"
-          TAG="$IMAGE:$SHORT_SHA-$RUN_ATTEMPT"
+          TAG="$SHORT_SHA-$RUN_ATTEMPT"
 
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            FULL_TAG="main-$TAG"
+            FULL_TAG="$IMAGE:main-$TAG"
           else
-            FULL_TAG="dev-$TAG"
+            FULL_TAG="$IMAGE:dev-$TAG"
           fi
 
           echo "Building and pushing image: $FULL_TAG"
 
           docker build -t "$FULL_TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
           docker push "$FULL_TAG"
-          echo "Tagging $FULL_TAG as :latest"
           docker tag "$FULL_TAG" "$IMAGE:latest"
           docker push "$IMAGE:latest"
+
           echo "Pushed: $IMAGE:latest"
 
       - name: Deployment to ECS
