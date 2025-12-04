@@ -27,13 +27,12 @@ module "ecr" {
       },
       {
         rulePriority = 2,
-        description  = "Expire dev images after 1 day",
+        description  = "Keep last 5 images",
         selection = {
           tagStatus   = "tagged",
           tagPrefixList = ["dev*"],
-          countType   = "sinceImagePushed",
-          countUnit   = "days",
-          countNumber = 1
+          countType   = "imageCountMoreThan",
+          countNumber = 5
         },
         action = {
           type = "expire"
