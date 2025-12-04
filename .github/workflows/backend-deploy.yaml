@@ -1,12 +1,19 @@
 name: Build and push backend docker image
 on:
   push:
-    branches: 
-      - '**'
+    branches:
+      - main
     paths:
       - 'backend/**'
       - 'terraform/**'
       - '.github/workflows/backend-deploy.yaml'
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    paths:
+      - 'backend/**'
+      - 'terraform/**'
+      - '.github/workflows/backend-deploy.yaml'
+
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
 
