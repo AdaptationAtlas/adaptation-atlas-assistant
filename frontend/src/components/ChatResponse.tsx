@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { BarChart } from './Charts/Bar';
+import type { ChartRef } from './Charts/Main';
 import type {
     AiResponseMessage,
+    BarChartMetadata,
     GenerateBarChartMetadataResponseMessage,
     OutputResponseMessage,
 } from '../types/generated';
@@ -11,7 +13,7 @@ import { Button } from './Button';
 import styles from './ChatResponse.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { CopyIcon, CheckIcon } from '../assets/icons';
+import { CopyIcon, CheckIcon, CodeIcon, DownloadIcon } from '../assets/icons';
 import { copyToClipboard } from '../utils/clipboard';
 
 interface ChatResponseProps {
@@ -109,6 +111,163 @@ function CopyButton({ content }: CopyButtonProps) {
         >
             {copied ? 'Copied' : 'Copy'}
         </Button>
+    );
+}
+
+interface GetCodeButtonProps {
+    metadata: BarChartMetadata;
+    data: unknown[];
+    isFlipped: boolean;
+}
+
+function generateObservableCode(metadata: BarChartMetadata, data: unknown[], isFlipped: boolean): string {
+    const { x_column, y_column, grouping_column, title } = metadata;
+    const fill = grouping_column || x_column;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    if (isFlipped) {
+        return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Bar Chart'}
+Plot.plot({
+  marginBottom: 60,
+  marginLeft: 120,
+  x: {
+    label: "${y_column}",
+    grid: true,
+  },
+  y: {
+    label: "${x_column}",
+  },
+  marks: [
+    Plot.barX(data, {
+      y: "${x_column}",
+      x: "${y_column}",
+      fill: "${fill}",
+    }),
+    Plot.ruleX([0]),
+  ]
+})`;
+    }
+
+    return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Bar Chart'}
+Plot.plot({
+  marginBottom: 90,
+  marginLeft: 60,
+  x: {
+    label: "${x_column}",
+    tickRotate: -45,
+  },
+  y: {
+    label: "${y_column}",
+    grid: true,
+  },
+  marks: [
+    Plot.barY(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      fill: "${fill}",
+    }),
+    Plot.ruleY([0]),
+  ]
+})`;
+}
+
+function GetCodeButton({ metadata, data, isFlipped }: GetCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateObservableCode(metadata, data, isFlipped);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
+interface DownloadButtonProps {
+    chartRef: ChartRef | null;
+    title?: string;
+}
+
+function DownloadButton({ chartRef, title }: DownloadButtonProps) {
+    const handleDownload = () => {
+        if (!chartRef) return;
+
+        const svg = chartRef.getSvgElement();
+        if (!svg) return;
+
+        const clonedSvg = svg.cloneNode(true) as SVGElement;
+
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(clonedSvg);
+
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = title ? `${title.replace(/[^a-z0-9]/gi, '_')}.svg` : 'chart.svg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    return (
+        <Button variant="outline" onClick={handleDownload} icon={<DownloadIcon />}>
+            Download
+        </Button>
+    );
+}
+
+interface ArtifactWithControlsProps {
+    data: unknown[];
+    metadata: NonNullable<GenerateBarChartMetadataResponseMessage['bar_chart_metadata']>;
+    rawData: string;
+}
+
+function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsProps) {
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
+    const [isFlipped, setIsFlipped] = useState(false);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
+    }, []);
+
+    const handleFlippedChange = useCallback((flipped: boolean) => {
+        setIsFlipped(flipped);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <BarChart
+                data={data}
+                metadata={metadata}
+                onChartRefChange={handleChartRefChange}
+                onFlippedChange={handleFlippedChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetCodeButton metadata={metadata} data={data} isFlipped={isFlipped} />
+            </div>
+        </div>
     );
 }
 
@@ -254,15 +413,12 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                         if (!metadata) return null;
 
                         return (
-                            <div key={messageId} className={styles.artifact}>
-                                <BarChart
-                                    data={data}
-                                    metadata={metadata}
-                                />
-                                <div className={styles.copyRow}>
-                                    <CopyButton content={artifact.data || ''} />
-                                </div>
-                            </div>
+                            <ArtifactWithControls
+                                key={messageId}
+                                data={data}
+                                metadata={metadata}
+                                rawData={artifact.data || ''}
+                            />
                         );
                     })}
 
