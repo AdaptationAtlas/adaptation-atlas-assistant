@@ -27,6 +27,7 @@ jobs:
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
       TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
       TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
+      TF_VAR_email_source_arn: ${{ vars.TF_VAR_EMAIL_SOURCE_ARN }}
     defaults:
       run:
         working-directory: terraform/aws
@@ -121,6 +122,7 @@ jobs:
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
       TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
       TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
+      TF_VAR_email_source_arn: ${{ vars.TF_VAR_EMAIL_SOURCE_ARN }}
     defaults:
       run:
         working-directory: terraform/aws
