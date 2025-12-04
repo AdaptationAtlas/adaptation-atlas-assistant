@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '../api/hooks';
 import { sendChatMessage, createStreamController } from '../api';
 import { useChatStore } from '../store/chatStore';
-import { contextTagsToText } from '../utils/tagFormatting';
+import { contextTagsToText, attachmentsToText } from '../utils/tagFormatting';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
@@ -90,6 +90,13 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
         });
     }
 
+    sidebar.attachments.files.forEach((file) => {
+        tags.push({
+            id: `attachments-${file.id}`,
+            label: file.name,
+        });
+    });
+
     return tags;
 }
 
@@ -118,11 +125,16 @@ export function Chat() {
     const handlePromptSubmit = useCallback(async (value: string) => {
         if (!value.trim()) return;
 
-        // Inject context tags as natural language into the query
+        // Build query with context and attachments
         const contextTagsAsText = contextTagsToText(contextTags);
-        const queryWithContext = contextTagsAsText
-            ? `${contextTagsAsText}\n\nQuestion: ${value}`
-            : value;
+        const attachmentsAsText = attachmentsToText(sidebar.attachments.files);
+
+        const queryParts: string[] = [];
+        if (contextTagsAsText) queryParts.push(contextTagsAsText);
+        if (attachmentsAsText) queryParts.push(attachmentsAsText);
+        queryParts.push(`Question: ${value}`);
+
+        const queryWithContext = queryParts.join('\n\n');
 
         startStreaming(value);
 
@@ -153,7 +165,7 @@ export function Chat() {
             const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
             setError(errorMessage);
         }
-    }, [contextTags, startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
+    }, [contextTags, sidebar.attachments.files, startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
 
     const handleExampleClick = (prompt: string) => {
         handlePromptSubmit(prompt);

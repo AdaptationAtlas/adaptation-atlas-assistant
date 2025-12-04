@@ -43,6 +43,18 @@ export interface AdaptiveCapacityLayer {
   rangeMax: number | null;
 }
 
+export interface AttachmentFile {
+  id: string;
+  name: string;
+  content: string;
+  type: 'csv' | 'txt';
+  size: number;
+}
+
+export interface AttachmentsState {
+  files: AttachmentFile[];
+}
+
 
 export interface SidebarState {
   expandedSections: string[];
@@ -53,6 +65,7 @@ export interface SidebarState {
   hazards: HazardsState;
   exposure: ExposureState;
   adaptiveCapacity: AdaptiveCapacityLayer;
+  attachments: AttachmentsState;
 }
 
 
@@ -96,6 +109,10 @@ export interface SidebarActions {
     min: number | null,
     max: number | null,
   ) => void;
+
+  addAttachment: (file: AttachmentFile) => void;
+  removeAttachment: (id: string) => void;
+  clearAttachments: () => void;
 
   resetSidebar: () => void;
   removeTag: (tagId: string) => void;

@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { ChatStatus, StreamEvent } from '../types/chat';
-import type { SidebarState, SidebarActions, Geography, SeverityLevel } from '../types/sidebar';
+import type { SidebarState, SidebarActions, Geography, SeverityLevel, AttachmentFile } from '../types/sidebar';
 import { GEOGRAPHIES, COUNTRIES } from '../constants/sidebar';
 
 export interface ChatUIState extends SidebarActions {
@@ -40,6 +40,9 @@ const CHAT_ACTION_TYPES = {
   setMaxFarmSize: 'chat/setMaxFarmSize',
   setAdaptiveCapacityLayer: 'chat/setAdaptiveCapacityLayer',
   setAdaptiveCapacityRange: 'chat/setAdaptiveCapacityRange',
+  addAttachment: 'chat/addAttachment',
+  removeAttachment: 'chat/removeAttachment',
+  clearAttachments: 'chat/clearAttachments',
   resetSidebar: 'chat/resetSidebar',
   removeTag: 'chat/removeTag',
   anonymous: 'chat/anonymous',
@@ -118,6 +121,9 @@ const initialSidebarState: SidebarState = {
     rangeMin: null,
     rangeMax: null,
   },
+  attachments: {
+    files: [],
+  },
 }
 
 const createInitialState = (): Omit<
@@ -140,6 +146,9 @@ const createInitialState = (): Omit<
   | 'setMaxFarmSize'
   | 'setAdaptiveCapacityLayer'
   | 'setAdaptiveCapacityRange'
+  | 'addAttachment'
+  | 'removeAttachment'
+  | 'clearAttachments'
   | 'resetSidebar'
   | 'removeTag'
 > => ({
@@ -462,6 +471,54 @@ export const useChatStore = create<ChatUIState>()(
           );
         },
 
+        addAttachment: (file: AttachmentFile) => {
+          const { sidebar } = get();
+          set(
+            {
+              sidebar: {
+                ...sidebar,
+                attachments: {
+                  files: [...sidebar.attachments.files, file],
+                },
+              },
+            },
+            false,
+            CHAT_ACTION_TYPES.addAttachment,
+          );
+        },
+
+        removeAttachment: (id: string) => {
+          const { sidebar } = get();
+          set(
+            {
+              sidebar: {
+                ...sidebar,
+                attachments: {
+                  files: sidebar.attachments.files.filter((f) => f.id !== id),
+                },
+              },
+            },
+            false,
+            CHAT_ACTION_TYPES.removeAttachment,
+          );
+        },
+
+        clearAttachments: () => {
+          const { sidebar } = get();
+          set(
+            {
+              sidebar: {
+                ...sidebar,
+                attachments: {
+                  files: [],
+                },
+              },
+            },
+            false,
+            CHAT_ACTION_TYPES.clearAttachments,
+          );
+        },
+
         resetSidebar: () => {
           const freshState = createInitialState();
           set(
@@ -513,6 +570,12 @@ export const useChatStore = create<ChatUIState>()(
               if (type === 'layer') {
                 get().setAdaptiveCapacityLayer('None');
               }
+              break;
+            }
+
+            case 'attachments': {
+              // tagId format: "attachments-{id}"
+              get().removeAttachment(type);
               break;
             }
           }

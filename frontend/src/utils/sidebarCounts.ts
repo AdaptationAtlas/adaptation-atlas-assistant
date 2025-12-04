@@ -28,7 +28,7 @@ export function getSectionCount(
       return sidebar.adaptiveCapacity.name !== 'None' ? 1 : 0;
 
     case 'attachments':
-      return 0;
+      return sidebar.attachments.files.length;
 
     default:
       return 0;
