@@ -2,7 +2,7 @@ name: Build and push backend docker image
 on:
   push:
     branches: 
-      - '*'
+      - '**'
     paths:
       - 'backend/**'
       - 'terraform/**'
