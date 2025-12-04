@@ -27,7 +27,7 @@ module "ecr" {
       },
       {
         rulePriority = 2,
-        description  = "Keep last 5 images",
+        description  = "Keep last 5 dev images",
         selection = {
           tagStatus   = "tagged",
           tagPrefixList = ["dev*"],
