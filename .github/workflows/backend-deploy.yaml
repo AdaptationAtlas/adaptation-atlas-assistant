@@ -1,12 +1,12 @@
----
 name: Build and push backend docker image
 on:
   push:
-    branches: [build/add-ecr-workflow]
+    branches: 
+      - '*'
     paths:
-      - backend/**
-      - terraform/**
-      - .github/workflows/backend-deploy.yaml
+      - 'backend/**'
+      - 'terraform/**'
+      - '.github/workflows/backend-deploy.yaml'
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
 
@@ -33,7 +33,7 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Install uv based on the config files in the working-directory
+      - name: Install uv
         uses: astral-sh/setup-uv@v7
 
       - name: Run embeddings script
@@ -64,10 +64,12 @@ jobs:
 
           docker build -t "$FULL_TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
           docker push "$FULL_TAG"
-          docker tag "$FULL_TAG" "$IMAGE:latest"
-          docker push "$IMAGE:latest"
 
-          echo "Pushed: $IMAGE:latest"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            docker tag "$FULL_TAG" "$IMAGE:latest"
+            docker push "$IMAGE:latest"
+            echo "Pushed: $IMAGE:latest"
+          fi
 
       - name: Deployment to ECS
         if: github.ref == 'refs/heads/main'
@@ -76,5 +78,5 @@ jobs:
             
       - name: Wait for Service to Stabilize
         if: github.ref == 'refs/heads/main'
-        run: |-
+        run: |
           aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
