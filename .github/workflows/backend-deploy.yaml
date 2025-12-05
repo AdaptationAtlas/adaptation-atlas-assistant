@@ -2,7 +2,7 @@ name: Build and push backend docker image
 on:
   push:
     branches:
-      - main
+      - build/add-ecr-workflow
     paths:
       - 'backend/**'
       - 'terraform/**'
@@ -53,7 +53,7 @@ jobs:
         run: |
           SHORT_SHA="sha-${GITHUB_SHA::7}"
           IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}"
-          TAG="$SHORT_SHA-$RUN_ATTEMPT"
+          TAG="$IMAGE:$SHORT_SHA-$RUN_ATTEMPT"
 
           echo "Building and pushing image: $TAG"
 
@@ -65,10 +65,10 @@ jobs:
           echo "Pushed: $IMAGE:latest"
 
 
-      - name: Deployment to ECS
-        run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
+      # - name: Deployment to ECS
+      #   run: |
+      #     aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
             
-      - name: Wait for Service to Stabilize
-        run: |
-          aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
+      # - name: Wait for Service to Stabilize
+      #   run: |
+      #     aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
