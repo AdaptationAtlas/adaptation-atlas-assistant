@@ -2,7 +2,7 @@ name: Build and push backend docker image
 on:
   push:
     branches:
-      - build/add-ecr-workflow
+      - main
     paths:
       - 'backend/**'
       - 'terraform/**'
@@ -64,11 +64,10 @@ jobs:
           docker push "$IMAGE:latest"
           echo "Pushed: $IMAGE:latest"
 
-
-      # - name: Deployment to ECS
-      #   run: |
-      #     aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
+      - name: Deployment to ECS
+        run: |
+          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
             
-      # - name: Wait for Service to Stabilize
-      #   run: |
-      #     aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
+      - name: Wait for Service to Stabilize
+        run: |
+          aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
