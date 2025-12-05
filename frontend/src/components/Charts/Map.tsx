@@ -65,7 +65,7 @@ export const MapChart = ({
 
         // Enrich geojson data with sample query results
         const enrichedData: Feature<Geometry, NationProperties>[] =
-            geoData.features.map((feature) => {
+            geoData.features.map((feature: Feature<Geometry, NationProperties>) => {
                 // Use adm0_a3 property for country code matching (e.g., "MAR", "CMR", "NGA")
                 const countryCode = (
                     feature.properties as Record<string, unknown>
@@ -137,6 +137,7 @@ export const MapChart = ({
                 scheme: colorScheme,
                 legend: true,
                 label: uppercaseFirstLetter(valueField),
+                tickFormat: formatValue,
             },
             marks,
         };
