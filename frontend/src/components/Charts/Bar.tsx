@@ -3,6 +3,7 @@ import * as Plot from '@observablehq/plot';
 import type { BarChartMetadata } from '../../types/generated';
 import { Chart, type ChartProps, type ChartRef } from './Main';
 import { Button } from '../Button';
+import { formatValue } from '../../utils/stringFormatting';
 import styles from './Bar.module.css';
 
 export interface BarChartProps {
@@ -15,13 +16,6 @@ export interface BarChartProps {
 
 const truncateLabel = (label: string, maxLength = 15): string => {
     return label.length > maxLength ? label.slice(0, maxLength) + '...' : label;
-};
-
-const formatValue = (value: number): string => {
-    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
-    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
-    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
-    return value.toString();
 };
 
 export const BarChart = ({
