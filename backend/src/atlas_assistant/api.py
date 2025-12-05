@@ -22,7 +22,7 @@ from pwdlib import PasswordHash
 from pydantic import BaseModel
 from starlette import status
 
-from atlas_assistant.state import BarChartMetadata
+from atlas_assistant.state import BarChartMetadata, MapChartMetadata
 
 from . import settings
 from .agent import Agent, Output, create_agent
@@ -169,6 +169,18 @@ class GenerateBarChartMetadataResponseMessage(ToolResponseMessage):
     """The table data as a JSON string"""
 
 
+class GenerateMapChartMetadataResponseMessage(ToolResponseMessage):
+    """The response from generate_map_chart_metadata"""
+
+    name: str = "generate_map_chart_metadata"
+
+    map_chart_metadata: MapChartMetadata | None
+    """The map chart metadata"""
+
+    data: str | None
+    """The table data as a JSON string"""
+
+
 class AiResponseMessage(ResponseMessage):
     """The response from the AI"""
 
@@ -256,6 +268,7 @@ async def login(
     | SelectDatasetResponseMessage
     | GenerateTableResponseMessage
     | GenerateBarChartMetadataResponseMessage
+    | GenerateMapChartMetadataResponseMessage
     | AiResponseMessage
     | OutputResponseMessage,
 )
@@ -364,6 +377,17 @@ def create_response_message(
                     status=message.status,
                     thread_id=thread_id,
                     bar_chart_metadata=artifact.get("bar_chart_metadata")
+                    if isinstance(artifact, dict)
+                    else artifact,
+                    data=artifact.get("data") if isinstance(artifact, dict) else None,
+                )
+            case "generate_map_chart_metadata":
+                artifact = message.artifact or {}
+                return GenerateMapChartMetadataResponseMessage(
+                    content=message.content,
+                    status=message.status,
+                    thread_id=thread_id,
+                    map_chart_metadata=artifact.get("map_chart_metadata")
                     if isinstance(artifact, dict)
                     else artifact,
                     data=artifact.get("data") if isinstance(artifact, dict) else None,
