@@ -24,6 +24,19 @@ module "ecr" {
         action = {
           type = "expire"
         }
+      },
+      {
+        rulePriority = 2,
+        description  = "Keep last 5 dev images",
+        selection = {
+          tagStatus   = "tagged",
+          tagPrefixList = ["dev*"],
+          countType   = "imageCountMoreThan",
+          countNumber = 5
+        },
+        action = {
+          type = "expire"
+        }
       }
     ]
   })
