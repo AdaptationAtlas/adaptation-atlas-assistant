@@ -26,6 +26,7 @@ export interface MapChartProps {
 interface NationProperties {
     name: string;
     value?: number | null;
+    [key: string]: unknown; // Allow additional properties from GeoJSON
 }
 
 type NationsGeoJSON = FeatureCollection<Geometry, NationProperties>;
@@ -53,7 +54,7 @@ export const MapChart = ({
 
         const idField = metadata.id_column;
         const valueField = metadata.value_column;
-        const colorScheme = metadata.color_scheme || 'Oranges';
+        const colorScheme = (metadata.color_scheme || 'Oranges') as Plot.ColorScheme;
 
         const dataMap = new Map(
             data.map((item) => {
