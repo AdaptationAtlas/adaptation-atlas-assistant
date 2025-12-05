@@ -132,6 +132,8 @@ export const MapChart = ({
                 domain: domainFeatureCollection, // zoom to bounds
             },
             color: {
+                //TODO: make "type" configurable to support different types of data distributions (ie chloropleth maps)
+                // see sample: https://observablehq.com/@observablehq/plot-choropleth
                 type: 'linear',
                 scheme: colorScheme,
                 legend: true,
