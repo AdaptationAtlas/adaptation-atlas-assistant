@@ -7,12 +7,6 @@ on:
       - 'backend/**'
       - 'terraform/**'
       - '.github/workflows/backend-deploy.yaml'
-  pull_request:
-    types: [opened, synchronize, ready_for_review]
-    paths:
-      - 'backend/**'
-      - 'terraform/**'
-      - '.github/workflows/backend-deploy.yaml'
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
@@ -61,29 +55,20 @@ jobs:
           IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}"
           TAG="$SHORT_SHA-$RUN_ATTEMPT"
 
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            FULL_TAG="$IMAGE:main-$TAG"
-          else
-            FULL_TAG="$IMAGE:dev-$TAG"
-          fi
+          echo "Building and pushing image: $TAG"
 
-          echo "Building and pushing image: $FULL_TAG"
+          docker build -t "$TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
+          docker push "$TAG"
 
-          docker build -t "$FULL_TAG" --platform linux/amd64 --target prod -f backend/Dockerfile backend
-          docker push "$FULL_TAG"
+          docker tag "$TAG" "$IMAGE:latest"
+          docker push "$IMAGE:latest"
+          echo "Pushed: $IMAGE:latest"
 
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker tag "$FULL_TAG" "$IMAGE:latest"
-            docker push "$IMAGE:latest"
-            echo "Pushed: $IMAGE:latest"
-          fi
 
       - name: Deployment to ECS
-        if: github.ref == 'refs/heads/main'
         run: |
           aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
             
       - name: Wait for Service to Stabilize
-        if: github.ref == 'refs/heads/main'
         run: |
           aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null
