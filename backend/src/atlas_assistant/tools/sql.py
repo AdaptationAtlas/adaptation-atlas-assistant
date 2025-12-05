@@ -173,6 +173,9 @@ Other instructions:
    - If aggregating data, limit to n results
     - When aggregating numeric values, you must include a `where` clause
       that removes all `nan` values using the DuckDB `isnan` function
+   - When grouping by country (admin0_name or similar), ALWAYS also include
+     the `iso3` column in the SELECT and GROUP BY clauses for geographic
+     mapping purposes
 """
 
     for table_column in dataset.item.properties.table_columns:
