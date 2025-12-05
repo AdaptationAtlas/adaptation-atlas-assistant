@@ -207,6 +207,88 @@ function GetCodeButton({ metadata, data, isFlipped }: GetCodeButtonProps) {
     );
 }
 
+function generateMapObservableCode(
+    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>,
+    data: unknown[]
+): string {
+    const { id_column, value_column, color_scheme, title } = metadata;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    return `// Data
+data = ${dataJson}
+
+// GeoJSON (fetch African nations)
+geoData = await fetch('/data/african-nations-reduced.geojson').then(r => r.json())
+
+// Enrich GeoJSON with data values
+dataMap = new Map(data.map(d => [d["${id_column}"], d["${value_column}"]]))
+enrichedFeatures = geoData.features.map(f => ({
+  ...f,
+  properties: { ...f.properties, value: dataMap.get(f.properties.adm0_a3) ?? null }
+}))
+
+// Chart: ${title || 'Choropleth Map'}
+Plot.plot({
+  height: 400,
+  projection: {
+    type: "equirectangular",
+    domain: { type: "FeatureCollection", features: enrichedFeatures },
+  },
+  color: {
+    type: "linear",
+    scheme: "${color_scheme || 'Oranges'}",
+    legend: true,
+    label: "${value_column}",
+  },
+  marks: [
+    Plot.geo(enrichedFeatures.filter(f => f.properties.value === null), {
+      fill: "#E5E7EB",
+      stroke: "#fff",
+      strokeWidth: 1,
+    }),
+    Plot.geo(enrichedFeatures.filter(f => f.properties.value !== null), {
+      fill: d => d.properties.value,
+      stroke: "#ddd",
+      strokeWidth: 0.5,
+    }),
+    Plot.tip(
+      enrichedFeatures.filter(f => f.properties.value !== null),
+      Plot.pointer(Plot.geoCentroid({
+        title: d => \`\${d.properties.name}: \${d.properties.value}\`
+      }))
+    ),
+  ]
+})`;
+}
+
+interface GetMapCodeButtonProps {
+    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>;
+    data: unknown[];
+}
+
+function GetMapCodeButton({ metadata, data }: GetMapCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateMapObservableCode(metadata, data);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
 interface DownloadButtonProps {
     chartRef: ChartRef | null;
     title?: string;
@@ -301,6 +383,7 @@ function MapArtifactWithControls({ data, metadata, rawData }: MapArtifactWithCon
             <div className={styles.copyRow}>
                 <CopyButton content={rawData} />
                 <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetMapCodeButton metadata={metadata} data={data} />
             </div>
         </div>
     );
