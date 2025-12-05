@@ -2,7 +2,6 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import * as Plot from '@observablehq/plot';
 import type { FeatureCollection, Feature, Geometry } from 'geojson';
 import { Chart, type ChartProps, type ChartRef } from './Main';
-import { Button } from '../Button';
 import {
     formatValue,
     uppercaseFirstLetter,
@@ -29,7 +28,6 @@ interface NationProperties {
     value?: number | null;
 }
 
-type NationFeature = Feature<Geometry, NationProperties>;
 type NationsGeoJSON = FeatureCollection<Geometry, NationProperties>;
 
 export const MapChart = ({
