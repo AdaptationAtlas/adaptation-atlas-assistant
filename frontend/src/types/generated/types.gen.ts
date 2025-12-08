@@ -167,6 +167,39 @@ export type GenerateBarChartMetadataResponseMessage = {
 };
 
 /**
+ * GenerateMapChartMetadataResponseMessage
+ *
+ * The response from generate_map_chart_metadata
+ */
+export type GenerateMapChartMetadataResponseMessage = {
+    /**
+     * Content
+     */
+    content: string | null;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'tool';
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Status
+     */
+    status: string;
+    map_chart_metadata: MapChartMetadata | null;
+    /**
+     * Data
+     */
+    data: string | null;
+};
+
+/**
  * GenerateTableResponseMessage
  *
  * The response from generate_table
@@ -229,6 +262,30 @@ export type Item = {
     assets: {
         [key: string]: Asset;
     };
+};
+
+/**
+ * MapChartMetadata
+ *
+ * Data to create a map chart (choropleth)
+ */
+export type MapChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Id Column
+     */
+    id_column: string;
+    /**
+     * Value Column
+     */
+    value_column: string;
+    /**
+     * Color Scheme
+     */
+    color_scheme?: string;
 };
 
 /**
@@ -415,6 +472,20 @@ export type ValidationError = {
     type: string;
 };
 
+export type HealthCheckHealthGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/health';
+};
+
+export type HealthCheckHealthGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type MeMeGetData = {
     body?: never;
     path?: never;
@@ -484,7 +555,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | GenerateMapChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];

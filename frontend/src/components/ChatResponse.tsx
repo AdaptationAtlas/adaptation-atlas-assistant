@@ -1,10 +1,12 @@
 import { useState, useCallback } from 'react';
 import { BarChart } from './Charts/Bar';
+import { MapChart } from './Charts/Map';
 import type { ChartRef } from './Charts/Main';
 import type {
     AiResponseMessage,
     BarChartMetadata,
     GenerateBarChartMetadataResponseMessage,
+    GenerateMapChartMetadataResponseMessage,
     OutputResponseMessage,
 } from '../types/generated';
 import { ExamplePrompts } from './ExamplePrompts';
@@ -31,6 +33,11 @@ function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { 
 function isGenerateBarChartMetadataMessage(event: StreamEvent): event is GenerateBarChartMetadataResponseMessage & { id?: string; timestamp?: number } {
     if (!event || 'error' in event) return false;
     return event.type === 'tool' && 'name' in event && event.name === 'generate_bar_chart_metadata';
+}
+
+function isGenerateMapChartMetadataMessage(event: StreamEvent): event is GenerateMapChartMetadataResponseMessage & { id?: string; timestamp?: number } {
+    if (!event || 'error' in event) return false;
+    return event.type === 'tool' && 'name' in event && event.name === 'generate_map_chart_metadata';
 }
 
 function isOutputMessage(event: StreamEvent | null): event is OutputResponseMessage & { id?: string; timestamp?: number } {
@@ -200,6 +207,88 @@ function GetCodeButton({ metadata, data, isFlipped }: GetCodeButtonProps) {
     );
 }
 
+function generateMapObservableCode(
+    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>,
+    data: unknown[]
+): string {
+    const { id_column, value_column, color_scheme, title } = metadata;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    return `// Data
+data = ${dataJson}
+
+// GeoJSON (fetch African nations)
+geoData = await fetch('/data/african-nations-reduced.geojson').then(r => r.json())
+
+// Enrich GeoJSON with data values
+dataMap = new Map(data.map(d => [d["${id_column}"], d["${value_column}"]]))
+enrichedFeatures = geoData.features.map(f => ({
+  ...f,
+  properties: { ...f.properties, value: dataMap.get(f.properties.adm0_a3) ?? null }
+}))
+
+// Chart: ${title || 'Choropleth Map'}
+Plot.plot({
+  height: 400,
+  projection: {
+    type: "equirectangular",
+    domain: { type: "FeatureCollection", features: enrichedFeatures },
+  },
+  color: {
+    type: "linear",
+    scheme: "${color_scheme || 'Oranges'}",
+    legend: true,
+    label: "${value_column}",
+  },
+  marks: [
+    Plot.geo(enrichedFeatures.filter(f => f.properties.value === null), {
+      fill: "#E5E7EB",
+      stroke: "#fff",
+      strokeWidth: 1,
+    }),
+    Plot.geo(enrichedFeatures.filter(f => f.properties.value !== null), {
+      fill: d => d.properties.value,
+      stroke: "#ddd",
+      strokeWidth: 0.5,
+    }),
+    Plot.tip(
+      enrichedFeatures.filter(f => f.properties.value !== null),
+      Plot.pointer(Plot.geoCentroid({
+        title: d => \`\${d.properties.name}: \${d.properties.value}\`
+      }))
+    ),
+  ]
+})`;
+}
+
+interface GetMapCodeButtonProps {
+    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>;
+    data: unknown[];
+}
+
+function GetMapCodeButton({ metadata, data }: GetMapCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateMapObservableCode(metadata, data);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
 interface DownloadButtonProps {
     chartRef: ChartRef | null;
     title?: string;
@@ -271,11 +360,41 @@ function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsP
     );
 }
 
+interface MapArtifactWithControlsProps {
+    data: unknown[];
+    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>;
+    rawData: string;
+}
+
+function MapArtifactWithControls({ data, metadata, rawData }: MapArtifactWithControlsProps) {
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <MapChart
+                data={data}
+                metadata={metadata}
+                onChartRefChange={handleChartRefChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetMapCodeButton metadata={metadata} data={data} />
+            </div>
+        </div>
+    );
+}
+
 export function ChatResponse({ events, status, onSuggestionClick }: ChatResponseProps) {
     interface ConversationTurn {
         userMessages: typeof events;
         intermediateMessages: typeof events;
-        artifacts: GenerateBarChartMetadataResponseMessage[];
+        barChartArtifacts: GenerateBarChartMetadataResponseMessage[];
+        mapChartArtifacts: GenerateMapChartMetadataResponseMessage[];
         finalAiMessage: typeof events[0] | null;
     }
 
@@ -283,19 +402,21 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
     let currentTurn: ConversationTurn = {
         userMessages: [],
         intermediateMessages: [],
-        artifacts: [],
+        barChartArtifacts: [],
+        mapChartArtifacts: [],
         finalAiMessage: null,
     };
 
     events.forEach((event) => {
         if (!('error' in event) && event.type === 'user') {
             // Start a new turn when we see a user message
-            if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.artifacts.length > 0 || currentTurn.finalAiMessage) {
+            if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
                 conversationTurns.push(currentTurn);
                 currentTurn = {
                     userMessages: [],
                     intermediateMessages: [],
-                    artifacts: [],
+                    barChartArtifacts: [],
+                    mapChartArtifacts: [],
                     finalAiMessage: null,
                 };
             }
@@ -303,9 +424,15 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         } else if ('error' in event) {
             currentTurn.intermediateMessages.push(event);
         } else if (isGenerateBarChartMetadataMessage(event)) {
-            // only add artifact if not null 
+            // only add artifact if not null
             if (event.data && event.bar_chart_metadata) {
-                currentTurn.artifacts.push(event);
+                currentTurn.barChartArtifacts.push(event);
+            }
+            currentTurn.intermediateMessages.push(event);
+        } else if (isGenerateMapChartMetadataMessage(event)) {
+            // only add artifact if not null
+            if (event.data && event.map_chart_metadata) {
+                currentTurn.mapChartArtifacts.push(event);
             }
             currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'ai') {
@@ -317,7 +444,7 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         }
     });
 
-    if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.artifacts.length > 0 || currentTurn.finalAiMessage) {
+    if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
         conversationTurns.push(currentTurn);
     }
 
@@ -403,9 +530,9 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                         );
                     })()}
 
-                    {/* Render artifacts (charts) */}
-                    {turn.artifacts.map((artifact, index) => {
-                        const messageId = `artifact-${turnIndex}-${index}`;
+                    {/* Render bar chart artifacts */}
+                    {turn.barChartArtifacts.map((artifact, index) => {
+                        const messageId = `bar-artifact-${turnIndex}-${index}`;
 
                         const data = artifact.data ? JSON.parse(artifact.data) : [];
                         const metadata = artifact.bar_chart_metadata;
@@ -414,6 +541,25 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
                         return (
                             <ArtifactWithControls
+                                key={messageId}
+                                data={data}
+                                metadata={metadata}
+                                rawData={artifact.data || ''}
+                            />
+                        );
+                    })}
+
+                    {/* Render map chart artifacts */}
+                    {turn.mapChartArtifacts.map((artifact, index) => {
+                        const messageId = `map-artifact-${turnIndex}-${index}`;
+
+                        const data = artifact.data ? JSON.parse(artifact.data) : [];
+                        const metadata = artifact.map_chart_metadata;
+
+                        if (!metadata) return null;
+
+                        return (
+                            <MapArtifactWithControls
                                 key={messageId}
                                 data={data}
                                 metadata={metadata}

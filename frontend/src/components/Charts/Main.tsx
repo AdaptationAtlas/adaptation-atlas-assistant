@@ -26,7 +26,48 @@ export const Chart = forwardRef<ChartRef, ChartProps>(function Chart(
         getSvgElement: () => {
             const container = containerRef.current;
             if (!container) return null;
-            return container.querySelector('svg');
+
+            const figure = container.querySelector('figure');
+            if (!figure) return container.querySelector('svg');
+
+            const svgs = figure.querySelectorAll<SVGSVGElement>(':scope > svg');
+            if (svgs.length === 0) return null;
+            if (svgs.length === 1) return svgs[0];
+
+            // Multiple SVGs (e.g., legend + chart) - combine them into one
+            const combinedSvg = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'svg'
+            );
+            let currentY = 0;
+            let maxWidth = 0;
+
+            svgs.forEach((svg) => {
+                const clone = svg.cloneNode(true) as SVGElement;
+                const width = parseFloat(svg.getAttribute('width') || '0');
+                const height = parseFloat(svg.getAttribute('height') || '0');
+
+                const g = document.createElementNS(
+                    'http://www.w3.org/2000/svg',
+                    'g'
+                );
+                g.setAttribute('transform', `translate(0, ${currentY})`);
+
+                while (clone.firstChild) {
+                    g.appendChild(clone.firstChild);
+                }
+                combinedSvg.appendChild(g);
+
+                currentY += height + 10; // 10px gap between elements
+                maxWidth = Math.max(maxWidth, width);
+            });
+
+            combinedSvg.setAttribute('width', String(maxWidth));
+            combinedSvg.setAttribute('height', String(currentY));
+            combinedSvg.setAttribute('viewBox', `0 0 ${maxWidth} ${currentY}`);
+            combinedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+            return combinedSvg;
         },
     }));
 

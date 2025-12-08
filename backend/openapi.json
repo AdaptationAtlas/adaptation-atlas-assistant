@@ -150,6 +150,9 @@
                       "$ref": "#/components/schemas/GenerateBarChartMetadataResponseMessage"
                     },
                     {
+                      "$ref": "#/components/schemas/GenerateMapChartMetadataResponseMessage"
+                    },
+                    {
                       "$ref": "#/components/schemas/AiResponseMessage"
                     },
                     {
@@ -453,6 +456,71 @@
         "title": "GenerateBarChartMetadataResponseMessage",
         "description": "The response from generate_bar_chart_metadata"
       },
+      "GenerateMapChartMetadataResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_map_chart_metadata"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "map_chart_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MapChartMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "map_chart_metadata",
+          "data"
+        ],
+        "title": "GenerateMapChartMetadataResponseMessage",
+        "description": "The response from generate_map_chart_metadata"
+      },
       "GenerateTableResponseMessage": {
         "properties": {
           "content": {
@@ -557,6 +625,35 @@
         ],
         "title": "Item",
         "description": "A STAC item, with only the fields we need."
+      },
+      "MapChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "id_column": {
+            "type": "string",
+            "title": "Id Column"
+          },
+          "value_column": {
+            "type": "string",
+            "title": "Value Column"
+          },
+          "color_scheme": {
+            "type": "string",
+            "title": "Color Scheme",
+            "default": "Oranges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "id_column",
+          "value_column"
+        ],
+        "title": "MapChartMetadata",
+        "description": "Data to create a map chart (choropleth)"
       },
       "Output": {
         "properties": {

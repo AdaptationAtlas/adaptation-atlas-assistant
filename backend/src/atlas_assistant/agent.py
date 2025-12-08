@@ -21,7 +21,7 @@ from .context import Context
 from .settings import Settings
 from .state import State
 from .tools.dataset import list_datasets, select_dataset
-from .tools.plot import generate_bar_chart_metadata
+from .tools.plot import generate_bar_chart_metadata, generate_map_chart_metadata
 from .tools.sql import generate_table
 
 
@@ -43,6 +43,7 @@ TOOLS = [
     select_dataset,
     generate_table,
     generate_bar_chart_metadata,
+    generate_map_chart_metadata,
 ]
 
 
