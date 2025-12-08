@@ -43,7 +43,8 @@ export const MapChart = ({
     useEffect(() => {
         // sample geojson data selected & downloaded from: https://geojson-maps.kyd.au/
         // the data was also reduced to retain minimal properties
-        fetch('/data/african-nations-reduced.geojson')
+        const geoJsonPath = `${import.meta.env.BASE_URL}data/african-nations-reduced.geojson`;
+        fetch(geoJsonPath)
             .then((response) => response.json())
             .then((data) => setGeoData(data as NationsGeoJSON))
             .catch((error) => console.error('Error loading GeoJSON:', error));
