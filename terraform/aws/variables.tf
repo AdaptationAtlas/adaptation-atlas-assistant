@@ -95,3 +95,11 @@ variable "from_email_address" {
   Email From address to use for automated Cognito emails
   EOT
 }
+
+variable "embeddings_directory" {
+  type        = string
+  default     = null
+  description = <<-EOT
+  Path to embeddings directory
+  EOT
+}
