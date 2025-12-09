@@ -18,8 +18,8 @@ class Settings(BaseSettings):
         "https://digital-atlas.s3.amazonaws.com/stac/AtlasV3/catalog.json"
     )
     cors_origins: list[str] = ["http://localhost:5173"]
-    oidc_url: str
-    oauth_client_id: str | None
+    oidc_url: str | None = None
+    oauth_client_id: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", extra="forbid")  # pyright: ignore[reportUnannotatedClassAttribute]
 
