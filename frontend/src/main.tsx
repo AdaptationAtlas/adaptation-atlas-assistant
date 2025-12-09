@@ -9,7 +9,7 @@ const cognitoAuthConfig = {
     client_id: import.meta.env.VITE_COGNITO_CLIENT_ID,
     redirect_uri: import.meta.env.DEV
         ? 'http://localhost:5173'
-        : window.location.href.replace(/\/$/, ''),
+        : window.location.href,
     response_type: 'code',
     scope: 'email openid phone',
 };
