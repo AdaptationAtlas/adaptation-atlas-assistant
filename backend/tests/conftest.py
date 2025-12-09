@@ -14,34 +14,20 @@ from atlas_assistant.settings import Settings
 
 @pytest.fixture
 def settings() -> Settings:
-    settings = atlas_assistant.settings.get_settings()
-    # python -c 'from pwdlib import PasswordHash; h = PasswordHash.recommended(); print(h.hash("test-password"))'  # noqa: E501
-    settings.users = {
-        "test-user": "$argon2id$v=19$m=65536,t=3,p=4$wcrhwu+MkorDhOTHuY6J1w$S3LkpIYNmV7nOg+lgck1Nqfxmtz1ZHrpbQVLrvjhzfI"  # noqa: E501
-    }
-    return settings
+    return atlas_assistant.settings.get_settings()
 
 
 @pytest.fixture
-def client(settings: Settings) -> Iterator[TestClient]:
-    def override_get_settings() -> Settings:
-        return settings
+def client() -> Iterator[TestClient]:
+    def override_oidc() -> str:
+        return "token!"
 
-    atlas_assistant.api.app.dependency_overrides[atlas_assistant.api.get_settings] = (
-        override_get_settings
+    atlas_assistant.api.app.dependency_overrides[atlas_assistant.api.oidc] = (
+        override_oidc
     )
+
     with TestClient(atlas_assistant.api.app) as client:
         yield client
-
-
-@pytest.fixture
-def authenticated_client(client: TestClient) -> Iterator[TestClient]:
-    response = client.post(
-        "/token", data={"username": "test-user", "password": "test-password"}
-    )
-    _ = response.raise_for_status()
-    client.headers["Authorization"] = f"Bearer {response.json()['access_token']}"
-    yield client
 
 
 @pytest.fixture

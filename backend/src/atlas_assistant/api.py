@@ -8,51 +8,56 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Annotated, Any, Literal
 
-import jwt
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import (
+    OpenIdConnect,
+)
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.errors import GraphRecursionError
 from langgraph.graph.message import BaseMessage
 from langgraph.graph.state import RunnableConfig
-from pwdlib import PasswordHash
 from pydantic import BaseModel
 from starlette import status
 
-from atlas_assistant.state import BarChartMetadata, MapChartMetadata
-
-from . import settings
 from .agent import Agent, Output, create_agent
 from .context import Context
 from .dataset import Dataset
-from .settings import Settings
+from .settings import Settings, get_settings
+from .state import BarChartMetadata, MapChartMetadata
 
 logger = logging.getLogger(__name__)
-algorithm = "HS256"
-password_hash = PasswordHash.recommended()
+settings = get_settings()
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[dict[str, Any]]:
-    agent = create_agent(get_settings())
+    agent = create_agent(settings)
     yield {"agent": agent}
 
 
-app = FastAPI(lifespan=lifespan)
+oidc = OpenIdConnect(openIdConnectUrl=settings.oidc_url)
+if settings.oauth_client_id:
+    swagger_ui_init_oauth = {
+        "clientId": settings.oauth_client_id,
+        "appName": "Adaptation Atlas Assistant",
+        "scopes": "email openid phone",
+    }
+else:
+    swagger_ui_init_oauth = None
+
+app = FastAPI(lifespan=lifespan, swagger_ui_init_oauth=swagger_ui_init_oauth)
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.get_settings().cors_origins,
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_settings() -> Settings:
@@ -60,7 +65,7 @@ def get_settings() -> Settings:
 
     Used for dependency injection.
     """
-    return settings.get_settings()
+    return settings
 
 
 class ChatRequest(BaseModel):
@@ -71,31 +76,6 @@ class ChatRequest(BaseModel):
 
     thread_id: str | None = None
     """A thread id, provided by a previous chat."""
-
-
-class Token(BaseModel):
-    """The return type for the token endpoint."""
-
-    access_token: str
-    """The JWT."""
-
-    token_type: str
-    """The type of the token."""
-
-
-class User(BaseModel):
-    """An extremely simple user model."""
-
-    username: str
-    """The username"""
-
-    def create_access_token(self, settings: Settings) -> str:
-        """Creates an access token for this user."""
-        return jwt.encode(
-            {"sub": self.username},
-            settings.jwt_key.get_secret_value(),
-            algorithm=algorithm,
-        )
 
 
 class ResponseMessage(BaseModel):
@@ -201,64 +181,9 @@ class Error(BaseModel):
     """The error message"""
 
 
-def authenticate_user(
-    username: str, password: str, users: dict[str, str]
-) -> User | None:
-    """Checks a user's password against a naive user 'database'."""
-    hashed_password = users.get(username)
-    if hashed_password and password_hash.verify(password, hashed_password):
-        return User(username=username)
-    else:
-        return None
-
-
-def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    settings: Annotated[Settings, Depends(get_settings)],
-) -> User:
-    """Returns the current user, as decoded from a JWT."""
-    payload = jwt.decode(
-        token, settings.jwt_key.get_secret_value(), algorithms=[algorithm]
-    )
-    username: str | None = payload.get("sub")
-    if username in settings.users:
-        return User(username=username)
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-
 @app.get("/health")
 def health_check():
     return {"status": "OK"}
-
-
-@app.get("/me", tags=["auth"])
-async def me(current_user: Annotated[User, Depends(get_current_user)]) -> User:
-    """Returns information about the currently logged-in user."""
-    return current_user
-
-
-@app.post("/token", tags=["auth"])
-async def login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    settings: Annotated[Settings, Depends(get_settings)],
-) -> Token:
-    """Logs in a user with a username and password."""
-    user = authenticate_user(form_data.username, form_data.password, settings.users)
-    if user:
-        return Token(
-            access_token=user.create_access_token(settings), token_type="bearer"
-        )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
 
 @app.post(
@@ -276,7 +201,7 @@ async def chat(
     request: Request,
     chat_request: ChatRequest,
     settings: Annotated[Settings, Depends(get_settings)],
-    current_user: Annotated[User, Depends(get_current_user)],  # pyright: ignore[reportUnusedParameter]
+    token: Annotated[str, Depends(oidc)],  # pyright: ignore[reportUnusedParameter]
     accept: Annotated[str | None, Header()] = None,
 ) -> StreamingResponse:
     agent: Agent = request.state.agent

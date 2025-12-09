@@ -16,6 +16,8 @@ ROOT = Path(__file__).parents[1]
 OUTPUT_PATH = ROOT / "openapi.json"
 
 openapi_schema = app.openapi()
+# https://github.com/AdaptationAtlas/adaptation-atlas-assistant/pull/147#discussion_r2551705944
+del openapi_schema["components"]["securitySchemes"]
 
 with open(OUTPUT_PATH, "w") as f:
     json.dump(openapi_schema, f, indent=2)

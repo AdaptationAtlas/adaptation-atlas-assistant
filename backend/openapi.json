@@ -21,75 +21,6 @@
         }
       }
     },
-    "/me": {
-      "get": {
-        "tags": [
-          "auth"
-        ],
-        "summary": "Me",
-        "description": "Returns information about the currently logged-in user.",
-        "operationId": "me_me_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/token": {
-      "post": {
-        "tags": [
-          "auth"
-        ],
-        "summary": "Login",
-        "description": "Logs in a user with a username and password.",
-        "operationId": "login_token_post",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_login_token_post"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Token"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/chat": {
       "post": {
         "tags": [
@@ -99,7 +30,7 @@
         "operationId": "chat_chat_post",
         "security": [
           {
-            "OAuth2PasswordBearer": []
+            "OpenIdConnect": []
           }
         ],
         "parameters": [
@@ -288,65 +219,6 @@
         ],
         "title": "BarChartMetadata",
         "description": "Data to create a bar chart"
-      },
-      "Body_login_token_post": {
-        "properties": {
-          "grant_type": {
-            "anyOf": [
-              {
-                "type": "string",
-                "pattern": "^password$"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Grant Type"
-          },
-          "username": {
-            "type": "string",
-            "title": "Username"
-          },
-          "password": {
-            "type": "string",
-            "format": "password",
-            "title": "Password"
-          },
-          "scope": {
-            "type": "string",
-            "title": "Scope",
-            "default": ""
-          },
-          "client_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Client Id"
-          },
-          "client_secret": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "format": "password",
-            "title": "Client Secret"
-          }
-        },
-        "type": "object",
-        "required": [
-          "username",
-          "password"
-        ],
-        "title": "Body_login_token_post"
       },
       "ChatRequest": {
         "properties": {
@@ -847,25 +719,6 @@
         "title": "TableColumn",
         "description": "A table column, from the table extension: https://github.com/stac-extensions/table"
       },
-      "Token": {
-        "properties": {
-          "access_token": {
-            "type": "string",
-            "title": "Access Token"
-          },
-          "token_type": {
-            "type": "string",
-            "title": "Token Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "access_token",
-          "token_type"
-        ],
-        "title": "Token",
-        "description": "The return type for the token endpoint."
-      },
       "ToolResponseMessage": {
         "properties": {
           "content": {
@@ -908,20 +761,6 @@
         "title": "ToolResponseMessage",
         "description": "The response from a tool"
       },
-      "User": {
-        "properties": {
-          "username": {
-            "type": "string",
-            "title": "Username"
-          }
-        },
-        "type": "object",
-        "required": [
-          "username"
-        ],
-        "title": "User",
-        "description": "An extremely simple user model."
-      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -954,17 +793,6 @@
           "type"
         ],
         "title": "ValidationError"
-      }
-    },
-    "securitySchemes": {
-      "OAuth2PasswordBearer": {
-        "type": "oauth2",
-        "flows": {
-          "password": {
-            "scopes": {},
-            "tokenUrl": "token"
-          }
-        }
       }
     }
   }
