@@ -81,7 +81,13 @@
                       "$ref": "#/components/schemas/GenerateBarChartMetadataResponseMessage"
                     },
                     {
+                      "$ref": "#/components/schemas/GenerateMapChartMetadataResponseMessage"
+                    },
+                    {
                       "$ref": "#/components/schemas/AiResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OutputResponseMessage"
                     }
                   ],
                   "title": "Response Chat Chat Post"
@@ -108,7 +114,14 @@
       "AiResponseMessage": {
         "properties": {
           "content": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Content"
           },
           "thread_id": {
@@ -253,7 +266,14 @@
       "GenerateBarChartMetadataResponseMessage": {
         "properties": {
           "content": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Content"
           },
           "thread_id": {
@@ -308,10 +328,82 @@
         "title": "GenerateBarChartMetadataResponseMessage",
         "description": "The response from generate_bar_chart_metadata"
       },
+      "GenerateMapChartMetadataResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_map_chart_metadata"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "map_chart_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MapChartMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "map_chart_metadata",
+          "data"
+        ],
+        "title": "GenerateMapChartMetadataResponseMessage",
+        "description": "The response from generate_map_chart_metadata"
+      },
       "GenerateTableResponseMessage": {
         "properties": {
           "content": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Content"
           },
           "thread_id": {
@@ -406,6 +498,91 @@
         "title": "Item",
         "description": "A STAC item, with only the fields we need."
       },
+      "MapChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "id_column": {
+            "type": "string",
+            "title": "Id Column"
+          },
+          "value_column": {
+            "type": "string",
+            "title": "Value Column"
+          },
+          "color_scheme": {
+            "type": "string",
+            "title": "Color Scheme",
+            "default": "Oranges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "id_column",
+          "value_column"
+        ],
+        "title": "MapChartMetadata",
+        "description": "Data to create a map chart (choropleth)"
+      },
+      "Output": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "queries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Queries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer",
+          "queries"
+        ],
+        "title": "Output"
+      },
+      "OutputResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "output",
+            "title": "Type",
+            "default": "output"
+          },
+          "output": {
+            "$ref": "#/components/schemas/Output"
+          }
+        },
+        "type": "object",
+        "required": [
+          "thread_id",
+          "output"
+        ],
+        "title": "OutputResponseMessage",
+        "description": "The response from an output"
+      },
       "Properties": {
         "properties": {
           "description": {
@@ -445,7 +622,14 @@
       "SelectDatasetResponseMessage": {
         "properties": {
           "content": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Content"
           },
           "thread_id": {
@@ -538,7 +722,14 @@
       "ToolResponseMessage": {
         "properties": {
           "content": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Content"
           },
           "thread_id": {

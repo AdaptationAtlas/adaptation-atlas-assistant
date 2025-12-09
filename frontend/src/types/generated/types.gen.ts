@@ -13,7 +13,7 @@ export type AiResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -142,7 +142,7 @@ export type GenerateBarChartMetadataResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -167,6 +167,39 @@ export type GenerateBarChartMetadataResponseMessage = {
 };
 
 /**
+ * GenerateMapChartMetadataResponseMessage
+ *
+ * The response from generate_map_chart_metadata
+ */
+export type GenerateMapChartMetadataResponseMessage = {
+    /**
+     * Content
+     */
+    content: string | null;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'tool';
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Status
+     */
+    status: string;
+    map_chart_metadata: MapChartMetadata | null;
+    /**
+     * Data
+     */
+    data: string | null;
+};
+
+/**
  * GenerateTableResponseMessage
  *
  * The response from generate_table
@@ -175,7 +208,7 @@ export type GenerateTableResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -232,6 +265,65 @@ export type Item = {
 };
 
 /**
+ * MapChartMetadata
+ *
+ * Data to create a map chart (choropleth)
+ */
+export type MapChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Id Column
+     */
+    id_column: string;
+    /**
+     * Value Column
+     */
+    value_column: string;
+    /**
+     * Color Scheme
+     */
+    color_scheme?: string;
+};
+
+/**
+ * Output
+ */
+export type Output = {
+    /**
+     * Answer
+     */
+    answer: string;
+    /**
+     * Queries
+     */
+    queries: Array<string>;
+};
+
+/**
+ * OutputResponseMessage
+ *
+ * The response from an output
+ */
+export type OutputResponseMessage = {
+    /**
+     * Content
+     */
+    content?: string | null;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'output';
+    output: Output;
+};
+
+/**
  * Properties
  *
  * STAC item properties, the ones we use
@@ -262,7 +354,7 @@ export type SelectDatasetResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -331,7 +423,7 @@ export type ToolResponseMessage = {
     /**
      * Content
      */
-    content: string;
+    content: string | null;
     /**
      * Thread Id
      */
@@ -378,6 +470,20 @@ export type ValidationError = {
      * Error Type
      */
     type: string;
+};
+
+export type HealthCheckHealthGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/health';
+};
+
+export type HealthCheckHealthGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
 };
 
 export type MeMeGetData = {
@@ -449,7 +555,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | AiResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | GenerateMapChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];
