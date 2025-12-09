@@ -38,6 +38,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[dict[str, Any]]:
     yield {"agent": agent}
 
 
+assert settings.oidc_url
 oidc = OpenIdConnect(openIdConnectUrl=settings.oidc_url)
 if settings.oauth_client_id:
     swagger_ui_init_oauth = {
