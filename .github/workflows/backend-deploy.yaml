@@ -1,4 +1,4 @@
-name: Rebuild container and deploy to ECS
+name: Rebuild Container and Deploy to ECS
 on:
   workflow_dispatch:
   push:
