@@ -13,8 +13,9 @@ locals {
 
   container_port = 8000
   env = {
-    MISTRAL_API_KEY      = var.mistral_api_key
-    CHAT_MODEL_SIZE      = var.chat_model_size
+    CHAT_MODEL__TYPE     = var.chat_model__type
+    CHAT_MODEL__API_KEY  = var.chat_model__api_key
+    CHAT_MODEL__SIZE     = var.chat_model__size
     JWT_KEY              = var.jwt_key
     CORS_ORIGINS         = var.cors_origins
     OIDC_URL             = aws_cognito_user_pool.atlas_pool.endpoint

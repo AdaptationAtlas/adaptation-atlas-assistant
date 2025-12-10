@@ -3,7 +3,6 @@ import json
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
 from langgraph.types import Command
-from mistralai import Mistral
 
 from ..context import Context
 from ..state import BarChartMetadata, MapChartMetadata, State
@@ -30,15 +29,8 @@ def generate_bar_chart_metadata(runtime: ToolRuntime[Context, State]) -> Command
         )
 
     settings = runtime.context.settings
-    client = Mistral(
-        api_key=(
-            settings.mistral_api_key.get_secret_value()
-            if settings.mistral_api_key
-            else None
-        )
-    )
-    response = client.chat.parse(
-        model="codestral-latest",
+    client = settings.get_code_client()
+    bar_chart_metadata = client.chat(
         messages=[
             {
                 "role": "system",
@@ -47,9 +39,6 @@ def generate_bar_chart_metadata(runtime: ToolRuntime[Context, State]) -> Command
         ],
         response_format=BarChartMetadata,
     )
-    assert response.choices and response.choices[0] and response.choices[0].message
-    bar_chart_metadata = response.choices[0].message.parsed
-    assert bar_chart_metadata
     return Command(
         update={
             "messages": [
@@ -119,15 +108,8 @@ def generate_map_chart_metadata(runtime: ToolRuntime[Context, State]) -> Command
         )
 
     settings = runtime.context.settings
-    client = Mistral(
-        api_key=(
-            settings.mistral_api_key.get_secret_value()
-            if settings.mistral_api_key
-            else None
-        )
-    )
-    response = client.chat.parse(
-        model="codestral-latest",
+    client = settings.get_code_client()
+    map_chart_metadata = client.chat(
         messages=[
             {
                 "role": "system",
@@ -136,9 +118,6 @@ def generate_map_chart_metadata(runtime: ToolRuntime[Context, State]) -> Command
         ],
         response_format=MapChartMetadata,
     )
-    assert response.choices and response.choices[0] and response.choices[0].message
-    map_chart_metadata = response.choices[0].message.parsed
-    assert map_chart_metadata
     return Command(
         update={
             "messages": [
