@@ -45,6 +45,7 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_REDIRECT_URI: ${{ vars.VITE_REDIRECT_URI }}
           VITE_COGNITO_AUTHORITY: ${{ vars.VITE_COGNITO_AUTHORITY }}
           VITE_COGNITO_CLIENT_ID: ${{ vars.VITE_COGNITO_CLIENT_ID }}
         run: npm run build
