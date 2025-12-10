@@ -19,13 +19,13 @@ Message = dict[str, str]
 
 class MistralConfig(BaseModel):
     type: Literal["mistral"] = "mistral"
-    api_key: SecretStr | None = None
+    api_key: SecretStr
     size: Literal["large"] | Literal["medium"] | Literal["small"] = "small"
     temperature: float = 0.0
 
 
 class Settings(BaseSettings):
-    chat_model: MistralConfig = Field(discriminator="type")
+    chat_model: MistralConfig | None = Field(default=None, discriminator="type")
     jwt_key: SecretStr
     embeddings_directory: Path = Path(__file__).parents[2] / "data" / "embeddings"
     stac_catalog_href: str = (
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
 
     def get_model(self) -> BaseChatModel:
         """Returns the chat model as identified by these settings."""
-        if isinstance(self.chat_model, MistralConfig):  # pyright: ignore[reportUnnecessaryIsInstance]
+        if isinstance(self.chat_model, MistralConfig):
             return ChatMistralAI(
                 model_name=f"mistral-{self.chat_model.size}-latest",
                 api_key=self.chat_model.api_key,
@@ -51,8 +51,7 @@ class Settings(BaseSettings):
             raise ValueError(f"Unsupported chat model type: {type(self.chat_model)}")
 
     def get_embeddings(self) -> Chroma:
-        if isinstance(self.chat_model, MistralConfig):  # pyright: ignore[reportUnnecessaryIsInstance]
-            assert self.chat_model.api_key
+        if isinstance(self.chat_model, MistralConfig):
             embedding_function = MistralAIEmbeddings(
                 model="mistral-embed", api_key=self.chat_model.api_key
             )
@@ -65,7 +64,7 @@ class Settings(BaseSettings):
         )
 
     def get_code_client(self) -> CodeClient:
-        if isinstance(self.chat_model, MistralConfig):  # pyright: ignore[reportUnnecessaryIsInstance]
+        if isinstance(self.chat_model, MistralConfig):
             return CodestralClient(self.chat_model)
         else:
             raise ValueError(f"Unsupported chat model type: {type(self.chat_model)}")
