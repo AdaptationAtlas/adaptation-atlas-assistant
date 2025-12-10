@@ -5,69 +5,16 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/me": {
+    "/health": {
       "get": {
-        "tags": [
-          "auth"
-        ],
-        "summary": "Me",
-        "description": "Returns information about the currently logged-in user.",
-        "operationId": "me_me_get",
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
-      }
-    },
-    "/token": {
-      "post": {
-        "tags": [
-          "auth"
-        ],
-        "summary": "Login",
-        "description": "Logs in a user with a username and password.",
-        "operationId": "login_token_post",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_login_token_post"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Token"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": {}
               }
             }
           }
@@ -83,7 +30,7 @@
         "operationId": "chat_chat_post",
         "security": [
           {
-            "OAuth2PasswordBearer": []
+            "OpenIdConnect": []
           }
         ],
         "parameters": [
@@ -125,10 +72,22 @@
                       "$ref": "#/components/schemas/ToolResponseMessage"
                     },
                     {
+                      "$ref": "#/components/schemas/SelectDatasetResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GenerateTableResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GenerateBarChartMetadataResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GenerateMapChartMetadataResponseMessage"
+                    },
+                    {
                       "$ref": "#/components/schemas/AiResponseMessage"
                     },
                     {
-                      "$ref": "#/components/schemas/BarChartResponseMessage"
+                      "$ref": "#/components/schemas/OutputResponseMessage"
                     }
                   ],
                   "title": "Response Chat Chat Post"
@@ -155,7 +114,14 @@
       "AiResponseMessage": {
         "properties": {
           "content": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Content"
           },
           "thread_id": {
@@ -181,6 +147,42 @@
         ],
         "title": "AiResponseMessage",
         "description": "The response from the AI"
+      },
+      "Asset": {
+        "properties": {
+          "href": {
+            "type": "string",
+            "title": "Href"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "href"
+        ],
+        "title": "Asset",
+        "description": "A STAC asset, with only the fields we need"
       },
       "BarChartMetadata": {
         "properties": {
@@ -218,94 +220,6 @@
         "title": "BarChartMetadata",
         "description": "Data to create a bar chart"
       },
-      "BarChartResponseMessage": {
-        "properties": {
-          "content": {
-            "type": "string",
-            "title": "Content"
-          },
-          "thread_id": {
-            "type": "string",
-            "title": "Thread Id"
-          },
-          "type": {
-            "type": "string",
-            "const": "bar-chart",
-            "title": "Type",
-            "default": "bar-chart"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/BarChartMetadata"
-          }
-        },
-        "type": "object",
-        "required": [
-          "content",
-          "thread_id",
-          "metadata"
-        ],
-        "title": "BarChartResponseMessage",
-        "description": "The agent has created a bar chart and here it is.\n\nThe message content is the data as a JSON string."
-      },
-      "Body_login_token_post": {
-        "properties": {
-          "grant_type": {
-            "anyOf": [
-              {
-                "type": "string",
-                "pattern": "^password$"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Grant Type"
-          },
-          "username": {
-            "type": "string",
-            "title": "Username"
-          },
-          "password": {
-            "type": "string",
-            "format": "password",
-            "title": "Password"
-          },
-          "scope": {
-            "type": "string",
-            "title": "Scope",
-            "default": ""
-          },
-          "client_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Client Id"
-          },
-          "client_secret": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "format": "password",
-            "title": "Client Secret"
-          }
-        },
-        "type": "object",
-        "required": [
-          "username",
-          "password"
-        ],
-        "title": "Body_login_token_post"
-      },
       "ChatRequest": {
         "properties": {
           "query": {
@@ -331,42 +245,35 @@
         "title": "ChatRequest",
         "description": "A chat request"
       },
-      "HTTPValidationError": {
+      "Dataset": {
         "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "Token": {
-        "properties": {
-          "access_token": {
-            "type": "string",
-            "title": "Access Token"
+          "item": {
+            "$ref": "#/components/schemas/Item"
           },
-          "token_type": {
+          "asset_key": {
             "type": "string",
-            "title": "Token Type"
+            "title": "Asset Key"
           }
         },
         "type": "object",
         "required": [
-          "access_token",
-          "token_type"
+          "item",
+          "asset_key"
         ],
-        "title": "Token",
-        "description": "The return type for the token endpoint."
+        "title": "Dataset",
+        "description": "A parquet dataset, which is an asset.\n\nWe include the item in case we want to look information up there."
       },
-      "ToolResponseMessage": {
+      "GenerateBarChartMetadataResponseMessage": {
         "properties": {
           "content": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Content"
           },
           "thread_id": {
@@ -380,6 +287,25 @@
             "default": "tool"
           },
           "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_bar_chart_metadata"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "bar_chart_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BarChartMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
             "anyOf": [
               {
                 "type": "string"
@@ -388,6 +314,436 @@
                 "type": "null"
               }
             ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "bar_chart_metadata",
+          "data"
+        ],
+        "title": "GenerateBarChartMetadataResponseMessage",
+        "description": "The response from generate_bar_chart_metadata"
+      },
+      "GenerateMapChartMetadataResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_map_chart_metadata"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "map_chart_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MapChartMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "map_chart_metadata",
+          "data"
+        ],
+        "title": "GenerateMapChartMetadataResponseMessage",
+        "description": "The response from generate_map_chart_metadata"
+      },
+      "GenerateTableResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_table"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "sql_query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sql Query"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "data",
+          "sql_query"
+        ],
+        "title": "GenerateTableResponseMessage",
+        "description": "The response from generate_table"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Item": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/Properties"
+          },
+          "assets": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Asset"
+            },
+            "type": "object",
+            "title": "Assets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "properties",
+          "assets"
+        ],
+        "title": "Item",
+        "description": "A STAC item, with only the fields we need."
+      },
+      "MapChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "id_column": {
+            "type": "string",
+            "title": "Id Column"
+          },
+          "value_column": {
+            "type": "string",
+            "title": "Value Column"
+          },
+          "color_scheme": {
+            "type": "string",
+            "title": "Color Scheme",
+            "default": "Oranges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "id_column",
+          "value_column"
+        ],
+        "title": "MapChartMetadata",
+        "description": "Data to create a map chart (choropleth)"
+      },
+      "Output": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "queries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Queries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer",
+          "queries"
+        ],
+        "title": "Output"
+      },
+      "OutputResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "output",
+            "title": "Type",
+            "default": "output"
+          },
+          "output": {
+            "$ref": "#/components/schemas/Output"
+          }
+        },
+        "type": "object",
+        "required": [
+          "thread_id",
+          "output"
+        ],
+        "title": "OutputResponseMessage",
+        "description": "The response from an output"
+      },
+      "Properties": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "table:columns": {
+            "items": {
+              "$ref": "#/components/schemas/TableColumn"
+            },
+            "type": "array",
+            "title": "Table:Columns"
+          },
+          "atlas_assistant:sql_instructions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Atlas Assistant:Sql Instructions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "description",
+          "table:columns"
+        ],
+        "title": "Properties",
+        "description": "STAC item properties, the ones we use\n\nSome fields are required here but are not required on a STAC item."
+      },
+      "SelectDatasetResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "select_dataset"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "dataset": {
+            "$ref": "#/components/schemas/Dataset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "dataset"
+        ],
+        "title": "SelectDatasetResponseMessage",
+        "description": "The response from select_dataset"
+      },
+      "TableColumn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "title": "TableColumn",
+        "description": "A table column, from the table extension: https://github.com/stac-extensions/table"
+      },
+      "ToolResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
             "title": "Name"
           },
           "status": {
@@ -404,20 +760,6 @@
         ],
         "title": "ToolResponseMessage",
         "description": "The response from a tool"
-      },
-      "User": {
-        "properties": {
-          "username": {
-            "type": "string",
-            "title": "Username"
-          }
-        },
-        "type": "object",
-        "required": [
-          "username"
-        ],
-        "title": "User",
-        "description": "An extremely simple user model."
       },
       "ValidationError": {
         "properties": {
@@ -451,17 +793,6 @@
           "type"
         ],
         "title": "ValidationError"
-      }
-    },
-    "securitySchemes": {
-      "OAuth2PasswordBearer": {
-        "type": "oauth2",
-        "flows": {
-          "password": {
-            "scopes": {},
-            "tokenUrl": "token"
-          }
-        }
       }
     }
   }

@@ -1,31 +1,33 @@
 services:
   api:
     image: atlas/backend
+    platform: linux/amd64
     build:
       context: backend
+      target: local
     ports:
       - "8000:8000"
     command:
       [
-        "sh",
-        "-c",
-        "uv run python scripts/embed_stac.py && uv run uvicorn src.atlas_assistant.api:app --reload --reload-exclude *data* --host 0.0.0.0",
+        "uvicorn",
+        "atlas_assistant.api:app",
+        "--reload",
+        "--reload-exclude",
+        "*data*",
+        "--host",
+        "0.0.0.0",
       ]
     volumes:
       - ./backend/.env:/app/.env
       - ./backend/src:/app/src
-      - ./backend/scripts:/app/scripts
-      - ./backend/chainlit:/app/chainlit
       - ./backend/data:/app/data
-      - ./backend/.chainlit:/app/.chainlit
+      - ./backend/tests:/app/tests
 
   chat:
     image: atlas/backend
     pull_policy: never
     command:
       [
-        "uv",
-        "run",
         "chainlit",
         "run",
         "chainlit/app.py",
@@ -37,6 +39,9 @@ services:
       - "8501:8501"
     volumes_from:
       - api
+    volumes:
+      - ./backend/chainlit:/app/chainlit
+      - ./backend/.chainlit:/app/.chainlit
 
   frontend:
     image: atlas/frontend
@@ -48,5 +53,6 @@ services:
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/data:/app/data
+      - ./frontend/.env:/app/.env
     depends_on:
       - api

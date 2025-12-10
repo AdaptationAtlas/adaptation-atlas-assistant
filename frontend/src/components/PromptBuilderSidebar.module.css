@@ -1,15 +1,16 @@
 .sidebar {
-    width: 320px;
+    width: 380px;
     height: 100%;
     position: relative;
     flex-shrink: 0;
     display: flex;
     align-items: stretch;
+    overflow-y: auto;
+    background-color: #f3f4f6;
 }
 
 .sidebarPanel {
     flex: 1;
-    background-color: #f3f4f6;
     border-right: 1px solid #d2d6db;
     border-top-left-radius: 12px;
     padding: 24px 0;
