@@ -32,10 +32,7 @@ resource "aws_cognito_user_pool" "atlas_pool" {
 resource "aws_cognito_user_pool_client" "atlas_pool_client" {
   name         = "atlas-backend-client"
   user_pool_id = aws_cognito_user_pool.atlas_pool.id
-  callback_urls = concat(
-    ["https://api.${var.domain_name}/docs/oauth2-redirect"],
-    jsondecode(var.cognito_redirect_urls),
-  )
+  callback_urls = jsondecode(var.cognito_redirect_urls)
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code"]
   allowed_oauth_scopes                 = ["openid", "email", "phone", "profile"]
