@@ -80,11 +80,7 @@ class CodeClient(ABC):
 class CodestralClient(CodeClient):
     def __init__(self, mistral_config: MistralConfig):
         self.client: Mistral = Mistral(
-            api_key=(
-                mistral_config.api_key.get_secret_value()
-                if mistral_config.api_key
-                else None
-            )
+            api_key=(mistral_config.api_key.get_secret_value())
         )
 
     @override
