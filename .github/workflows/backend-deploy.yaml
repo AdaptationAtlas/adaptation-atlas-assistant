@@ -1,5 +1,11 @@
-name: Build and push backend docker image
+name: Backend Deploy
 on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: "Rebuild container and deploy to ECS"
+        type: boolean
+        required: true
   push:
     branches:
       - main
