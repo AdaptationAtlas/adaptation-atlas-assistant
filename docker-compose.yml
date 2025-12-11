@@ -47,7 +47,7 @@ services:
     image: atlas/frontend
     build:
       context: frontend
-      target: ${BUILD_TARGET:-development} #TODO Add BUILD_TARGET to GHA workflow
+      target: development
     ports:
       - "5173:5173"
     volumes:
