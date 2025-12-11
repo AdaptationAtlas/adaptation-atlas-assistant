@@ -73,6 +73,15 @@ variable "cors_origins" {
   EOT
 }
 
+variable "cognito_redirect_urls" {
+  type        = string
+  default     = "[]"
+  description = <<-EOT
+  Allowed OAuth callback/redirect URLs for Cognito (JSON array string).
+  These should include full paths, e.g., "https://example.com/app/"
+  EOT
+}
+
 variable "api_image_tag" {
   type        = string
   default     = "latest"

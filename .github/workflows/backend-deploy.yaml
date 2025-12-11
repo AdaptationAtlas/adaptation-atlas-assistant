@@ -1,5 +1,6 @@
-name: Build and push backend docker image
+name: Rebuild Container and Deploy to ECS
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
