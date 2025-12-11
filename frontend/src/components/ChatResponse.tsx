@@ -1,10 +1,12 @@
 import { useState, useCallback } from 'react';
+import { AreaChart } from './Charts/Area';
 import { BarChart } from './Charts/Bar';
 import { MapChart } from './Charts/Map';
 import type { ChartRef } from './Charts/Main';
 import type {
     AiResponseMessage,
     BarChartMetadata,
+    GenerateAreaChartMetadataResponseMessage,
     GenerateBarChartMetadataResponseMessage,
     GenerateMapChartMetadataResponseMessage,
     OutputResponseMessage,
@@ -38,6 +40,11 @@ function isGenerateBarChartMetadataMessage(event: StreamEvent): event is Generat
 function isGenerateMapChartMetadataMessage(event: StreamEvent): event is GenerateMapChartMetadataResponseMessage & { id?: string; timestamp?: number } {
     if (!event || 'error' in event) return false;
     return event.type === 'tool' && 'name' in event && event.name === 'generate_map_chart_metadata';
+}
+
+function isGenerateAreaChartMetadataMessage(event: StreamEvent): event is GenerateAreaChartMetadataResponseMessage & { id?: string; timestamp?: number } {
+    if (!event || 'error' in event) return false;
+    return event.type === 'tool' && 'name' in event && event.name === 'generate_area_chart_metadata';
 }
 
 function isOutputMessage(event: StreamEvent | null): event is OutputResponseMessage & { id?: string; timestamp?: number } {
@@ -289,6 +296,68 @@ function GetMapCodeButton({ metadata, data }: GetMapCodeButtonProps) {
     );
 }
 
+function generateAreaObservableCode(
+    metadata: NonNullable<GenerateAreaChartMetadataResponseMessage['area_chart_metadata']>,
+    data: unknown[]
+): string {
+    const { x_column, y_column, grouping_column, title } = metadata;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Area Chart'}
+Plot.plot({
+  marginBottom: 60,
+  marginLeft: 60,
+  x: { label: "${x_column}" },
+  y: { label: "${y_column}", grid: true },
+  marks: [
+    Plot.areaY(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      fill: ${grouping_column ? `"${grouping_column}"` : '"steelblue"'},
+      fillOpacity: 0.6,
+    }),
+    Plot.lineY(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      stroke: ${grouping_column ? `"${grouping_column}"` : '"steelblue"'},
+      strokeWidth: 1.5,
+    }),
+    Plot.ruleY([0]),
+  ]
+})`;
+}
+
+interface GetAreaCodeButtonProps {
+    metadata: NonNullable<GenerateAreaChartMetadataResponseMessage['area_chart_metadata']>;
+    data: unknown[];
+}
+
+function GetAreaCodeButton({ metadata, data }: GetAreaCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateAreaObservableCode(metadata, data);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
 interface DownloadButtonProps {
     chartRef: ChartRef | null;
     title?: string;
@@ -389,12 +458,42 @@ function MapArtifactWithControls({ data, metadata, rawData }: MapArtifactWithCon
     );
 }
 
+interface AreaArtifactWithControlsProps {
+    data: unknown[];
+    metadata: NonNullable<GenerateAreaChartMetadataResponseMessage['area_chart_metadata']>;
+    rawData: string;
+}
+
+function AreaArtifactWithControls({ data, metadata, rawData }: AreaArtifactWithControlsProps) {
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <AreaChart
+                data={data}
+                metadata={metadata}
+                onChartRefChange={handleChartRefChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetAreaCodeButton metadata={metadata} data={data} />
+            </div>
+        </div>
+    );
+}
+
 export function ChatResponse({ events, status, onSuggestionClick }: ChatResponseProps) {
     interface ConversationTurn {
         userMessages: typeof events;
         intermediateMessages: typeof events;
         barChartArtifacts: GenerateBarChartMetadataResponseMessage[];
         mapChartArtifacts: GenerateMapChartMetadataResponseMessage[];
+        areaChartArtifacts: GenerateAreaChartMetadataResponseMessage[];
         finalAiMessage: typeof events[0] | null;
     }
 
@@ -404,19 +503,21 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         intermediateMessages: [],
         barChartArtifacts: [],
         mapChartArtifacts: [],
+        areaChartArtifacts: [],
         finalAiMessage: null,
     };
 
     events.forEach((event) => {
         if (!('error' in event) && event.type === 'user') {
             // Start a new turn when we see a user message
-            if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
+            if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.areaChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
                 conversationTurns.push(currentTurn);
                 currentTurn = {
                     userMessages: [],
                     intermediateMessages: [],
                     barChartArtifacts: [],
                     mapChartArtifacts: [],
+                    areaChartArtifacts: [],
                     finalAiMessage: null,
                 };
             }
@@ -435,6 +536,12 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                 currentTurn.mapChartArtifacts.push(event);
             }
             currentTurn.intermediateMessages.push(event);
+        } else if (isGenerateAreaChartMetadataMessage(event)) {
+            // only add artifact if not null
+            if (event.data && event.area_chart_metadata) {
+                currentTurn.areaChartArtifacts.push(event);
+            }
+            currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'ai') {
             currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'output') {
@@ -444,7 +551,7 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         }
     });
 
-    if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
+    if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.areaChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
         conversationTurns.push(currentTurn);
     }
 
@@ -560,6 +667,25 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
                         return (
                             <MapArtifactWithControls
+                                key={messageId}
+                                data={data}
+                                metadata={metadata}
+                                rawData={artifact.data || ''}
+                            />
+                        );
+                    })}
+
+                    {/* Render area chart artifacts */}
+                    {turn.areaChartArtifacts.map((artifact, index) => {
+                        const messageId = `area-artifact-${turnIndex}-${index}`;
+
+                        const data = artifact.data ? JSON.parse(artifact.data) : [];
+                        const metadata = artifact.area_chart_metadata;
+
+                        if (!metadata) return null;
+
+                        return (
+                            <AreaArtifactWithControls
                                 key={messageId}
                                 data={data}
                                 metadata={metadata}

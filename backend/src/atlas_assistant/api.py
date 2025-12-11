@@ -26,7 +26,7 @@ from .agent import Agent, Output, create_agent
 from .context import Context
 from .dataset import Dataset
 from .settings import Settings, get_settings
-from .state import BarChartMetadata, MapChartMetadata
+from .state import AreaChartMetadata, BarChartMetadata, MapChartMetadata
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -162,6 +162,18 @@ class GenerateMapChartMetadataResponseMessage(ToolResponseMessage):
     """The table data as a JSON string"""
 
 
+class GenerateAreaChartMetadataResponseMessage(ToolResponseMessage):
+    """The response from generate_area_chart_metadata"""
+
+    name: str = "generate_area_chart_metadata"
+
+    area_chart_metadata: AreaChartMetadata | None
+    """The area chart metadata"""
+
+    data: str | None
+    """The table data as a JSON string"""
+
+
 class AiResponseMessage(ResponseMessage):
     """The response from the AI"""
 
@@ -195,6 +207,7 @@ def health_check():
     | GenerateTableResponseMessage
     | GenerateBarChartMetadataResponseMessage
     | GenerateMapChartMetadataResponseMessage
+    | GenerateAreaChartMetadataResponseMessage
     | AiResponseMessage
     | OutputResponseMessage,
 )
@@ -318,6 +331,17 @@ def create_response_message(
                     else artifact,
                     data=artifact.get("data") if isinstance(artifact, dict) else None,
                 )
+            case "generate_area_chart_metadata":
+                artifact = message.artifact or {}
+                return GenerateAreaChartMetadataResponseMessage(
+                    content=message.content,
+                    status=message.status,
+                    thread_id=thread_id,
+                    area_chart_metadata=artifact.get("area_chart_metadata")
+                    if isinstance(artifact, dict)
+                    else artifact,
+                    data=artifact.get("data") if isinstance(artifact, dict) else None,
+                )
             case None:
                 logger.warning(
                     f"Tool message does not have a name: {message.to_json()}"
@@ -348,6 +372,32 @@ def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None
     """
     state = agent.get_state(config)
     messages = list(state.values.get("messages", []))
+
+    # Debug: log message state to help diagnose duplicate tool_call_id issues
+    if messages:
+        logger.debug(f"Current message count: {len(messages)}")
+        seen_tool_call_ids: set[str] = set()
+        duplicate_ids: list[str] = []
+        for i, msg in enumerate(messages):
+            msg_type = type(msg).__name__
+            msg_id = getattr(msg, "id", "no-id")
+            if hasattr(msg, "tool_calls") and msg.tool_calls:
+                tool_call_ids = [tc.get("id", "?") for tc in msg.tool_calls]
+                for tc_id in tool_call_ids:
+                    if tc_id in seen_tool_call_ids:
+                        duplicate_ids.append(tc_id)
+                    seen_tool_call_ids.add(tc_id)
+                logger.debug(
+                    f"  [{i}] {msg_type} id={msg_id} tool_calls={tool_call_ids}"
+                )
+            elif hasattr(msg, "tool_call_id"):
+                logger.debug(
+                    f"  [{i}] {msg_type} id={msg_id} tool_call_id={msg.tool_call_id}"
+                )
+            else:
+                logger.debug(f"  [{i}] {msg_type} id={msg_id}")
+        if duplicate_ids:
+            logger.error(f"DUPLICATE TOOL_CALL_IDS DETECTED: {duplicate_ids}")
     if messages and isinstance(messages[-1], ToolMessage):
         last_tool = messages[-1]
         acknowledgement = (
@@ -355,5 +405,6 @@ def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None
             if getattr(last_tool, "name", None)
             else "Noted the previous tool result."
         )
-        messages.append(AIMessage(content=acknowledgement))
-        _ = agent.update_state(config, {"messages": messages})
+        _ = agent.update_state(
+            config, {"messages": [AIMessage(content=acknowledgement)]}
+        )

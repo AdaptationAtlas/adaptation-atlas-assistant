@@ -29,6 +29,30 @@ export type AiResponseMessage = {
 };
 
 /**
+ * AreaChartMetadata
+ *
+ * Data to create a stacked area chart
+ */
+export type AreaChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Grouping Column
+     */
+    grouping_column: string | null;
+};
+
+/**
  * Asset
  *
  * A STAC asset, with only the fields we need
@@ -73,36 +97,6 @@ export type BarChartMetadata = {
 };
 
 /**
- * Body_login_token_post
- */
-export type BodyLoginTokenPost = {
-    /**
-     * Grant Type
-     */
-    grant_type?: string | null;
-    /**
-     * Username
-     */
-    username: string;
-    /**
-     * Password
-     */
-    password: string;
-    /**
-     * Scope
-     */
-    scope?: string;
-    /**
-     * Client Id
-     */
-    client_id?: string | null;
-    /**
-     * Client Secret
-     */
-    client_secret?: string | null;
-};
-
-/**
  * ChatRequest
  *
  * A chat request
@@ -131,6 +125,39 @@ export type Dataset = {
      * Asset Key
      */
     asset_key: string;
+};
+
+/**
+ * GenerateAreaChartMetadataResponseMessage
+ *
+ * The response from generate_area_chart_metadata
+ */
+export type GenerateAreaChartMetadataResponseMessage = {
+    /**
+     * Content
+     */
+    content: string | null;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'tool';
+    /**
+     * Name
+     */
+    name?: string;
+    /**
+     * Status
+     */
+    status: string;
+    area_chart_metadata: AreaChartMetadata | null;
+    /**
+     * Data
+     */
+    data: string | null;
 };
 
 /**
@@ -399,22 +426,6 @@ export type TableColumn = {
 };
 
 /**
- * Token
- *
- * The return type for the token endpoint.
- */
-export type Token = {
-    /**
-     * Access Token
-     */
-    access_token: string;
-    /**
-     * Token Type
-     */
-    token_type: string;
-};
-
-/**
  * ToolResponseMessage
  *
  * The response from a tool
@@ -440,18 +451,6 @@ export type ToolResponseMessage = {
      * Status
      */
     status: string;
-};
-
-/**
- * User
- *
- * An extremely simple user model.
- */
-export type User = {
-    /**
-     * Username
-     */
-    username: string;
 };
 
 /**
@@ -486,47 +485,6 @@ export type HealthCheckHealthGetResponses = {
     200: unknown;
 };
 
-export type MeMeGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/me';
-};
-
-export type MeMeGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: User;
-};
-
-export type MeMeGetResponse = MeMeGetResponses[keyof MeMeGetResponses];
-
-export type LoginTokenPostData = {
-    body: BodyLoginTokenPost;
-    path?: never;
-    query?: never;
-    url: '/token';
-};
-
-export type LoginTokenPostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type LoginTokenPostError = LoginTokenPostErrors[keyof LoginTokenPostErrors];
-
-export type LoginTokenPostResponses = {
-    /**
-     * Successful Response
-     */
-    200: Token;
-};
-
-export type LoginTokenPostResponse = LoginTokenPostResponses[keyof LoginTokenPostResponses];
-
 export type ChatChatPostData = {
     body: ChatRequest;
     headers?: {
@@ -555,7 +513,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | GenerateMapChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | GenerateMapChartMetadataResponseMessage | GenerateAreaChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];

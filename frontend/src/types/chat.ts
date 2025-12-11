@@ -3,6 +3,7 @@ import type {
     ToolResponseMessage,
     SelectDatasetResponseMessage,
     GenerateTableResponseMessage,
+    GenerateAreaChartMetadataResponseMessage,
     GenerateBarChartMetadataResponseMessage,
     GenerateMapChartMetadataResponseMessage,
     OutputResponseMessage,
@@ -28,6 +29,7 @@ export type StreamEvent = (
     | (ToolResponseMessage & { id?: string; timestamp?: number })
     | (SelectDatasetResponseMessage & { id?: string; timestamp?: number })
     | (GenerateTableResponseMessage & { id?: string; timestamp?: number })
+    | (GenerateAreaChartMetadataResponseMessage & { id?: string; timestamp?: number })
     | (GenerateBarChartMetadataResponseMessage & { id?: string; timestamp?: number })
     | (GenerateMapChartMetadataResponseMessage & { id?: string; timestamp?: number })
     | (OutputResponseMessage & { id?: string; timestamp?: number })

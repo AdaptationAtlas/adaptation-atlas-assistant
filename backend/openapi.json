@@ -84,6 +84,9 @@
                       "$ref": "#/components/schemas/GenerateMapChartMetadataResponseMessage"
                     },
                     {
+                      "$ref": "#/components/schemas/GenerateAreaChartMetadataResponseMessage"
+                    },
+                    {
                       "$ref": "#/components/schemas/AiResponseMessage"
                     },
                     {
@@ -147,6 +150,42 @@
         ],
         "title": "AiResponseMessage",
         "description": "The response from the AI"
+      },
+      "AreaChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "x_column": {
+            "type": "string",
+            "title": "X Column"
+          },
+          "y_column": {
+            "type": "string",
+            "title": "Y Column"
+          },
+          "grouping_column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grouping Column"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "x_column",
+          "y_column",
+          "grouping_column"
+        ],
+        "title": "AreaChartMetadata",
+        "description": "Data to create a stacked area chart"
       },
       "Asset": {
         "properties": {
@@ -262,6 +301,71 @@
         ],
         "title": "Dataset",
         "description": "A parquet dataset, which is an asset.\n\nWe include the item in case we want to look information up there."
+      },
+      "GenerateAreaChartMetadataResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "tool",
+            "title": "Type",
+            "default": "tool"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "generate_area_chart_metadata"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "area_chart_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AreaChartMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id",
+          "status",
+          "area_chart_metadata",
+          "data"
+        ],
+        "title": "GenerateAreaChartMetadataResponseMessage",
+        "description": "The response from generate_area_chart_metadata"
       },
       "GenerateBarChartMetadataResponseMessage": {
         "properties": {

@@ -27,6 +27,9 @@ class State(AgentState[None]):
     map_chart_metadata: MapChartMetadata | None
     """Map chart metadata for the data."""
 
+    area_chart_metadata: AreaChartMetadata | None
+    """Area chart metadata for the data."""
+
 
 class SqlQuery(BaseModel):
     """The current SQL query"""
@@ -68,3 +71,19 @@ class MapChartMetadata(BaseModel):
 
     color_scheme: str = "Oranges"
     """The Observable Plot color scheme to use"""
+
+
+class AreaChartMetadata(BaseModel):
+    """Data to create a stacked area chart"""
+
+    title: str
+    """The title of the area chart."""
+
+    x_column: str
+    """The name of the data column used for the x-axis (typically time or sequence)"""
+
+    y_column: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name for creating stacked areas (categories)"""
