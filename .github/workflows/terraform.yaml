@@ -146,5 +146,3 @@ jobs:
         run: |
           set -e
           terraform apply -no-color -input=false -auto-approve -var-file=${{ env.TFVARS_FILE }}
-          echo "working_dir=${PWD#${{ github.workspace }}}" >> $GITHUB_OUTPUT
-
