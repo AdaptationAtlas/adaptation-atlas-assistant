@@ -30,7 +30,7 @@ module "ecr" {
         description  = "Keep last 5 tagged images",
         selection = {
           tagStatus   = "tagged",
-          tagPrefixList = ["sha*"],
+          tagPrefixList = ["sha-"],
           countType   = "imageCountMoreThan",
           countNumber = 5
         },
