@@ -145,7 +145,6 @@ jobs:
         id: apply
         run: |
           set -e
-          terraform apply -no-color -input=false -auto-approve -var-file=${{ env.TFVARS_FILE }} | tee apply.txt
-          echo "stdout<<EOF" >> $GITHUB_OUTPUT
-          cat apply.txt >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          terraform apply -no-color -input=false -auto-approve -var-file=${{ env.TFVARS_FILE }}
+          echo "working_dir=${PWD#${{ github.workspace }}}" >> $GITHUB_OUTPUT
+
