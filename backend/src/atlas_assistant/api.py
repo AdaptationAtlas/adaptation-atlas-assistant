@@ -342,7 +342,7 @@ def create_response_message(
 
 
 def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None:
-    """Mistral fails when a tool message is followed by a user message.
+    """Models fails when a tool message is followed by a user message.
     Append a short assistant acknowledgement so the next user turn comes
     after an assistant role.
     """
