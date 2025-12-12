@@ -89,7 +89,6 @@
     margin: 0 auto;
     width: 100%;
     position: relative;
-    overflow: hidden;
 }
 
 /* Prompt Container */
@@ -112,7 +111,7 @@
     flex: 1;
     min-height: 0;
     padding-bottom: calc(2rem + 120px);
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 /* Responsive adjustments */
