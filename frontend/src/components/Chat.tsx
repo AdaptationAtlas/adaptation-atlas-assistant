@@ -12,12 +12,6 @@ import type { SidebarState, PromptContextTag } from '../types/sidebar';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
 
-const examplePrompts = [
-    'How is maize production projected to change under future climate scenarios in Kenya?',
-    'Which regions in West Africa face the highest exposure to drought risk?',
-    'Compare adaptive capacity between smallholder farmers in Malawi and Zambia',
-];
-
 function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     const tags: PromptContextTag[] = [];
 
@@ -206,10 +200,7 @@ export function Chat() {
 
             <main className={styles.mainContent}>
                 {status === 'idle' && (
-                    <EmptyState
-                        examplePrompts={examplePrompts}
-                        onExampleClick={handleExampleClick}
-                    />
+                    <EmptyState onExampleClick={handleExampleClick} />
                 )}
 
                 {status !== 'idle' && (
