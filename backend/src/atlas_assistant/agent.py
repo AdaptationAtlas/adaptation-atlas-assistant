@@ -6,10 +6,15 @@ See https://docs.langchain.com/oss/python/langgraph/workflows-agents#agents for 
 from __future__ import annotations
 
 import datetime
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 import langchain.agents
 from langchain.agents import AgentState
 from langchain.agents.middleware.types import (
+    AgentMiddleware,
+    ModelRequest,
+    ModelResponse,
     _InputAgentState,  # pyright: ignore[reportPrivateUsage]
     _OutputAgentState,  # pyright: ignore[reportPrivateUsage]
 )
@@ -46,6 +51,28 @@ TOOLS = [
 ]
 
 
+class DisableParallelToolCalls(AgentMiddleware[AgentState[None], Context]):
+    """Disable parallel tool calls to prevent race conditions.
+
+    LangGraph's ToolNode executes multiple tool calls in parallel, which causes
+    issues when tools depend on each other's state (e.g., generate_chart_metadata
+    depends on data populated by generate_table). This middleware sets
+    parallel_tool_calls=False in the Mistral API to force sequential tool calls.
+    """
+
+    state_schema: type[AgentState[None]] = AgentState
+    tools: list[Any] = []
+
+    async def awrap_model_call(  # pyright: ignore[reportImplicitOverride]
+        self,
+        request: ModelRequest,
+        handler: Callable[[ModelRequest], Awaitable[ModelResponse]],
+    ) -> ModelResponse:
+        """Set parallel_tool_calls=False before each model call."""
+        request.model_settings["parallel_tool_calls"] = False
+        return await handler(request)
+
+
 def create_agent(settings: Settings) -> Agent:
     """Creates a new agent."""
     return langchain.agents.create_agent(
@@ -56,6 +83,7 @@ def create_agent(settings: Settings) -> Agent:
         context_schema=Context,
         state_schema=State,
         response_format=Output,  # pyright: ignore[reportArgumentType]
+        middleware=[DisableParallelToolCalls()],
     )
 
 
