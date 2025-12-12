@@ -5,10 +5,10 @@ import { MapChart } from './Charts/Map';
 import type { ChartRef } from './Charts/Main';
 import type {
     AiResponseMessage,
+    AreaChartMetadata,
     BarChartMetadata,
-    GenerateAreaChartMetadataResponseMessage,
-    GenerateBarChartMetadataResponseMessage,
-    GenerateMapChartMetadataResponseMessage,
+    GenerateChartMetadataResponseMessage,
+    MapChartMetadata,
     OutputResponseMessage,
 } from '../types/generated';
 import { ExamplePrompts } from './ExamplePrompts';
@@ -32,19 +32,9 @@ function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { 
     return event.type === 'ai';
 }
 
-function isGenerateBarChartMetadataMessage(event: StreamEvent): event is GenerateBarChartMetadataResponseMessage & { id?: string; timestamp?: number } {
+function isGenerateChartMetadataMessage(event: StreamEvent): event is GenerateChartMetadataResponseMessage & { id?: string; timestamp?: number } {
     if (!event || 'error' in event) return false;
-    return event.type === 'tool' && 'name' in event && event.name === 'generate_bar_chart_metadata';
-}
-
-function isGenerateMapChartMetadataMessage(event: StreamEvent): event is GenerateMapChartMetadataResponseMessage & { id?: string; timestamp?: number } {
-    if (!event || 'error' in event) return false;
-    return event.type === 'tool' && 'name' in event && event.name === 'generate_map_chart_metadata';
-}
-
-function isGenerateAreaChartMetadataMessage(event: StreamEvent): event is GenerateAreaChartMetadataResponseMessage & { id?: string; timestamp?: number } {
-    if (!event || 'error' in event) return false;
-    return event.type === 'tool' && 'name' in event && event.name === 'generate_area_chart_metadata';
+    return event.type === 'tool' && 'name' in event && event.name === 'generate_chart_metadata';
 }
 
 function isOutputMessage(event: StreamEvent | null): event is OutputResponseMessage & { id?: string; timestamp?: number } {
@@ -215,7 +205,7 @@ function GetCodeButton({ metadata, data, isFlipped }: GetCodeButtonProps) {
 }
 
 function generateMapObservableCode(
-    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>,
+    metadata: MapChartMetadata,
     data: unknown[]
 ): string {
     const { id_column, value_column, color_scheme, title } = metadata;
@@ -269,7 +259,7 @@ Plot.plot({
 }
 
 interface GetMapCodeButtonProps {
-    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>;
+    metadata: MapChartMetadata;
     data: unknown[];
 }
 
@@ -297,7 +287,7 @@ function GetMapCodeButton({ metadata, data }: GetMapCodeButtonProps) {
 }
 
 function generateAreaObservableCode(
-    metadata: NonNullable<GenerateAreaChartMetadataResponseMessage['area_chart_metadata']>,
+    metadata: AreaChartMetadata,
     data: unknown[]
 ): string {
     const { x_column, y_column, grouping_column, title } = metadata;
@@ -331,7 +321,7 @@ Plot.plot({
 }
 
 interface GetAreaCodeButtonProps {
-    metadata: NonNullable<GenerateAreaChartMetadataResponseMessage['area_chart_metadata']>;
+    metadata: AreaChartMetadata;
     data: unknown[];
 }
 
@@ -396,7 +386,7 @@ function DownloadButton({ chartRef, title }: DownloadButtonProps) {
 
 interface ArtifactWithControlsProps {
     data: unknown[];
-    metadata: NonNullable<GenerateBarChartMetadataResponseMessage['bar_chart_metadata']>;
+    metadata: BarChartMetadata;
     rawData: string;
 }
 
@@ -431,7 +421,7 @@ function ArtifactWithControls({ data, metadata, rawData }: ArtifactWithControlsP
 
 interface MapArtifactWithControlsProps {
     data: unknown[];
-    metadata: NonNullable<GenerateMapChartMetadataResponseMessage['map_chart_metadata']>;
+    metadata: MapChartMetadata;
     rawData: string;
 }
 
@@ -460,7 +450,7 @@ function MapArtifactWithControls({ data, metadata, rawData }: MapArtifactWithCon
 
 interface AreaArtifactWithControlsProps {
     data: unknown[];
-    metadata: NonNullable<GenerateAreaChartMetadataResponseMessage['area_chart_metadata']>;
+    metadata: AreaChartMetadata;
     rawData: string;
 }
 
@@ -491,9 +481,7 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
     interface ConversationTurn {
         userMessages: typeof events;
         intermediateMessages: typeof events;
-        barChartArtifacts: GenerateBarChartMetadataResponseMessage[];
-        mapChartArtifacts: GenerateMapChartMetadataResponseMessage[];
-        areaChartArtifacts: GenerateAreaChartMetadataResponseMessage[];
+        chartArtifacts: GenerateChartMetadataResponseMessage[];
         finalAiMessage: typeof events[0] | null;
     }
 
@@ -501,45 +489,29 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
     let currentTurn: ConversationTurn = {
         userMessages: [],
         intermediateMessages: [],
-        barChartArtifacts: [],
-        mapChartArtifacts: [],
-        areaChartArtifacts: [],
+        chartArtifacts: [],
         finalAiMessage: null,
     };
 
     events.forEach((event) => {
         if (!('error' in event) && event.type === 'user') {
             // Start a new turn when we see a user message
-            if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.areaChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
+            if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.chartArtifacts.length > 0 || currentTurn.finalAiMessage) {
                 conversationTurns.push(currentTurn);
                 currentTurn = {
                     userMessages: [],
                     intermediateMessages: [],
-                    barChartArtifacts: [],
-                    mapChartArtifacts: [],
-                    areaChartArtifacts: [],
+                    chartArtifacts: [],
                     finalAiMessage: null,
                 };
             }
             currentTurn.userMessages.push(event);
         } else if ('error' in event) {
             currentTurn.intermediateMessages.push(event);
-        } else if (isGenerateBarChartMetadataMessage(event)) {
-            // only add artifact if not null
-            if (event.data && event.bar_chart_metadata) {
-                currentTurn.barChartArtifacts.push(event);
-            }
-            currentTurn.intermediateMessages.push(event);
-        } else if (isGenerateMapChartMetadataMessage(event)) {
-            // only add artifact if not null
-            if (event.data && event.map_chart_metadata) {
-                currentTurn.mapChartArtifacts.push(event);
-            }
-            currentTurn.intermediateMessages.push(event);
-        } else if (isGenerateAreaChartMetadataMessage(event)) {
-            // only add artifact if not null
-            if (event.data && event.area_chart_metadata) {
-                currentTurn.areaChartArtifacts.push(event);
+        } else if (isGenerateChartMetadataMessage(event)) {
+            // only add artifact if data and metadata are present
+            if (event.data && event.chart_metadata) {
+                currentTurn.chartArtifacts.push(event);
             }
             currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'ai') {
@@ -551,7 +523,7 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         }
     });
 
-    if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.barChartArtifacts.length > 0 || currentTurn.mapChartArtifacts.length > 0 || currentTurn.areaChartArtifacts.length > 0 || currentTurn.finalAiMessage) {
+    if (currentTurn.userMessages.length > 0 || currentTurn.intermediateMessages.length > 0 || currentTurn.chartArtifacts.length > 0 || currentTurn.finalAiMessage) {
         conversationTurns.push(currentTurn);
     }
 
@@ -637,61 +609,48 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                         );
                     })()}
 
-                    {/* Render bar chart artifacts */}
-                    {turn.barChartArtifacts.map((artifact, index) => {
-                        const messageId = `bar-artifact-${turnIndex}-${index}`;
-
+                    {/* Render chart artifacts */}
+                    {turn.chartArtifacts.map((artifact, index) => {
+                        const messageId = `chart-artifact-${turnIndex}-${index}`;
                         const data = artifact.data ? JSON.parse(artifact.data) : [];
-                        const metadata = artifact.bar_chart_metadata;
+                        const metadata = artifact.chart_metadata;
 
                         if (!metadata) return null;
 
-                        return (
-                            <ArtifactWithControls
-                                key={messageId}
-                                data={data}
-                                metadata={metadata}
-                                rawData={artifact.data || ''}
-                            />
-                        );
-                    })}
+                        if (artifact.chart_type === 'bar') {
+                            return (
+                                <ArtifactWithControls
+                                    key={messageId}
+                                    data={data}
+                                    metadata={metadata as BarChartMetadata}
+                                    rawData={artifact.data || ''}
+                                />
+                            );
+                        }
 
-                    {/* Render map chart artifacts */}
-                    {turn.mapChartArtifacts.map((artifact, index) => {
-                        const messageId = `map-artifact-${turnIndex}-${index}`;
+                        if (artifact.chart_type === 'map') {
+                            return (
+                                <MapArtifactWithControls
+                                    key={messageId}
+                                    data={data}
+                                    metadata={metadata as MapChartMetadata}
+                                    rawData={artifact.data || ''}
+                                />
+                            );
+                        }
 
-                        const data = artifact.data ? JSON.parse(artifact.data) : [];
-                        const metadata = artifact.map_chart_metadata;
+                        if (artifact.chart_type === 'area') {
+                            return (
+                                <AreaArtifactWithControls
+                                    key={messageId}
+                                    data={data}
+                                    metadata={metadata as AreaChartMetadata}
+                                    rawData={artifact.data || ''}
+                                />
+                            );
+                        }
 
-                        if (!metadata) return null;
-
-                        return (
-                            <MapArtifactWithControls
-                                key={messageId}
-                                data={data}
-                                metadata={metadata}
-                                rawData={artifact.data || ''}
-                            />
-                        );
-                    })}
-
-                    {/* Render area chart artifacts */}
-                    {turn.areaChartArtifacts.map((artifact, index) => {
-                        const messageId = `area-artifact-${turnIndex}-${index}`;
-
-                        const data = artifact.data ? JSON.parse(artifact.data) : [];
-                        const metadata = artifact.area_chart_metadata;
-
-                        if (!metadata) return null;
-
-                        return (
-                            <AreaArtifactWithControls
-                                key={messageId}
-                                data={data}
-                                metadata={metadata}
-                                rawData={artifact.data || ''}
-                            />
-                        );
+                        return null;
                     })}
 
                     {/* Render final message (AI or Output) */}

@@ -128,11 +128,11 @@ export type Dataset = {
 };
 
 /**
- * GenerateAreaChartMetadataResponseMessage
+ * GenerateChartMetadataResponseMessage
  *
- * The response from generate_area_chart_metadata
+ * The response from generate_chart_metadata
  */
-export type GenerateAreaChartMetadataResponseMessage = {
+export type GenerateChartMetadataResponseMessage = {
     /**
      * Content
      */
@@ -153,73 +153,14 @@ export type GenerateAreaChartMetadataResponseMessage = {
      * Status
      */
     status: string;
-    area_chart_metadata: AreaChartMetadata | null;
     /**
-     * Data
+     * Chart Type
      */
-    data: string | null;
-};
-
-/**
- * GenerateBarChartMetadataResponseMessage
- *
- * The response from generate_bar_chart_metadata
- */
-export type GenerateBarChartMetadataResponseMessage = {
+    chart_type: 'bar' | 'map' | 'area' | null;
     /**
-     * Content
+     * Chart Metadata
      */
-    content: string | null;
-    /**
-     * Thread Id
-     */
-    thread_id: string;
-    /**
-     * Type
-     */
-    type?: 'tool';
-    /**
-     * Name
-     */
-    name?: string;
-    /**
-     * Status
-     */
-    status: string;
-    bar_chart_metadata: BarChartMetadata | null;
-    /**
-     * Data
-     */
-    data: string | null;
-};
-
-/**
- * GenerateMapChartMetadataResponseMessage
- *
- * The response from generate_map_chart_metadata
- */
-export type GenerateMapChartMetadataResponseMessage = {
-    /**
-     * Content
-     */
-    content: string | null;
-    /**
-     * Thread Id
-     */
-    thread_id: string;
-    /**
-     * Type
-     */
-    type?: 'tool';
-    /**
-     * Name
-     */
-    name?: string;
-    /**
-     * Status
-     */
-    status: string;
-    map_chart_metadata: MapChartMetadata | null;
+    chart_metadata: BarChartMetadata | MapChartMetadata | AreaChartMetadata | null;
     /**
      * Data
      */
@@ -513,7 +454,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | GenerateMapChartMetadataResponseMessage | GenerateAreaChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];

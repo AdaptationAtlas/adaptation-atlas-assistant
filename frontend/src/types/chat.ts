@@ -3,9 +3,7 @@ import type {
     ToolResponseMessage,
     SelectDatasetResponseMessage,
     GenerateTableResponseMessage,
-    GenerateAreaChartMetadataResponseMessage,
-    GenerateBarChartMetadataResponseMessage,
-    GenerateMapChartMetadataResponseMessage,
+    GenerateChartMetadataResponseMessage,
     OutputResponseMessage,
 } from './generated';
 
@@ -24,15 +22,12 @@ export type UserMessage = {
     content: string;
 };
 
-export type StreamEvent = (
+export type StreamEvent =
     | (AiResponseMessage & { id?: string; timestamp?: number })
     | (ToolResponseMessage & { id?: string; timestamp?: number })
     | (SelectDatasetResponseMessage & { id?: string; timestamp?: number })
     | (GenerateTableResponseMessage & { id?: string; timestamp?: number })
-    | (GenerateAreaChartMetadataResponseMessage & { id?: string; timestamp?: number })
-    | (GenerateBarChartMetadataResponseMessage & { id?: string; timestamp?: number })
-    | (GenerateMapChartMetadataResponseMessage & { id?: string; timestamp?: number })
+    | (GenerateChartMetadataResponseMessage & { id?: string; timestamp?: number })
     | (OutputResponseMessage & { id?: string; timestamp?: number })
     | UserMessage
-    | ErrorEvent
-);
+    | ErrorEvent;

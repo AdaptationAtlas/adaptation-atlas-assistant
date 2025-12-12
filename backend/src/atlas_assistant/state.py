@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from langchain.agents import AgentState
 from pydantic import BaseModel
 
 from .dataset import Dataset
+
+# Chart type literals - add new chart types here
+ChartType = Literal["bar", "map", "area"]
 
 
 class State(AgentState[None]):
@@ -21,14 +26,11 @@ class State(AgentState[None]):
     data: str | None
     """The active data from a SQL query, as a json string."""
 
-    bar_chart_metadata: BarChartMetadata | None
-    """Bar chart metadata for the data."""
+    chart_type: ChartType | None
+    """The type of chart being generated."""
 
-    map_chart_metadata: MapChartMetadata | None
-    """Map chart metadata for the data."""
-
-    area_chart_metadata: AreaChartMetadata | None
-    """Area chart metadata for the data."""
+    chart_metadata: ChartMetadata | None
+    """The chart metadata for the data."""
 
 
 class SqlQuery(BaseModel):
@@ -87,3 +89,7 @@ class AreaChartMetadata(BaseModel):
 
     grouping_column: str | None
     """An optional column name for creating stacked areas (categories)"""
+
+
+# Union type for chart metadata - add new metadata types here
+ChartMetadata = BarChartMetadata | MapChartMetadata | AreaChartMetadata

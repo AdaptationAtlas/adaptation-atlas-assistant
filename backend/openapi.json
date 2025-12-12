@@ -78,13 +78,7 @@
                       "$ref": "#/components/schemas/GenerateTableResponseMessage"
                     },
                     {
-                      "$ref": "#/components/schemas/GenerateBarChartMetadataResponseMessage"
-                    },
-                    {
-                      "$ref": "#/components/schemas/GenerateMapChartMetadataResponseMessage"
-                    },
-                    {
-                      "$ref": "#/components/schemas/GenerateAreaChartMetadataResponseMessage"
+                      "$ref": "#/components/schemas/GenerateChartMetadataResponseMessage"
                     },
                     {
                       "$ref": "#/components/schemas/AiResponseMessage"
@@ -302,7 +296,7 @@
         "title": "Dataset",
         "description": "A parquet dataset, which is an asset.\n\nWe include the item in case we want to look information up there."
       },
-      "GenerateAreaChartMetadataResponseMessage": {
+      "GenerateChartMetadataResponseMessage": {
         "properties": {
           "content": {
             "anyOf": [
@@ -328,21 +322,44 @@
           "name": {
             "type": "string",
             "title": "Name",
-            "default": "generate_area_chart_metadata"
+            "default": "generate_chart_metadata"
           },
           "status": {
             "type": "string",
             "title": "Status"
           },
-          "area_chart_metadata": {
+          "chart_type": {
             "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "bar",
+                  "map",
+                  "area"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chart Type"
+          },
+          "chart_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BarChartMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/MapChartMetadata"
+              },
               {
                 "$ref": "#/components/schemas/AreaChartMetadata"
               },
               {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Chart Metadata"
           },
           "data": {
             "anyOf": [
@@ -361,141 +378,12 @@
           "content",
           "thread_id",
           "status",
-          "area_chart_metadata",
+          "chart_type",
+          "chart_metadata",
           "data"
         ],
-        "title": "GenerateAreaChartMetadataResponseMessage",
-        "description": "The response from generate_area_chart_metadata"
-      },
-      "GenerateBarChartMetadataResponseMessage": {
-        "properties": {
-          "content": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Content"
-          },
-          "thread_id": {
-            "type": "string",
-            "title": "Thread Id"
-          },
-          "type": {
-            "type": "string",
-            "const": "tool",
-            "title": "Type",
-            "default": "tool"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "default": "generate_bar_chart_metadata"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
-          },
-          "bar_chart_metadata": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/BarChartMetadata"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "data": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Data"
-          }
-        },
-        "type": "object",
-        "required": [
-          "content",
-          "thread_id",
-          "status",
-          "bar_chart_metadata",
-          "data"
-        ],
-        "title": "GenerateBarChartMetadataResponseMessage",
-        "description": "The response from generate_bar_chart_metadata"
-      },
-      "GenerateMapChartMetadataResponseMessage": {
-        "properties": {
-          "content": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Content"
-          },
-          "thread_id": {
-            "type": "string",
-            "title": "Thread Id"
-          },
-          "type": {
-            "type": "string",
-            "const": "tool",
-            "title": "Type",
-            "default": "tool"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "default": "generate_map_chart_metadata"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
-          },
-          "map_chart_metadata": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/MapChartMetadata"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "data": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Data"
-          }
-        },
-        "type": "object",
-        "required": [
-          "content",
-          "thread_id",
-          "status",
-          "map_chart_metadata",
-          "data"
-        ],
-        "title": "GenerateMapChartMetadataResponseMessage",
-        "description": "The response from generate_map_chart_metadata"
+        "title": "GenerateChartMetadataResponseMessage",
+        "description": "The response from generate_chart_metadata"
       },
       "GenerateTableResponseMessage": {
         "properties": {
