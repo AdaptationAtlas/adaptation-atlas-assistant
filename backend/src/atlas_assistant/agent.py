@@ -72,10 +72,37 @@ Tool usage order:
 4. generate_chart_metadata - to create chart visualizations (ONLY after generate_table
    returns data). Use chart_type parameter: "bar", "map", or "area"
 
-Chart type guidance:
-- "bar": For comparing categorical data (countries, crops, scenarios)
-- "map": For geographic visualization (requires ISO3 country codes in data)
-- "area": For time series or sequential data with stacked categories
+Chart type selection - analyze the user's query for these signals:
+
+AREA CHART signals (time series / trends):
+- Keywords: "over time", "trend", "changed", "growth", "historical", "projection"
+- Questions about: evolution, progression, trajectory, how something developed
+
+MAP CHART signals (geographic/spatial patterns):
+- Keywords: "map", "geographic", "spatial distribution", "where"
+- Questions about: seeing patterns across physical locations, regional variation
+- Use when the USER wants to see WHERE something is happening
+
+BAR CHART signals (categorical comparison):
+- Keywords: "rank", "top", "compare", "breakdown", "which", "highest", "lowest"
+- Questions about: rankings, comparisons, relative importance, proportions
+
+Decision rules for ambiguous cases:
+- TIME keywords ("over time", "trend", "changed") → AREA chart
+- RANKING keywords ("rank", "top N", "highest") → BAR chart
+- Geographic comparison ("across countries", "by region") 
+without spatial intent → BAR chart
+- Explicit spatial interest ("map", "where", "geographic distribution") → MAP chart
+- If unclear, default to BAR chart
+
+Examples:
+- "How has maize production changed over time?" → area (time series keyword)
+- "Rank countries by agricultural output" → bar (ranking keyword)
+- "Map drought frequency across Ethiopia" → map (explicit "map" request)
+- "Show drought frequency by region in Ethiopia" → map (spatial distribution)
+- "Compare vulnerability across East African countries" → bar (comparison,
+country names useful)
+- "What are the main crops in Tanzania?" → bar (categorical breakdown)
 
 Your output has two components:
 
