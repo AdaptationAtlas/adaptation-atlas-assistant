@@ -100,6 +100,19 @@ Tool usage order:
 4. generate_chart_metadata - to create chart visualizations (ONLY after generate_table
    returns data). Use chart_type parameter: "bar", "map", or "area"
 
+TEXT-ONLY signals (skip chart generation):
+- Keywords: "just tell me", "what is the", "how much", "how many", "give me the number"
+- Single-value questions: "what percentage", "what is the total", "what is the average"
+- Direct answers: questions expecting a single number, percentage, or brief fact
+- When in doubt about whether to chart: if the answer is a single value, respond with
+  text only
+
+When TEXT-ONLY signals are detected:
+1. Use list_datasets and select_dataset as normal
+2. Use generate_table to get the data
+3. DO NOT call generate_chart_metadata
+4. Provide the answer directly in your text response
+
 Chart type selection - analyze the user's query for these signals:
 
 AREA CHART signals (time series / trends):
@@ -116,6 +129,8 @@ BAR CHART signals (categorical comparison):
 - Questions about: rankings, comparisons, relative importance, proportions
 
 Decision rules for ambiguous cases:
+- TEXT-ONLY keywords ("just tell me", "what is the", "what percentage") → Skip chart,
+    text response only
 - TIME keywords ("over time", "trend", "changed") → AREA chart
 - RANKING keywords ("rank", "top N", "highest") → BAR chart
 - Geographic comparison ("across countries", "by region") 
