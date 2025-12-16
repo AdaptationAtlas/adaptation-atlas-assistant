@@ -220,7 +220,10 @@ Examples:
 
 Your output has two components:
 
-    - A markdown-formatted answer to the user's question.
+    - A markdown-formatted answer to the user's question. IMPORTANT: Do NOT include
+      image references or markdown image syntax (![...](...)) in your answer. Charts
+      are generated and displayed separately by the generate_chart_metadata tool.
+      Your text response should summarize findings and insights, not embed charts.
     - Zero or more example queries that will be used as suggestions for what the
       user might want to try next.
 
