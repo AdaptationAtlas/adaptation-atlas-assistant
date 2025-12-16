@@ -1147,7 +1147,11 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                     open={stepsOpen}
                                     onToggle={(e) => {
                                         const next = new Set(openSteps);
-                                        (e.target as HTMLDetailsElement).open ? next.add(turnIndex) : next.delete(turnIndex);
+                                        if ((e.target as HTMLDetailsElement).open) {
+                                            next.add(turnIndex);
+                                        } else {
+                                            next.delete(turnIndex);
+                                        }
                                         setOpenSteps(next);
                                     }}
                                 >
@@ -1162,7 +1166,11 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                                     open={moreOpen}
                                                     onToggle={(e) => {
                                                         const next = new Set(openMore);
-                                                        (e.target as HTMLDetailsElement).open ? next.add(turnIndex) : next.delete(turnIndex);
+                                                        if ((e.target as HTMLDetailsElement).open) {
+                                                            next.add(turnIndex);
+                                                        } else {
+                                                            next.delete(turnIndex);
+                                                        }
                                                         setOpenMore(next);
                                                     }}
                                                 >
