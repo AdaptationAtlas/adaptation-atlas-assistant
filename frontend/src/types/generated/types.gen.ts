@@ -29,6 +29,30 @@ export type AiResponseMessage = {
 };
 
 /**
+ * AreaChartMetadata
+ *
+ * Data to create a stacked area chart
+ */
+export type AreaChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Grouping Column
+     */
+    grouping_column: string | null;
+};
+
+/**
  * Asset
  *
  * A STAC asset, with only the fields we need
@@ -73,33 +97,27 @@ export type BarChartMetadata = {
 };
 
 /**
- * Body_login_token_post
+ * BeeswarmChartMetadata
+ *
+ * Data to create a beeswarm plot (1D scatter with jittered positioning)
  */
-export type BodyLoginTokenPost = {
+export type BeeswarmChartMetadata = {
     /**
-     * Grant Type
+     * Title
      */
-    grant_type?: string | null;
+    title: string;
     /**
-     * Username
+     * Category Column
      */
-    username: string;
+    category_column: string;
     /**
-     * Password
+     * Value Column
      */
-    password: string;
+    value_column: string;
     /**
-     * Scope
+     * Color Column
      */
-    scope?: string;
-    /**
-     * Client Id
-     */
-    client_id?: string | null;
-    /**
-     * Client Secret
-     */
-    client_secret?: string | null;
+    color_column: string | null;
 };
 
 /**
@@ -134,44 +152,39 @@ export type Dataset = {
 };
 
 /**
- * GenerateBarChartMetadataResponseMessage
+ * DotPlotMetadata
  *
- * The response from generate_bar_chart_metadata
+ * Data to create a dot plot (scatter plot)
  */
-export type GenerateBarChartMetadataResponseMessage = {
+export type DotPlotMetadata = {
     /**
-     * Content
+     * Title
      */
-    content: string | null;
+    title: string;
     /**
-     * Thread Id
+     * X Column
      */
-    thread_id: string;
+    x_column: string;
     /**
-     * Type
+     * Y Column
      */
-    type?: 'tool';
+    y_column: string;
     /**
-     * Name
+     * Grouping Column
      */
-    name?: string;
+    grouping_column: string | null;
     /**
-     * Status
+     * Size Column
      */
-    status: string;
-    bar_chart_metadata: BarChartMetadata | null;
-    /**
-     * Data
-     */
-    data: string | null;
+    size_column: string | null;
 };
 
 /**
- * GenerateMapChartMetadataResponseMessage
+ * GenerateChartMetadataResponseMessage
  *
- * The response from generate_map_chart_metadata
+ * The response from generate_chart_metadata
  */
-export type GenerateMapChartMetadataResponseMessage = {
+export type GenerateChartMetadataResponseMessage = {
     /**
      * Content
      */
@@ -192,7 +205,14 @@ export type GenerateMapChartMetadataResponseMessage = {
      * Status
      */
     status: string;
-    map_chart_metadata: MapChartMetadata | null;
+    /**
+     * Chart Type
+     */
+    chart_type: 'bar' | 'map' | 'area' | 'dot' | 'line' | 'beeswarm' | 'heatmap' | null;
+    /**
+     * Chart Metadata
+     */
+    chart_metadata: BarChartMetadata | MapChartMetadata | AreaChartMetadata | LineChartMetadata | BeeswarmChartMetadata | HeatmapChartMetadata | DotPlotMetadata | null;
     /**
      * Data
      */
@@ -246,6 +266,34 @@ export type HttpValidationError = {
 };
 
 /**
+ * HeatmapChartMetadata
+ *
+ * Data to create a heatmap chart
+ */
+export type HeatmapChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Value Column
+     */
+    value_column: string;
+    /**
+     * Color Scheme
+     */
+    color_scheme?: string;
+};
+
+/**
  * Item
  *
  * A STAC item, with only the fields we need.
@@ -262,6 +310,30 @@ export type Item = {
     assets: {
         [key: string]: Asset;
     };
+};
+
+/**
+ * LineChartMetadata
+ *
+ * Data to create a line chart
+ */
+export type LineChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Grouping Column
+     */
+    grouping_column: string | null;
 };
 
 /**
@@ -286,6 +358,10 @@ export type MapChartMetadata = {
      * Color Scheme
      */
     color_scheme?: string;
+    /**
+     * Admin Level
+     */
+    admin_level?: 'admin0' | 'admin1' | 'admin2';
 };
 
 /**
@@ -399,22 +475,6 @@ export type TableColumn = {
 };
 
 /**
- * Token
- *
- * The return type for the token endpoint.
- */
-export type Token = {
-    /**
-     * Access Token
-     */
-    access_token: string;
-    /**
-     * Token Type
-     */
-    token_type: string;
-};
-
-/**
  * ToolResponseMessage
  *
  * The response from a tool
@@ -440,18 +500,6 @@ export type ToolResponseMessage = {
      * Status
      */
     status: string;
-};
-
-/**
- * User
- *
- * An extremely simple user model.
- */
-export type User = {
-    /**
-     * Username
-     */
-    username: string;
 };
 
 /**
@@ -486,47 +534,6 @@ export type HealthCheckHealthGetResponses = {
     200: unknown;
 };
 
-export type MeMeGetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/me';
-};
-
-export type MeMeGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: User;
-};
-
-export type MeMeGetResponse = MeMeGetResponses[keyof MeMeGetResponses];
-
-export type LoginTokenPostData = {
-    body: BodyLoginTokenPost;
-    path?: never;
-    query?: never;
-    url: '/token';
-};
-
-export type LoginTokenPostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type LoginTokenPostError = LoginTokenPostErrors[keyof LoginTokenPostErrors];
-
-export type LoginTokenPostResponses = {
-    /**
-     * Successful Response
-     */
-    200: Token;
-};
-
-export type LoginTokenPostResponse = LoginTokenPostResponses[keyof LoginTokenPostResponses];
-
 export type ChatChatPostData = {
     body: ChatRequest;
     headers?: {
@@ -555,7 +562,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateBarChartMetadataResponseMessage | GenerateMapChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];
