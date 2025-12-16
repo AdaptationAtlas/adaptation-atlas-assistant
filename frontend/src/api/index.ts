@@ -1,6 +1,6 @@
 export { apiClient, ApiClient } from './client';
 
-export { sendChatMessage } from './endpoints';
+export { sendChatMessage, getSuggestions } from './endpoints';
 
 export {
     readStream,
