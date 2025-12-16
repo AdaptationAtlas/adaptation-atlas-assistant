@@ -2,12 +2,20 @@ import { useState, useCallback } from 'react';
 import { AreaChart } from './Charts/Area';
 import { BarChart } from './Charts/Bar';
 import { MapChart } from './Charts/Map';
+import { LineChart } from './Charts/Line';
+import { HeatmapChart } from './Charts/Heatmap';
+import { DotPlot } from './Charts/DotPlot';
+import { BeeswarmChart } from './Charts/Beeswarm';
 import type { ChartRef } from './Charts/Main';
 import type {
     AiResponseMessage,
     AreaChartMetadata,
     BarChartMetadata,
+    BeeswarmChartMetadata,
+    DotPlotMetadata,
     GenerateChartMetadataResponseMessage,
+    HeatmapChartMetadata,
+    LineChartMetadata,
     MapChartMetadata,
     OutputResponseMessage,
 } from '../types/generated';
@@ -348,6 +356,346 @@ function GetAreaCodeButton({ metadata, data }: GetAreaCodeButtonProps) {
     );
 }
 
+function generateLineObservableCode(
+    metadata: LineChartMetadata,
+    data: unknown[],
+    isFlipped: boolean
+): string {
+    const { x_column, y_column, grouping_column, title } = metadata;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    if (isFlipped) {
+        return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Line Chart'}
+Plot.plot({
+  marginBottom: 60,
+  marginLeft: 120,
+  x: {
+    label: "${y_column}",
+    grid: true,
+  },
+  y: {
+    label: "${x_column}",
+  },
+  marks: [
+    Plot.lineX(data, {
+      y: "${x_column}",
+      x: "${y_column}",
+      ${grouping_column ? `stroke: "${grouping_column}",` : ''}
+    }),
+    Plot.dot(data, {
+      y: "${x_column}",
+      x: "${y_column}",
+      ${grouping_column ? `fill: "${grouping_column}",` : ''}
+    }),
+  ]
+})`;
+    }
+
+    return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Line Chart'}
+Plot.plot({
+  marginBottom: 60,
+  marginLeft: 60,
+  x: {
+    label: "${x_column}",
+  },
+  y: {
+    label: "${y_column}",
+    grid: true,
+  },
+  marks: [
+    Plot.lineY(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      ${grouping_column ? `stroke: "${grouping_column}",` : ''}
+    }),
+    Plot.dot(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      ${grouping_column ? `fill: "${grouping_column}",` : ''}
+    }),
+  ]
+})`;
+}
+
+interface GetLineCodeButtonProps {
+    metadata: LineChartMetadata;
+    data: unknown[];
+    isFlipped: boolean;
+}
+
+function GetLineCodeButton({ metadata, data, isFlipped }: GetLineCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateLineObservableCode(metadata, data, isFlipped);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
+function generateHeatmapObservableCode(
+    metadata: HeatmapChartMetadata,
+    data: unknown[]
+): string {
+    const { x_column, y_column, value_column, color_scheme, title } = metadata;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Heatmap'}
+Plot.plot({
+  marginBottom: 90,
+  marginLeft: 60,
+  x: {
+    label: "${x_column}",
+    tickRotate: -45,
+  },
+  y: {
+    label: "${y_column}",
+  },
+  color: {
+    type: "linear",
+    scheme: "${color_scheme || 'YlOrRd'}",
+    legend: true,
+    label: "${value_column}",
+  },
+  marks: [
+    Plot.cell(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      fill: "${value_column}",
+    }),
+  ]
+})`;
+}
+
+interface GetHeatmapCodeButtonProps {
+    metadata: HeatmapChartMetadata;
+    data: unknown[];
+}
+
+function GetHeatmapCodeButton({ metadata, data }: GetHeatmapCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateHeatmapObservableCode(metadata, data);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
+function generateDotPlotObservableCode(
+    metadata: DotPlotMetadata,
+    data: unknown[],
+    isFlipped: boolean
+): string {
+    const { x_column, y_column, grouping_column, size_column, title } = metadata;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    if (isFlipped) {
+        return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Dot Plot'}
+Plot.plot({
+  marginBottom: 60,
+  marginLeft: 120,
+  x: {
+    label: "${y_column}",
+    grid: true,
+  },
+  y: {
+    label: "${x_column}",
+  },
+  marks: [
+    Plot.dot(data, {
+      y: "${x_column}",
+      x: "${y_column}",
+      ${grouping_column ? `fill: "${grouping_column}",` : ''}
+      ${size_column ? `r: "${size_column}",` : ''}
+    }),
+  ]
+})`;
+    }
+
+    return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Dot Plot'}
+Plot.plot({
+  marginBottom: 90,
+  marginLeft: 60,
+  x: {
+    label: "${x_column}",
+    tickRotate: -45,
+  },
+  y: {
+    label: "${y_column}",
+    grid: true,
+  },
+  marks: [
+    Plot.dot(data, {
+      x: "${x_column}",
+      y: "${y_column}",
+      ${grouping_column ? `fill: "${grouping_column}",` : ''}
+      ${size_column ? `r: "${size_column}",` : ''}
+    }),
+  ]
+})`;
+}
+
+interface GetDotPlotCodeButtonProps {
+    metadata: DotPlotMetadata;
+    data: unknown[];
+    isFlipped: boolean;
+}
+
+function GetDotPlotCodeButton({ metadata, data, isFlipped }: GetDotPlotCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateDotPlotObservableCode(metadata, data, isFlipped);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
+function generateBeeswarmObservableCode(
+    metadata: BeeswarmChartMetadata,
+    data: unknown[],
+    isFlipped: boolean
+): string {
+    const { category_column, value_column, color_column, title } = metadata;
+    const fill = color_column || category_column;
+    const dataJson = JSON.stringify(data, null, 2);
+
+    if (isFlipped) {
+        return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Beeswarm Plot'}
+Plot.plot({
+  marginBottom: 60,
+  marginLeft: 120,
+  x: {
+    label: "${value_column}",
+    grid: true,
+  },
+  y: {
+    label: "${category_column}",
+  },
+  marks: [
+    Plot.dot(data, Plot.dodgeY({
+      y: "${category_column}",
+      x: "${value_column}",
+      fill: "${fill}",
+      r: 4,
+    })),
+  ]
+})`;
+    }
+
+    return `// Data
+data = ${dataJson}
+
+// Chart: ${title || 'Beeswarm Plot'}
+Plot.plot({
+  marginBottom: 90,
+  marginLeft: 60,
+  x: {
+    label: "${category_column}",
+    tickRotate: -45,
+  },
+  y: {
+    label: "${value_column}",
+    grid: true,
+  },
+  marks: [
+    Plot.dot(data, Plot.dodgeX({
+      x: "${category_column}",
+      y: "${value_column}",
+      fill: "${fill}",
+      r: 4,
+    })),
+  ]
+})`;
+}
+
+interface GetBeeswarmCodeButtonProps {
+    metadata: BeeswarmChartMetadata;
+    data: unknown[];
+    isFlipped: boolean;
+}
+
+function GetBeeswarmCodeButton({ metadata, data, isFlipped }: GetBeeswarmCodeButtonProps) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        const code = generateBeeswarmObservableCode(metadata, data, isFlipped);
+        const success = await copyToClipboard(code);
+        if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <Button
+            variant="outline"
+            onClick={handleCopy}
+            icon={copied ? <CheckIcon /> : <CodeIcon />}
+        >
+            {copied ? 'Copied' : 'Get Code'}
+        </Button>
+    );
+}
+
 interface DownloadButtonProps {
     chartRef: ChartRef | null;
     title?: string;
@@ -472,6 +820,140 @@ function AreaArtifactWithControls({ data, metadata, rawData }: AreaArtifactWithC
                 <CopyButton content={rawData} />
                 <DownloadButton chartRef={chartRef} title={metadata.title} />
                 <GetAreaCodeButton metadata={metadata} data={data} />
+            </div>
+        </div>
+    );
+}
+
+interface LineArtifactWithControlsProps {
+    data: unknown[];
+    metadata: LineChartMetadata;
+    rawData: string;
+}
+
+function LineArtifactWithControls({ data, metadata, rawData }: LineArtifactWithControlsProps) {
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
+    const [isFlipped, setIsFlipped] = useState(false);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
+    }, []);
+
+    const handleFlippedChange = useCallback((flipped: boolean) => {
+        setIsFlipped(flipped);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <LineChart
+                data={data}
+                metadata={metadata}
+                onChartRefChange={handleChartRefChange}
+                onFlippedChange={handleFlippedChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetLineCodeButton metadata={metadata} data={data} isFlipped={isFlipped} />
+            </div>
+        </div>
+    );
+}
+
+interface HeatmapArtifactWithControlsProps {
+    data: unknown[];
+    metadata: HeatmapChartMetadata;
+    rawData: string;
+}
+
+function HeatmapArtifactWithControls({ data, metadata, rawData }: HeatmapArtifactWithControlsProps) {
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <HeatmapChart
+                data={data}
+                metadata={metadata}
+                onChartRefChange={handleChartRefChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetHeatmapCodeButton metadata={metadata} data={data} />
+            </div>
+        </div>
+    );
+}
+
+interface DotPlotArtifactWithControlsProps {
+    data: unknown[];
+    metadata: DotPlotMetadata;
+    rawData: string;
+}
+
+function DotPlotArtifactWithControls({ data, metadata, rawData }: DotPlotArtifactWithControlsProps) {
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
+    const [isFlipped, setIsFlipped] = useState(false);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
+    }, []);
+
+    const handleFlippedChange = useCallback((flipped: boolean) => {
+        setIsFlipped(flipped);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <DotPlot
+                data={data}
+                metadata={metadata}
+                onChartRefChange={handleChartRefChange}
+                onFlippedChange={handleFlippedChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetDotPlotCodeButton metadata={metadata} data={data} isFlipped={isFlipped} />
+            </div>
+        </div>
+    );
+}
+
+interface BeeswarmArtifactWithControlsProps {
+    data: unknown[];
+    metadata: BeeswarmChartMetadata;
+    rawData: string;
+}
+
+function BeeswarmArtifactWithControls({ data, metadata, rawData }: BeeswarmArtifactWithControlsProps) {
+    const [chartRef, setChartRef] = useState<ChartRef | null>(null);
+    const [isFlipped, setIsFlipped] = useState(false);
+
+    const handleChartRefChange = useCallback((ref: ChartRef | null) => {
+        setChartRef(ref);
+    }, []);
+
+    const handleFlippedChange = useCallback((flipped: boolean) => {
+        setIsFlipped(flipped);
+    }, []);
+
+    return (
+        <div className={styles.artifact}>
+            <BeeswarmChart
+                data={data}
+                metadata={metadata}
+                onChartRefChange={handleChartRefChange}
+                onFlippedChange={handleFlippedChange}
+            />
+            <div className={styles.copyRow}>
+                <CopyButton content={rawData} />
+                <DownloadButton chartRef={chartRef} title={metadata.title} />
+                <GetBeeswarmCodeButton metadata={metadata} data={data} isFlipped={isFlipped} />
             </div>
         </div>
     );
@@ -645,6 +1127,50 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                     key={messageId}
                                     data={data}
                                     metadata={metadata as AreaChartMetadata}
+                                    rawData={artifact.data || ''}
+                                />
+                            );
+                        }
+
+                        if (artifact.chart_type === 'line') {
+                            return (
+                                <LineArtifactWithControls
+                                    key={messageId}
+                                    data={data}
+                                    metadata={metadata as LineChartMetadata}
+                                    rawData={artifact.data || ''}
+                                />
+                            );
+                        }
+
+                        if (artifact.chart_type === 'heatmap') {
+                            return (
+                                <HeatmapArtifactWithControls
+                                    key={messageId}
+                                    data={data}
+                                    metadata={metadata as HeatmapChartMetadata}
+                                    rawData={artifact.data || ''}
+                                />
+                            );
+                        }
+
+                        if (artifact.chart_type === 'dot') {
+                            return (
+                                <DotPlotArtifactWithControls
+                                    key={messageId}
+                                    data={data}
+                                    metadata={metadata as DotPlotMetadata}
+                                    rawData={artifact.data || ''}
+                                />
+                            );
+                        }
+
+                        if (artifact.chart_type === 'beeswarm') {
+                            return (
+                                <BeeswarmArtifactWithControls
+                                    key={messageId}
+                                    data={data}
+                                    metadata={metadata as BeeswarmChartMetadata}
                                     rawData={artifact.data || ''}
                                 />
                             );

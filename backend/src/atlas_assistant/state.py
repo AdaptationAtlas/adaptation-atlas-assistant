@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from .dataset import Dataset
 
 # Chart type literals - add new chart types here
-ChartType = Literal["bar", "map", "area"]
+ChartType = Literal["bar", "map", "area", "dot", "line", "beeswarm", "heatmap"]
 
 
 class State(AgentState[None]):
@@ -91,5 +91,83 @@ class AreaChartMetadata(BaseModel):
     """An optional column name for creating stacked areas (categories)"""
 
 
+class LineChartMetadata(BaseModel):
+    """Data to create a line chart"""
+
+    title: str
+    """The title of the line chart."""
+
+    x_column: str
+    """The name of the data column used for the x-axis (typically time or sequence)"""
+
+    y_column: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name for creating multiple series"""
+
+
+class BeeswarmChartMetadata(BaseModel):
+    """Data to create a beeswarm plot (1D scatter with jittered positioning)"""
+
+    title: str
+    """The title of the beeswarm plot."""
+
+    category_column: str
+    """The name of the categorical data column (groups along x-axis)"""
+
+    value_column: str
+    """The name of the numeric data column (values along y-axis)"""
+
+    color_column: str | None
+    """An optional column name for coloring points by category"""
+
+
+class DotPlotMetadata(BaseModel):
+    """Data to create a dot plot (scatter plot)"""
+
+    title: str
+    """The title of the dot plot."""
+
+    x_column: str
+    """The name of the data column used for the x-axis"""
+
+    y_column: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name for grouping/coloring dots by category"""
+
+    size_column: str | None
+    """An optional column name for sizing dots by value"""
+
+
+class HeatmapChartMetadata(BaseModel):
+    """Data to create a heatmap chart"""
+
+    title: str
+    """The title of the heatmap."""
+
+    x_column: str
+    """The name of the data column used for the x-axis (categories)"""
+
+    y_column: str
+    """The name of the data column used for the y-axis (categories)"""
+
+    value_column: str
+    """The name of the numeric data column used for cell color intensity"""
+
+    color_scheme: str = "YlOrRd"
+    """The Observable Plot color scheme to use"""
+
+
 # Union type for chart metadata - add new metadata types here
-ChartMetadata = BarChartMetadata | MapChartMetadata | AreaChartMetadata
+ChartMetadata = (
+    BarChartMetadata
+    | MapChartMetadata
+    | AreaChartMetadata
+    | LineChartMetadata
+    | BeeswarmChartMetadata
+    | HeatmapChartMetadata
+    | DotPlotMetadata
+)

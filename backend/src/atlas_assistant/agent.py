@@ -98,7 +98,8 @@ Tool usage order:
 2. select_dataset - to choose a dataset
 3. generate_table - to query data from the selected dataset
 4. generate_chart_metadata - to create chart visualizations (ONLY after generate_table
-   returns data). Use chart_type parameter: "bar", "map", or "area"
+   returns data). Use chart_type: "bar", "map", "area", "line", "dot", "beeswarm",
+   "heatmap"
 
 TEXT-ONLY signals (skip chart generation):
 - Keywords: "just tell me", "what is the", "how much", "how many", "give me the number"
@@ -113,39 +114,109 @@ When TEXT-ONLY signals are detected:
 3. DO NOT call generate_chart_metadata
 4. Provide the answer directly in your text response
 
-Chart type selection - analyze the user's query for these signals:
+Chart type selection - organized by chart family:
 
-AREA CHART signals (time series / trends):
-- Keywords: "over time", "trend", "changed", "growth", "historical", "projection"
-- Questions about: evolution, progression, trajectory, how something developed
+=== TIME-BASED CHARTS ===
 
-MAP CHART signals (geographic/spatial patterns):
-- Keywords: "map", "geographic", "spatial distribution", "where"
-- Questions about: seeing patterns across physical locations, regional variation
-- Use when the USER wants to see WHERE something is happening
+LINE CHART (comparing trends / tracking values over time):
+- Keywords: "trend", "over time", "changed", "growth", "trajectory",
+  "compare trends", "track", "evolution"
+- Use when: comparing series side-by-side, tracking metrics, seeing
+  inflection points, rate of change
+- Visual: Distinct lines that can cross/diverge
 
-BAR CHART signals (categorical comparison):
-- Keywords: "rank", "top", "compare", "breakdown", "which", "highest", "lowest"
-- Questions about: rankings, comparisons, relative importance, proportions
+AREA CHART (composition over time / cumulative totals):
+- Keywords: "stacked", "cumulative", "total", "composition",
+  "breakdown over time", "contribution", "share", "add up to"
+- Use when: showing how parts contribute to whole, cumulative effect,
+  composition changes
+- Visual: Filled regions that stack, emphasizes total magnitude
 
-Decision rules for ambiguous cases:
-- TEXT-ONLY keywords ("just tell me", "what is the", "what percentage") → Skip chart,
-    text response only
-- TIME keywords ("over time", "trend", "changed") → AREA chart
-- RANKING keywords ("rank", "top N", "highest") → BAR chart
-- Geographic comparison ("across countries", "by region") 
-without spatial intent → BAR chart
-- Explicit spatial interest ("map", "where", "geographic distribution") → MAP chart
-- If unclear, default to BAR chart
+LINE vs AREA decision:
+- "stacked", "cumulative", "composition" → AREA
+- "compare", "trend", "track" → LINE
+- Multiple categories + "over time" + no stacking → LINE
+- Parts of a whole + "over time" → AREA
+- Default for time series → LINE
 
 Examples:
-- "How has maize production changed over time?" → area (time series keyword)
-- "Rank countries by agricultural output" → bar (ranking keyword)
-- "Map drought frequency across Ethiopia" → map (explicit "map" request)
-- "Show drought frequency by region in Ethiopia" → map (spatial distribution)
-- "Compare vulnerability across East African countries" → bar (comparison,
-country names useful)
-- "What are the main crops in Tanzania?" → bar (categorical breakdown)
+- "How has maize production changed?" → LINE
+- "Compare yield trends across countries" → LINE
+- "Show cumulative rainfall" → AREA
+- "Stacked crop yields by type" → AREA
+
+=== CATEGORICAL CHARTS ===
+
+BAR CHART (rankings / aggregated comparisons):
+- Keywords: "rank", "top", "compare", "breakdown", "highest", "lowest",
+  "total by", "average by"
+- Use when: comparing aggregated values across categories, rankings
+- Visual: Bars showing totals/averages per category
+
+BEESWARM CHART (distribution within categories):
+- Keywords: "distribution", "spread", "outliers", "dispersion",
+  "individual values", "variability"
+- Use when: showing how values are spread within groups, revealing
+  clusters and outliers, individual data points within categories
+- Visual: Jittered dots avoiding overlap, shows full distribution
+
+BAR vs BEESWARM decision:
+- Aggregated (mean, total, count) → BAR
+- Individual data points, distribution → BEESWARM
+- "distribution", "spread", "outliers" → BEESWARM
+- "rank", "top N", "total" → BAR
+- Default for categorical → BAR
+
+Examples:
+- "Rank countries by output" → BAR
+- "Top 10 crops by yield" → BAR
+- "Distribution of yields across countries" → BEESWARM
+- "Show yield outliers by region" → BEESWARM
+
+=== SPATIAL CHARTS ===
+
+MAP CHART (geographic patterns):
+- Keywords: "map", "geographic", "spatial", "where", "across regions"
+- Use when: showing patterns across physical locations
+- Visual: Choropleth map with color intensity
+
+Examples:
+- "Map drought frequency across Ethiopia" → MAP
+- "Where is vulnerability highest?" → MAP
+
+=== RELATIONAL CHARTS ===
+
+DOT PLOT (scatter / correlation between numerics):
+- Keywords: "scatter", "relationship", "correlation", "vs",
+  "plotted against"
+- Use when: showing relationship between two numeric variables
+- Visual: Points showing x-y relationships
+
+HEATMAP (matrix / two categorical dimensions):
+- Keywords: "heatmap", "matrix", "intensity", "cross-tabulation",
+  "grid", "by X and Y"
+- Use when: showing patterns across two categorical dimensions with
+  numeric intensity values
+- Visual: Grid of cells with color intensity
+
+DOT vs HEATMAP decision:
+- Two numeric variables → DOT
+- Two categorical + numeric value → HEATMAP
+- "correlation" between numerics → DOT
+- "matrix", "cross-tabulation" → HEATMAP
+
+Examples:
+- "Relationship between rainfall and yield" → DOT
+- "Crop performance matrix by country and year" → HEATMAP
+- "Vulnerability by region and hazard type" → HEATMAP
+
+=== DEFAULT RULES ===
+
+- TEXT-ONLY signals ("just tell me", "what is the") → Skip chart
+- If unclear and categorical → BAR
+- If unclear and time-based → LINE
+- PREFER charts over tables for multi-value responses (2+ data points)
+- When uncertain whether to chart, generate a chart rather than skip
 
 Your output has two components:
 

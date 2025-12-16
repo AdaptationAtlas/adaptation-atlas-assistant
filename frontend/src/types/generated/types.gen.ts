@@ -97,6 +97,30 @@ export type BarChartMetadata = {
 };
 
 /**
+ * BeeswarmChartMetadata
+ *
+ * Data to create a beeswarm plot (1D scatter with jittered positioning)
+ */
+export type BeeswarmChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Category Column
+     */
+    category_column: string;
+    /**
+     * Value Column
+     */
+    value_column: string;
+    /**
+     * Color Column
+     */
+    color_column: string | null;
+};
+
+/**
  * ChatRequest
  *
  * A chat request
@@ -128,6 +152,34 @@ export type Dataset = {
 };
 
 /**
+ * DotPlotMetadata
+ *
+ * Data to create a dot plot (scatter plot)
+ */
+export type DotPlotMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Grouping Column
+     */
+    grouping_column: string | null;
+    /**
+     * Size Column
+     */
+    size_column: string | null;
+};
+
+/**
  * GenerateChartMetadataResponseMessage
  *
  * The response from generate_chart_metadata
@@ -156,11 +208,11 @@ export type GenerateChartMetadataResponseMessage = {
     /**
      * Chart Type
      */
-    chart_type: 'bar' | 'map' | 'area' | null;
+    chart_type: 'bar' | 'map' | 'area' | 'dot' | 'line' | 'beeswarm' | 'heatmap' | null;
     /**
      * Chart Metadata
      */
-    chart_metadata: BarChartMetadata | MapChartMetadata | AreaChartMetadata | null;
+    chart_metadata: BarChartMetadata | MapChartMetadata | AreaChartMetadata | LineChartMetadata | BeeswarmChartMetadata | HeatmapChartMetadata | DotPlotMetadata | null;
     /**
      * Data
      */
@@ -214,6 +266,34 @@ export type HttpValidationError = {
 };
 
 /**
+ * HeatmapChartMetadata
+ *
+ * Data to create a heatmap chart
+ */
+export type HeatmapChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Value Column
+     */
+    value_column: string;
+    /**
+     * Color Scheme
+     */
+    color_scheme?: string;
+};
+
+/**
  * Item
  *
  * A STAC item, with only the fields we need.
@@ -230,6 +310,30 @@ export type Item = {
     assets: {
         [key: string]: Asset;
     };
+};
+
+/**
+ * LineChartMetadata
+ *
+ * Data to create a line chart
+ */
+export type LineChartMetadata = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * X Column
+     */
+    x_column: string;
+    /**
+     * Y Column
+     */
+    y_column: string;
+    /**
+     * Grouping Column
+     */
+    grouping_column: string | null;
 };
 
 /**

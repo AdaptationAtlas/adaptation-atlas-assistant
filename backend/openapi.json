@@ -253,6 +253,42 @@
         "title": "BarChartMetadata",
         "description": "Data to create a bar chart"
       },
+      "BeeswarmChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "category_column": {
+            "type": "string",
+            "title": "Category Column"
+          },
+          "value_column": {
+            "type": "string",
+            "title": "Value Column"
+          },
+          "color_column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color Column"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "category_column",
+          "value_column",
+          "color_column"
+        ],
+        "title": "BeeswarmChartMetadata",
+        "description": "Data to create a beeswarm plot (1D scatter with jittered positioning)"
+      },
       "ChatRequest": {
         "properties": {
           "query": {
@@ -296,6 +332,54 @@
         "title": "Dataset",
         "description": "A parquet dataset, which is an asset.\n\nWe include the item in case we want to look information up there."
       },
+      "DotPlotMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "x_column": {
+            "type": "string",
+            "title": "X Column"
+          },
+          "y_column": {
+            "type": "string",
+            "title": "Y Column"
+          },
+          "grouping_column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grouping Column"
+          },
+          "size_column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Column"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "x_column",
+          "y_column",
+          "grouping_column",
+          "size_column"
+        ],
+        "title": "DotPlotMetadata",
+        "description": "Data to create a dot plot (scatter plot)"
+      },
       "GenerateChartMetadataResponseMessage": {
         "properties": {
           "content": {
@@ -335,7 +419,11 @@
                 "enum": [
                   "bar",
                   "map",
-                  "area"
+                  "area",
+                  "dot",
+                  "line",
+                  "beeswarm",
+                  "heatmap"
                 ]
               },
               {
@@ -354,6 +442,18 @@
               },
               {
                 "$ref": "#/components/schemas/AreaChartMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/LineChartMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/BeeswarmChartMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/HeatmapChartMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/DotPlotMetadata"
               },
               {
                 "type": "null"
@@ -464,6 +564,40 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HeatmapChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "x_column": {
+            "type": "string",
+            "title": "X Column"
+          },
+          "y_column": {
+            "type": "string",
+            "title": "Y Column"
+          },
+          "value_column": {
+            "type": "string",
+            "title": "Value Column"
+          },
+          "color_scheme": {
+            "type": "string",
+            "title": "Color Scheme",
+            "default": "YlOrRd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "x_column",
+          "y_column",
+          "value_column"
+        ],
+        "title": "HeatmapChartMetadata",
+        "description": "Data to create a heatmap chart"
+      },
       "Item": {
         "properties": {
           "id": {
@@ -489,6 +623,42 @@
         ],
         "title": "Item",
         "description": "A STAC item, with only the fields we need."
+      },
+      "LineChartMetadata": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "x_column": {
+            "type": "string",
+            "title": "X Column"
+          },
+          "y_column": {
+            "type": "string",
+            "title": "Y Column"
+          },
+          "grouping_column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grouping Column"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "x_column",
+          "y_column",
+          "grouping_column"
+        ],
+        "title": "LineChartMetadata",
+        "description": "Data to create a line chart"
       },
       "MapChartMetadata": {
         "properties": {

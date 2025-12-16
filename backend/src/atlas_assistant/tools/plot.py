@@ -11,7 +11,11 @@ from ..context import Context
 from ..state import (
     AreaChartMetadata,
     BarChartMetadata,
+    BeeswarmChartMetadata,
     ChartType,
+    DotPlotMetadata,
+    HeatmapChartMetadata,
+    LineChartMetadata,
     MapChartMetadata,
     State,
 )
@@ -104,6 +108,129 @@ Notes:
 """
 
 
+def _get_line_chart_metadata_prompt(data: str) -> str:
+    return f"""You are an expert in data visualization.
+
+Your task is to analyze the following data and create a line chart by:
+
+1. Identifying the best sequential/time field for the X-axis (e.g., year, date, time)
+2. Identifying a numeric field for the Y-axis
+3. Creating a descriptive title
+4. Optionally identifying a column for grouping into multiple series
+
+Data to visualize:
+
+```json
+{data}
+```
+
+You must respond with a JSON object matching this schema:
+
+```json
+{json.dumps(LineChartMetadata.model_json_schema(), indent=2)}
+```
+
+Notes:
+- The x_column should be a sequential or time-based field (years, dates, etc.)
+- The y_column should be numeric
+- The grouping_column creates multiple series lines (if present in the data)
+"""
+
+
+def _get_dot_plot_metadata_prompt(data: str) -> str:
+    return f"""You are an expert in data visualization.
+
+Your task is to analyze the following data and create a dot plot (scatter plot) by:
+
+1. Identifying a suitable field for the X-axis (can be categorical or numeric)
+2. Identifying a numeric field for the Y-axis
+3. Creating a descriptive title
+4. Optionally identifying a column for grouping/coloring dots
+5. Optionally identifying a column for sizing dots by value
+
+Data to visualize:
+
+```json
+{data}
+```
+
+You must respond with a JSON object matching this schema:
+
+```json
+{json.dumps(DotPlotMetadata.model_json_schema(), indent=2)}
+```
+
+Notes:
+- The x_column can be categorical or numeric
+- The y_column should be numeric
+- The grouping_column assigns colors to dots by category (if present in the data)
+- The size_column scales dot sizes by numeric value (if present in the data)
+- Best for showing relationships between variables or distributions
+"""
+
+
+def _get_beeswarm_chart_metadata_prompt(data: str) -> str:
+    return f"""You are an expert in data visualization.
+
+Your task is to analyze the following data and create a beeswarm plot by:
+
+1. Identifying the categorical field for grouping (displayed on x-axis)
+2. Identifying the numeric field for values (displayed on y-axis with jitter)
+3. Creating a descriptive title
+4. Optionally identifying a column for coloring the points
+
+Data to visualize:
+
+```json
+{data}
+```
+
+You must respond with a JSON object matching this schema:
+
+```json
+{json.dumps(BeeswarmChartMetadata.model_json_schema(), indent=2)}
+```
+
+Notes:
+- The category_column should be categorical (countries, crops, scenarios, etc.)
+- The value_column should be numeric
+- The color_column can be the same as category_column or a different grouping variable
+- Beeswarm plots are best for showing distribution of values within categories
+"""
+
+
+def _get_heatmap_chart_metadata_prompt(data: str) -> str:
+    return f"""You are an expert in data visualization.
+
+Your task is to analyze the following data and create a heatmap by:
+
+1. Identifying the categorical field for the X-axis
+2. Identifying the categorical field for the Y-axis
+3. Identifying the numeric field for cell color intensity
+4. Creating a descriptive title
+5. Optionally suggesting a color scheme (default is "YlOrRd")
+
+Data to visualize:
+
+```json
+{data}
+```
+
+You must respond with a JSON object matching this schema:
+
+```json
+{json.dumps(HeatmapChartMetadata.model_json_schema(), indent=2)}
+```
+
+Notes:
+- The x_column and y_column should be categorical (regions, crops, years, etc.)
+- The value_column should be numeric
+- Color schemes: "YlOrRd", "Reds", "Blues", "Greens", "Purples", "Oranges", "Viridis"
+- Heatmaps are best for showing relationships between two categorical variables
+  with a numeric value
+"""
+
+
 # Registry mapping chart types to their metadata class and prompt function.
 # To add a new chart type:
 # 1. Add the metadata class to state.py
@@ -113,6 +240,10 @@ CHART_REGISTRY: dict[ChartType, tuple[type[BaseModel], PromptFunc]] = {
     "bar": (BarChartMetadata, _get_bar_chart_metadata_prompt),
     "map": (MapChartMetadata, _get_map_chart_metadata_prompt),
     "area": (AreaChartMetadata, _get_area_chart_metadata_prompt),
+    "line": (LineChartMetadata, _get_line_chart_metadata_prompt),
+    "dot": (DotPlotMetadata, _get_dot_plot_metadata_prompt),
+    "beeswarm": (BeeswarmChartMetadata, _get_beeswarm_chart_metadata_prompt),
+    "heatmap": (HeatmapChartMetadata, _get_heatmap_chart_metadata_prompt),
 }
 
 
@@ -120,21 +251,15 @@ CHART_REGISTRY: dict[ChartType, tuple[type[BaseModel], PromptFunc]] = {
 def generate_chart_metadata(
     chart_type: ChartType, runtime: ToolRuntime[Context, State]
 ) -> Command[None]:
-    """Generates metadata to use when creating a chart visualization.
+    """Generates chart visualization metadata from queried data.
 
-    Use this tool after generate_table has returned data. Choose the appropriate
-    chart_type based on the data and user's request:
-
-    - "bar": For comparing categorical data. Best when showing values across
-      categories (countries, crops, scenarios).
-    - "map": For geographic/choropleth visualization. Use when data contains
-      ISO3 country codes and you want to show values on a map.
-    - "area": For time series or sequential data with stacked categories.
-      Best for showing how parts contribute to a whole over time.
+    Call this ONLY after generate_table has returned data. The chart_type
+    should be selected based on the user's query using the chart selection
+    guidance in your system instructions.
 
     Args:
-        chart_type: The type of chart to generate metadata for.
-            Must be one of: "bar", "map", "area"
+        chart_type: One of "bar", "map", "area", "line", "dot", "beeswarm",
+            "heatmap". Selection rules are in your system instructions.
     """
     data = runtime.state.get("data")
     if not data:
