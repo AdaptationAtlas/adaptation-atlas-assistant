@@ -12,7 +12,7 @@ locals {
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   container_port = 8000
-  env = {
+  application_env = {
     MISTRAL_API_KEY      = var.mistral_api_key
     CHAT_MODEL_SIZE      = var.chat_model_size
     JWT_KEY              = var.jwt_key
