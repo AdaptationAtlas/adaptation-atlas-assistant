@@ -342,12 +342,13 @@ def create_response_message(
 
 
 def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None:
-    """Models fails when a tool message is followed by a user message.
+    """Models fail when a tool message is followed by a user message.
     Append a short assistant acknowledgement so the next user turn comes
     after an assistant role.
     """
     state = agent.get_state(config)
     messages = list(state.values.get("messages", []))
+
     if messages and isinstance(messages[-1], ToolMessage):
         last_tool = messages[-1]
         acknowledgement = (
