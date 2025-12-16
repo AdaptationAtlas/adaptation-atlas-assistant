@@ -1142,10 +1142,37 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                     </summary>
                                     {toolCallMessages.length > 0 && (
                                         <div className={styles.reasoningContent}>
-                                            {toolCallMessages.map((event, index) => {
-                                                const messageId = event.id || `intermediate-${turnIndex}-${index}`;
+                                            {toolCallMessages.length > 3 && (
+                                                <details className={styles.moreSteps}>
+                                                    <summary className={styles.moreStepsSummary}>...</summary>
+                                                    <div className={styles.moreStepsContent}>
+                                                        {toolCallMessages.slice(0, -3).map((event, index) => {
+                                                            const messageId = event.id || `intermediate-${turnIndex}-${index}`;
+                                                            return (
+                                                                <div key={messageId} className={styles.stepItem}>
+                                                                    {'error' in event ? (
+                                                                        <div>Error: {event.error}</div>
+                                                                    ) : (
+                                                                        <details>
+                                                                            <summary className={styles.toolSummary}>
+                                                                                {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                                            </summary>
+                                                                            <div className={styles.toolContent}>
+                                                                                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
+                                                                                <CopyButton content={event.content ?? ''} />
+                                                                            </div>
+                                                                        </details>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </details>
+                                            )}
+                                            {toolCallMessages.slice(-3).map((event, index, arr) => {
+                                                const messageId = event.id || `intermediate-${turnIndex}-${toolCallMessages.length - 3 + index}`;
                                                 return (
-                                                    <div key={messageId} className={styles.intermediateMessage}>
+                                                    <div key={messageId} className={styles.stepItem}>
                                                         {'error' in event ? (
                                                             <div>Error: {event.error}</div>
                                                         ) : (
@@ -1159,6 +1186,7 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                                                 </div>
                                                             </details>
                                                         )}
+                                                        {index < arr.length - 1 && <div className={styles.stepDivider} />}
                                                     </div>
                                                 );
                                             })}
