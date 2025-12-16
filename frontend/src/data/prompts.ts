@@ -303,7 +303,9 @@ export const PROMPTS: Prompt[] = [
 /**
  * Check if chart type hints should be included based on URL parameter
  */
-function shouldIncludeChartType(): boolean {
+const CHART_HINT_PROBABILITY = 0.3;
+
+function shouldAlwaysIncludeChartType(): boolean {
     if (typeof window === 'undefined') return false;
     const params = new URLSearchParams(window.location.search);
     return params.get('chartHints') === 'true';
@@ -312,15 +314,34 @@ function shouldIncludeChartType(): boolean {
 /**
  * Get the display text for a prompt, optionally including the chart type
  * @param prompt The prompt object
- * @param includeChartType Whether to include the chart type prefix (default: based on URL param)
+ * @param includeChartType Whether to include the chart type prefix
+ *   - true: always include
+ *   - false: never include
+ *   - undefined: based on URL param, or randomly with CHART_HINT_PROBABILITY
  */
 export function getPromptDisplayText(
     prompt: Prompt,
     includeChartType?: boolean
 ): string {
-    const shouldInclude = includeChartType ?? shouldIncludeChartType();
+    if (includeChartType !== undefined) {
+        if (!includeChartType || !prompt.chartType) {
+            if (prompt.chartType) {
+                return prompt.text.charAt(0).toUpperCase() + prompt.text.slice(1);
+            }
+            return prompt.text;
+        }
+        const verb = prompt.verb ?? 'showing';
+        return `Create a ${prompt.chartType} ${verb} ${prompt.text}`;
+    }
 
-    if (!shouldInclude || !prompt.chartType) {
+    if (shouldAlwaysIncludeChartType() && prompt.chartType) {
+        const verb = prompt.verb ?? 'showing';
+        return `Create a ${prompt.chartType} ${verb} ${prompt.text}`;
+    }
+
+    const shouldInclude = prompt.chartType && Math.random() < CHART_HINT_PROBABILITY;
+
+    if (!shouldInclude) {
         // For prompts with chartType, capitalize first letter
         if (prompt.chartType) {
             return prompt.text.charAt(0).toUpperCase() + prompt.text.slice(1);
