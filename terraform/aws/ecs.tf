@@ -43,7 +43,9 @@ module "ecs" {
             "--host",
             "0.0.0.0",
             "--port",
-            "8000"
+            "8000",
+            "--log-config",
+            "logging.yaml"
           ]
           portMappings = [
             {

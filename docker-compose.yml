@@ -16,12 +16,15 @@ services:
         "*data*",
         "--host",
         "0.0.0.0",
+        "--log-config",
+        "logging.yaml",
       ]
     volumes:
       - ./backend/.env:/app/.env
       - ./backend/src:/app/src
       - ./backend/data:/app/data
       - ./backend/tests:/app/tests
+      - ./backend/logging.yaml:/app/logging.yaml
 
   chat:
     image: atlas/backend
