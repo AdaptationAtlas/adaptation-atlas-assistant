@@ -1115,10 +1115,9 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
     const getSummaryText = () => {
         if (status === 'streaming') {
-            return `Working...`;
-        } else {
-            return 'View steps';
+            return <span className={styles.shimmer}>Working...</span>;
         }
+        return 'View steps';
     };
 
     return (
