@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { sendChatMessage, createStreamController } from '../api';
 import { useChatStore } from '../store/chatStore';
@@ -89,7 +89,9 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
 
 export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
-      const { isAuthenticated, removeUser } = useAuth();
+    const { isAuthenticated, removeUser } = useAuth();
+    const abortRef = useRef<(() => void) | null>(null);
+    const isAbortingRef = useRef(false);
 
     // Chat store - includes chat state and sidebar state
     const {
@@ -121,6 +123,8 @@ export function Chat() {
         startStreaming(value);
 
         const controller = createStreamController();
+        abortRef.current = controller.abort;
+        isAbortingRef.current = false;
 
         try {
             await sendChatMessage(queryWithContext, threadId, {
@@ -136,6 +140,10 @@ export function Chat() {
                     });
                 },
                 onError: (error) => {
+                    // Don't show error if user intentionally cancelled
+                    if (isAbortingRef.current) {
+                        return;
+                    }
                     setError(error.message);
                 },
                 onComplete: () => {
@@ -152,6 +160,23 @@ export function Chat() {
     const handleExampleClick = (prompt: string) => {
         handlePromptSubmit(prompt);
     };
+
+    const handleAbort = useCallback(() => {
+        if (abortRef.current) {
+            isAbortingRef.current = true;
+            abortRef.current();
+            abortRef.current = null;
+            addEvent({
+                type: 'ai',
+                content: '*Response stopped*',
+                thread_id: threadId || '',
+                finish_reason: 'cancelled',
+                id: `cancelled-${Date.now()}`,
+                timestamp: Date.now(),
+            });
+            finishStreaming();
+        }
+    }, [addEvent, finishStreaming, threadId]);
 
     const handleAvatarClick = () => {
         if (isAuthenticated) {
@@ -214,6 +239,8 @@ export function Chat() {
                         onSubmit={handlePromptSubmit}
                         context={contextTags}
                         onRemoveTag={removeTag}
+                        isStreaming={status === 'streaming'}
+                        onAbort={handleAbort}
                     />
                 </div>
             </main>

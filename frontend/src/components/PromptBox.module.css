@@ -88,6 +88,14 @@
     cursor: not-allowed;
 }
 
+.submitBtn.abortBtn {
+    background-color: #dc2626;
+}
+
+.submitBtn.abortBtn:hover {
+    background-color: #b91c1c;
+}
+
 .submitIcon {
     width: 16px;
     height: 16px;
