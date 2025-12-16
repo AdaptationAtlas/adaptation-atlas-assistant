@@ -1042,6 +1042,9 @@ function BeeswarmArtifactWithControls({ data, metadata, rawData }: BeeswarmArtif
 }
 
 export function ChatResponse({ events, status, onSuggestionClick }: ChatResponseProps) {
+    const [openSteps, setOpenSteps] = useState<Set<number>>(() => new Set());
+    const [openMore, setOpenMore] = useState<Set<number>>(() => new Set());
+
     interface ConversationTurn {
         userMessages: typeof events;
         intermediateMessages: typeof events;
@@ -1134,17 +1137,36 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
                         if (!isStreamingThisTurn && toolCallMessages.length === 0) return null;
 
+                        const stepsOpen = isStreamingThisTurn || openSteps.has(turnIndex);
+                        const moreOpen = openMore.has(turnIndex);
+
                         return (
                             <div className={styles.loadingBlock}>
-                                <details className={styles.reasoningDropdown} open={isStreamingThisTurn}>
+                                <details
+                                    className={styles.reasoningDropdown}
+                                    open={stepsOpen}
+                                    onToggle={(e) => {
+                                        const next = new Set(openSteps);
+                                        (e.target as HTMLDetailsElement).open ? next.add(turnIndex) : next.delete(turnIndex);
+                                        setOpenSteps(next);
+                                    }}
+                                >
                                     <summary className={styles.reasoningSummary}>
-                                        {isStreamingThisTurn ? <span className={styles.shimmer}>Working...</span> : 'View steps'}
+                                        {isStreamingThisTurn ? <span className={styles.shimmer}>Working...</span> : stepsOpen ? 'Hide steps' : 'View steps'}
                                     </summary>
                                     {toolCallMessages.length > 0 && (
                                         <div className={styles.reasoningContent}>
                                             {toolCallMessages.length > 3 && (
-                                                <details className={styles.moreSteps}>
-                                                    <summary className={styles.moreStepsSummary}>...</summary>
+                                                <details
+                                                    className={styles.moreSteps}
+                                                    open={moreOpen}
+                                                    onToggle={(e) => {
+                                                        const next = new Set(openMore);
+                                                        (e.target as HTMLDetailsElement).open ? next.add(turnIndex) : next.delete(turnIndex);
+                                                        setOpenMore(next);
+                                                    }}
+                                                >
+                                                    <summary className={styles.moreStepsSummary}>{moreOpen ? 'Hide additional steps' : 'Show more steps'}</summary>
                                                     <div className={styles.moreStepsContent}>
                                                         {toolCallMessages.slice(0, -3).map((event, index) => {
                                                             const messageId = event.id || `intermediate-${turnIndex}-${index}`;
@@ -1153,6 +1175,7 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                                                     {'error' in event ? (
                                                                         <div>Error: {event.error}</div>
                                                                     ) : (
+                                                                        <>
                                                                         <details>
                                                                             <summary className={styles.toolSummary}>
                                                                                 {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
@@ -1162,6 +1185,8 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                                                                 <CopyButton content={event.content ?? ''} />
                                                                             </div>
                                                                         </details>
+                                                                        <div className={styles.stepDivider} />
+                                                                        </>
                                                                     )}
                                                                 </div>
                                                             );

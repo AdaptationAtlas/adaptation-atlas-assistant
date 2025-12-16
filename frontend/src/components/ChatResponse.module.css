@@ -8,17 +8,22 @@
     color: #6b7280;
     margin-bottom: 0.5rem;
     user-select: none;
+    list-style: none;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
 }
 
+.reasoningSummary::-webkit-details-marker { display: none; }
+
 .reasoningSummary:hover {
-    color: #374151;
+    color: var(--primary);
 }
 
 .reasoningContent {
     background-color: #F4F5F6;
-    margin-left: 1rem;
     padding: 0.5rem;
-    border-radius: 4px
+    border-radius: 4px;
 }
 
 .stepItem {
@@ -34,6 +39,7 @@
 
 .moreSteps {
     margin-bottom: 0.5rem;
+    margin-left: 0rem;
 }
 
 .moreStepsSummary {
@@ -41,17 +47,18 @@
     font-size: 0.875rem;
     color: #9ca3af;
     user-select: none;
-    letter-spacing: 2px;
+    list-style: none;
 }
 
+.moreStepsSummary::-webkit-details-marker { display: none; }
+
 .moreStepsSummary:hover {
-    color: #6b7280;
+    color: var(--primary);
 }
 
 .moreStepsContent {
     margin-top: 0.5rem;
-    padding-left: 0.5rem;
-    border-left: 1px solid #e5e7eb;
+    margin-left: 0rem;
 }
 
 .toolSummary {
@@ -61,7 +68,13 @@
     font-size: 0.9rem;
     color: #111927;
     user-select: none;
+    list-style: none;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
 }
+
+.toolSummary::-webkit-details-marker { display: none; }
 
 .toolSummary:hover {
     color: var(--primary);
@@ -70,7 +83,7 @@
 .toolContent {
     white-space: pre-wrap;
     word-wrap: break-word;
-    margin-left: 1.5rem;
+    margin-left: 0rem;
     font-size: 0.9rem;
     font-family: 'IBM Plex Mono', monospace;
     color: #374151;
