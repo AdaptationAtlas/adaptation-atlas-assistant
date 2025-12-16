@@ -1165,13 +1165,6 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                         </div>
                                     )}
                                 </details>
-                                {isStreamingThisTurn && (
-                                    <div className={styles.skeletonGroup}>
-                                        <div className={styles.skeleton} />
-                                        <div className={styles.skeleton} />
-                                        <div className={styles.skeleton} />
-                                    </div>
-                                )}
                             </div>
                         );
                     })()}
@@ -1263,6 +1256,15 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
                         return null;
                     })}
+
+                    {/* Skeleton at bottom while streaming */}
+                    {status === 'streaming' && turnIndex === conversationTurns.length - 1 && (
+                        <div className={styles.skeletonGroup}>
+                            <div className={styles.skeleton} />
+                            <div className={styles.skeleton} />
+                            <div className={styles.skeleton} />
+                        </div>
+                    )}
 
                     {/* Render final message (AI or Output) */}
                     {(() => {
