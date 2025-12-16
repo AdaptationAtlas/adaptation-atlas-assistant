@@ -217,3 +217,23 @@
     animation: shimmer 1.5s infinite;
 }
 
+.loadingBlock {
+    margin-bottom: 1.5rem;
+}
+
+.skeletonGroup {
+    margin-top: 0.75rem;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeletonGroup .skeleton:nth-child(2) { width: 85%; }
+.skeletonGroup .skeleton:nth-child(3) { width: 70%; }
+

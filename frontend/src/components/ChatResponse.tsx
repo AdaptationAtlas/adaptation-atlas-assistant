@@ -1113,13 +1113,6 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         }
     });
 
-    const getSummaryText = () => {
-        if (status === 'streaming') {
-            return <span className={styles.shimmer}>Working...</span>;
-        }
-        return 'View steps';
-    };
-
     return (
         <>
             {conversationTurns.map((turn, turnIndex) => (
@@ -1136,39 +1129,50 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
                     {/* Render intermediate messages (reasoning/tool calls) */}
                     {(() => {
+                        const isStreamingThisTurn = status === 'streaming' && turnIndex === conversationTurns.length - 1;
                         const toolCallMessages = turn.intermediateMessages.filter((event) => !isOutputToolEvent(event));
 
-                        if (toolCallMessages.length === 0) return null;
+                        if (!isStreamingThisTurn && toolCallMessages.length === 0) return null;
 
                         return (
-                            <details className={styles.reasoningDropdown}>
-                                <summary className={styles.reasoningSummary}>
-                                    {getSummaryText()}
-                                </summary>
-                                <div className={styles.reasoningContent}>
-                                    {toolCallMessages.map((event, index) => {
-                                        const messageId = event.id || `intermediate-${turnIndex}-${index}`;
-
-                                        return (
-                                            <div key={messageId} className={styles.intermediateMessage}>
-                                                {'error' in event ? (
-                                                    <div>Error: {event.error}</div>
-                                                ) : (
-                                                    <details>
-                                                        <summary className={styles.toolSummary}>
-                                                            {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
-                                                        </summary>
-                                                        <div className={styles.toolContent}>
-                                                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
-                                                            <CopyButton content={event.content ?? ''} />
-                                                        </div>
-                                                    </details>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </details>
+                            <div className={styles.loadingBlock}>
+                                <details className={styles.reasoningDropdown} open={isStreamingThisTurn}>
+                                    <summary className={styles.reasoningSummary}>
+                                        {isStreamingThisTurn ? <span className={styles.shimmer}>Working...</span> : 'View steps'}
+                                    </summary>
+                                    {toolCallMessages.length > 0 && (
+                                        <div className={styles.reasoningContent}>
+                                            {toolCallMessages.map((event, index) => {
+                                                const messageId = event.id || `intermediate-${turnIndex}-${index}`;
+                                                return (
+                                                    <div key={messageId} className={styles.intermediateMessage}>
+                                                        {'error' in event ? (
+                                                            <div>Error: {event.error}</div>
+                                                        ) : (
+                                                            <details>
+                                                                <summary className={styles.toolSummary}>
+                                                                    {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                                </summary>
+                                                                <div className={styles.toolContent}>
+                                                                    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
+                                                                    <CopyButton content={event.content ?? ''} />
+                                                                </div>
+                                                            </details>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </details>
+                                {isStreamingThisTurn && (
+                                    <div className={styles.skeletonGroup}>
+                                        <div className={styles.skeleton} />
+                                        <div className={styles.skeleton} />
+                                        <div className={styles.skeleton} />
+                                    </div>
+                                )}
+                            </div>
                         );
                     })()}
 
