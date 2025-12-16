@@ -358,6 +358,10 @@ export type MapChartMetadata = {
      * Color Scheme
      */
     color_scheme?: string;
+    /**
+     * Admin Level
+     */
+    admin_level?: 'admin0' | 'admin1' | 'admin2';
 };
 
 /**

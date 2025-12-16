@@ -54,11 +54,17 @@ geographic/choropleth maps.
 
 Your task is to analyze the following data and create a choropleth map by:
 
-1. Identifying the column containing ISO3 country codes \
-(3-letter codes like 'KEN', 'NGA', 'ZAF', 'ETH')
-2. Identifying the numeric column to use for coloring the map
-3. Creating a descriptive title
-4. Optionally suggesting a color scheme (default is "Oranges")
+1. Determining the administrative level based on the data columns:
+   - admin0 (country): if data has iso3/country codes but NOT admin1_name
+   - admin1 (state/province): if data has admin1_name column with values
+   - admin2 (district): if data has admin2_name column with values
+2. Identifying the id_column based on admin level:
+   - admin0: use the ISO3 country code column (e.g., 'iso3')
+   - admin1: use 'admin1_name'
+   - admin2: use 'admin2_name'
+3. Identifying the numeric column to use for coloring the map
+4. Creating a descriptive title
+5. Optionally suggesting a color scheme (default is "Oranges")
 
 Data to visualize:
 
@@ -73,7 +79,8 @@ You must respond with a JSON object matching this schema:
 ```
 
 Notes:
-- The id_column should contain ISO3 country codes
+- Set admin_level based on the granularity of geographic data present
+- id_column must match admin_level (iso3 for admin0, admin1_name for admin1, etc.)
 - The value_column should be numeric
 - Color schemes: "Oranges", "Blues", "Greens", "Reds", "Purples", "Viridis"
 """

@@ -678,6 +678,16 @@
             "type": "string",
             "title": "Color Scheme",
             "default": "Oranges"
+          },
+          "admin_level": {
+            "type": "string",
+            "enum": [
+              "admin0",
+              "admin1",
+              "admin2"
+            ],
+            "title": "Admin Level",
+            "default": "admin0"
           }
         },
         "type": "object",

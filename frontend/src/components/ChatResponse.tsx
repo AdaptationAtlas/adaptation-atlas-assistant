@@ -216,20 +216,31 @@ function generateMapObservableCode(
     metadata: MapChartMetadata,
     data: unknown[]
 ): string {
-    const { id_column, value_column, color_scheme, title } = metadata;
+    const { id_column, value_column, color_scheme, title, admin_level } = metadata;
     const dataJson = JSON.stringify(data, null, 2);
 
-    return `// Data
+    // Config based on admin level
+    const geoConfigs: Record<string, { path: string; idProperty: string; nameProperty: string }> = {
+        admin0: { path: '/data/african-nations-reduced.geojson', idProperty: 'adm0_a3', nameProperty: 'name' },
+        admin1: { path: '/data/gaul24_admin1_africa_simplified.geojson', idProperty: 'admin1_name', nameProperty: 'admin1_name' },
+        admin2: { path: '/data/gaul24_admin2_africa_simplified.geojson', idProperty: 'admin2_name', nameProperty: 'admin2_name' },
+    };
+    const level = admin_level || 'admin0';
+    const config = geoConfigs[level];
+    const isAdmin0 = level === 'admin0';
+
+    if (isAdmin0) {
+        return `// Data
 data = ${dataJson}
 
 // GeoJSON (fetch African nations)
-geoData = await fetch('/data/african-nations-reduced.geojson').then(r => r.json())
+geoData = await fetch('${config.path}').then(r => r.json())
 
 // Enrich GeoJSON with data values
 dataMap = new Map(data.map(d => [d["${id_column}"], d["${value_column}"]]))
 enrichedFeatures = geoData.features.map(f => ({
   ...f,
-  properties: { ...f.properties, value: dataMap.get(f.properties.adm0_a3) ?? null }
+  properties: { ...f.properties, value: dataMap.get(f.properties.${config.idProperty}) ?? null }
 }))
 
 // Chart: ${title || 'Choropleth Map'}
@@ -260,6 +271,77 @@ Plot.plot({
       enrichedFeatures.filter(f => f.properties.value !== null),
       Plot.pointer(Plot.geoCentroid({
         title: d => \`\${d.properties.name}: \${d.properties.value}\`
+      }))
+    ),
+  ]
+})`;
+    }
+
+    // Admin1/Admin2 code
+    return `// Data
+data = ${dataJson}
+
+// GeoJSON (fetch ${level} boundaries)
+geoData = await fetch('${config.path}').then(r => r.json())
+
+// Build data map and find relevant country ISO3 codes
+dataMap = new Map(data.filter(d => d["${id_column}"] != null).map(d => [String(d["${id_column}"]), d["${value_column}"]]))
+dataIds = new Set(data.filter(d => d["${id_column}"] != null).map(d => String(d["${id_column}"])))
+
+// Filter to features matching our data and get parent country ISO3s
+filteredFeatures = geoData.features.filter(f => dataIds.has(String(f.properties.${config.idProperty})))
+relevantISO3s = new Set(filteredFeatures.map(f => f.properties.iso3).filter(Boolean))
+
+// Get all features from parent countries
+parentFeatures = geoData.features.filter(f => relevantISO3s.has(f.properties.iso3))
+
+// Enrich with values
+enrichedFeatures = parentFeatures.map(f => ({
+  ...f,
+  properties: {
+    ...f.properties,
+    value: dataMap.get(String(f.properties.${config.idProperty})) ?? null,
+    hasData: dataMap.has(String(f.properties.${config.idProperty}))
+  }
+}))
+
+featuresWithData = enrichedFeatures.filter(f => f.properties.hasData)
+featuresWithoutData = enrichedFeatures.filter(f => !f.properties.hasData)
+values = Array.from(dataMap.values())
+
+// Chart: ${title || 'Choropleth Map'}
+Plot.plot({
+  height: 400,
+  projection: {
+    type: "reflect-y",
+    domain: { type: "FeatureCollection", features: enrichedFeatures },
+  },
+  color: {
+    type: "linear",
+    scheme: "${(color_scheme || 'Oranges').toLowerCase()}",
+    domain: [Math.min(...values), Math.max(...values)],
+    legend: true,
+    label: "${value_column}",
+  },
+  marks: [
+    Plot.geo({ type: "FeatureCollection", features: featuresWithoutData }, {
+      fill: "#e5e5e5",
+      stroke: "#999",
+      strokeWidth: 0.3,
+    }),
+    Plot.geo({ type: "FeatureCollection", features: featuresWithData }, {
+      fill: d => d.properties.value,
+      stroke: "#333",
+      strokeWidth: 0.5,
+    }),
+    Plot.tip(
+      enrichedFeatures,
+      Plot.pointer(Plot.centroid({
+        title: d => {
+          const name = d.properties.${config.nameProperty};
+          const val = d.properties.value;
+          return val !== null ? \`\${name}: \${val}\` : name;
+        }
       }))
     ),
   ]

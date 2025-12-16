@@ -66,13 +66,19 @@ class MapChartMetadata(BaseModel):
     """The title of the map chart."""
 
     id_column: str
-    """The name of the data column containing ISO3 country codes (e.g., 'adm0_a3')"""
+    """The data column with the geographic identifier.
+    admin0: ISO3 code column (e.g., 'iso3').
+    admin1: Region name column (e.g., 'admin1_name').
+    admin2: District name column (e.g., 'admin2_name')."""
 
     value_column: str
     """The name of the numeric data column used for coloring"""
 
     color_scheme: str = "Oranges"
     """The Observable Plot color scheme to use"""
+
+    admin_level: Literal["admin0", "admin1", "admin2"] = "admin0"
+    """The boundary level: admin0 (countries), admin1 (states), admin2 (districts)"""
 
 
 class AreaChartMetadata(BaseModel):
