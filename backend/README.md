@@ -26,7 +26,6 @@ We use the [Atlas's STAC Catalog](https://digital-atlas.s3.amazonaws.com/stac/pu
 To re-fetch all items that have parquet assets and rebuild the embeddings:
 
 ```sh
-uv run python scripts/fetch_stac.py
 uv run python scripts/embed_stac.py
 ```
 
