@@ -118,6 +118,11 @@ def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[
             "re-generating the SQL with `group by` or `distinct`."
         )
         data = None
+    elif len(data_frame) == 0:
+        content_parts.append(
+            f"Returned data had {len(data_frame)} rows. No data was returned."
+        )
+        data = None
     else:
         content_parts += [
             "Data returned:",
