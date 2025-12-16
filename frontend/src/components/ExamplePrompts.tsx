@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { MagicWandIcon } from '../assets/icons';
 import { Button } from './Button';
-import { getRandomPrompts, type Prompt } from '../data/prompts';
+import { getRandomPrompts, getPromptDisplayText, type Prompt } from '../data/prompts';
 import styles from './ExamplePrompts.module.css';
 
 interface ExamplePromptsProps {
@@ -64,13 +64,13 @@ export function ExamplePrompts({
                 {displayPrompts.map((prompt) => (
                     <Button
                         key={prompt.id}
-                        onClick={() => onExampleClick(prompt.text)}
+                        onClick={() => onExampleClick(getPromptDisplayText(prompt))}
                         icon={<MagicWandIcon />}
                         hoverSlide={true}
                         italic={true}
                         align="left"
                     >
-                        {prompt.text}
+                        {getPromptDisplayText(prompt)}
                     </Button>
                 ))}
             </div>

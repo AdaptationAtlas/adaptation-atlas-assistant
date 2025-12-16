@@ -11,87 +11,99 @@ This document contains evaluation prompts derived from Observable notebook analy
 
 ---
 
-## Prompts by Category
+## Evaluation Prompts
 
-### Agricultural Exposure Analysis
+### Bar Charts
 
-These prompts explore crop production, harvested areas, livestock distribution, and production values.
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| BC-01 | Create a bar chart showing the top 10 countries in Africa by total agricultural production value | Evaluate Climate Risks |
+| BC-02 | Create a bar chart showing livestock distribution by headcount in Kenya | Explore the Datasets |
+| BC-03 | Create a bar chart comparing historical exposure to dry vs wet hazards for crops in Kenya | Evaluate Climate Risks |
+| BC-04 | Create a bar chart showing crops most exposed to historical heat stress in terms of VOP | Climate Rationale |
+| BC-05 | Create a bar chart comparing future drought exposure between SSP1-2.6 and SSP5-8.5 for Tanzania | Climate Rationale |
+| BC-06 | Create a bar chart showing how livestock exposure to wet hazards changes over time in the Sahel | Climate Rationale |
+| BC-07 | Create a bar chart comparing hazard exposure profile of Ethiopia vs Kenya across all hazard types | Evaluate Climate Risks |
+| BC-08 | Create a bar chart showing breakdown of hazard exposure by type for crops in Ethiopia | Evaluate Climate Risks |
 
-| ID | Prompt | Expected Output | Source Notebook |
-|----|--------|-----------------|-----------------|
-| AE-01 | What is the total crop production value in USD for Ethiopia? | Bar chart or summary showing production value by crop | Explore the Datasets |
-| AE-02 | Show me the top 10 countries in Africa by total agricultural production value | Ranked bar chart | Evaluate Climate Risks |
-| AE-03 | Compare harvested area for maize across East African countries | Grouped bar chart by country | Explore the Datasets |
-| AE-04 | What is the livestock distribution (by headcount) in Kenya? | Bar chart showing livestock types | Explore the Datasets |
-| AE-05 | Which admin-1 regions in Nigeria have the highest crop production in tonnes? | Ranked bar chart by region | Explore the Datasets |
-| AE-06 | Show the distribution of agricultural production value across admin-2 districts in Tanzania | Choropleth-style data or ranked list | Evaluate Climate Risks |
-| AE-07 | What crops have the largest harvested area in West Africa? | Bar chart by crop type | Explore the Datasets |
-| AE-08 | Compare total livestock numbers between cattle, goats, and sheep in the Sahel region | Grouped bar chart | Explore the Datasets |
-| AE-09 | What is the total production value of cereals vs legumes in Sub-Saharan Africa? | Comparison bar chart | Explore the Datasets |
-| AE-10 | Show me the top 5 admin-1 regions by rice production in Madagascar | Ranked bar chart | Explore the Datasets |
+### Scatter Plots
 
-### Historical Climate Hazard Exposure
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| SP-01 | Create a scatter plot showing relationship between livestock numbers and historical heat exposure by country | Evaluate Climate Risks |
+| SP-02 | Create a scatter plot showing how crop production value correlates with future climate risk in East Africa | Evaluate Climate Risks |
+| SP-03 | Create a scatter plot showing relationship between agricultural production and compound hazard exposure across African countries | Climate Rationale |
 
-These prompts examine historical exposure of crops and livestock to climate hazards.
+### Heatmaps
 
-| ID | Prompt | Expected Output | Source Notebook |
-|----|--------|-----------------|-----------------|
-| HH-01 | What is the value of crop production exposed to drought historically in Ethiopia? | Summary statistic or bar chart | Evaluate Climate Risks |
-| HH-02 | Which countries have the highest historical exposure to heat hazards for livestock? | Ranked bar chart | Evaluate Climate Risks |
-| HH-03 | Compare historical exposure to dry vs wet hazards for crops in Kenya | Grouped bar chart | Evaluate Climate Risks |
-| HH-04 | Show the breakdown of compound hazard exposure for agriculture in West Africa | Stacked bar chart | Evaluate Climate Risks |
-| HH-05 | What crops are most exposed to historical heat stress in terms of VOP? | Ranked bar chart by crop | Climate Rationale |
-| HH-06 | Which livestock types face the greatest historical drought exposure in the Sahel? | Bar chart by livestock type | Evaluate Climate Risks |
-| HH-07 | Compare historical compound hazard exposure between East and Southern Africa | Grouped bar chart by region | Evaluate Climate Risks |
-| HH-08 | What is the total VOP exposed to any climate hazard historically in Nigeria? | Summary with breakdown | Evaluate Climate Risks |
-| HH-09 | Show me which admin-1 regions in Uganda have highest agricultural exposure to heat hazards | Ranked list or bar chart | Evaluate Climate Risks |
-| HH-10 | What percentage of agricultural VOP is exposed to compound hazards in Zambia? | Percentage summary | Evaluate Climate Risks |
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| HM-01 | Create a heatmap showing crop exposure to each hazard type across East African countries | Climate Rationale |
+| HM-02 | Create a heatmap showing livestock types vs hazard exposure in the Sahel | Climate Rationale |
+| HM-03 | Create a heatmap showing SSP scenarios vs time periods for maize drought exposure in Kenya | Climate Rationale |
+| HM-04 | Create a heatmap showing hazard exposure intensity for all crops across admin-1 regions in Ethiopia | Climate Rationale |
+| HM-05 | Create a heatmap comparing historical and future compound hazard exposure across major African regions | Climate Rationale |
 
-### Future Climate Hazard Exposure
+### Dot Plots
 
-These prompts examine projected future exposure under different scenarios and time periods.
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| DP-01 | Create a dot plot comparing crop production values across all crops in Tanzania | Evaluate Climate Risks |
+| DP-02 | Create a dot plot showing drought exposure for each crop in Kenya | Evaluate Climate Risks |
+| DP-03 | Create a dot plot showing livestock counts by type across Sahel countries | Evaluate Climate Risks |
+| DP-04 | Create a dot plot comparing future hazard exposure (2050) across scenarios for maize in Ethiopia | Climate Rationale |
+| DP-05 | Create a dot plot showing crop production values across admin-1 regions in Nigeria | Explore the Datasets |
 
-| ID | Prompt | Expected Output | Source Notebook |
-|----|--------|-----------------|-----------------|
-| FH-01 | How does crop exposure to drought change from historical to 2050 under SSP2-4.5 in Kenya? | Comparison bar chart (historical vs future) | Climate Rationale |
-| FH-02 | Compare heat hazard exposure for livestock in 2030 vs 2050 under SSP5-8.5 | Time series or grouped bar | Climate Rationale |
-| FH-03 | Which scenario shows the highest agricultural exposure to hazards by 2080? | Comparison across scenarios | Climate Rationale |
-| FH-04 | Show future exposure to compound hazards for crops in Ethiopia across all time periods | Line chart or grouped bar by timeframe | Evaluate Climate Risks |
-| FH-05 | What is the projected VOP exposed to heat hazards in West Africa by 2050 under SSP3-7.0? | Summary statistic with context | Climate Rationale |
-| FH-06 | Compare future drought exposure between SSP1-2.6 and SSP5-8.5 for Tanzania | Side-by-side comparison | Climate Rationale |
-| FH-07 | How does livestock exposure to wet hazards change over time in the Sahel? | Time series chart | Climate Rationale |
-| FH-08 | Which crops face the greatest increase in hazard exposure from historical to 2050? | Change analysis chart | Climate Rationale |
-| FH-09 | Show the distribution of future compound hazard exposure across admin-1 regions in Nigeria | Ranked bar chart | Evaluate Climate Risks |
-| FH-10 | What is the projected total agricultural VOP at risk in 2080 under the worst-case scenario? | Summary with breakdown | Climate Rationale |
+### Beeswarm Plots
 
-### Comparative Analysis (Cross-Cutting)
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| BS-01 | Create a beeswarm plot showing distribution of crop production values across all admin-2 districts in Kenya | Explore the Datasets |
+| BS-02 | Create a beeswarm plot showing historical drought exposure distribution for all crops across African countries | Evaluate Climate Risks |
+| BS-03 | Create a beeswarm plot showing distribution of future heat exposure values across all admin-2 regions in Tanzania | Climate Rationale |
 
-These prompts combine multiple datasets for comparative analysis.
+### Tables & Summaries
 
-| ID | Prompt | Expected Output | Source Notebook |
-|----|--------|-----------------|-----------------|
-| CA-01 | For countries with highest crop production, what is their hazard exposure profile? | Multi-variable comparison | Evaluate Climate Risks |
-| CA-02 | Compare historical vs future (2050) hazard exposure for the top 5 maize producing countries | Before/after comparison | Climate Rationale |
-| CA-03 | Which regions have high agricultural value AND high compound hazard exposure? | Intersection analysis | Evaluate Climate Risks |
-| CA-04 | Show the relationship between livestock numbers and historical heat exposure by country | Scatter plot or correlation | Evaluate Climate Risks |
-| CA-05 | How does crop production value correlate with future climate risk in East Africa? | Correlation analysis | Evaluate Climate Risks |
-| CA-06 | Compare the hazard exposure profile of Ethiopia vs Kenya across all hazard types | Side-by-side comparison | Evaluate Climate Risks |
-| CA-07 | Which admin-1 regions have the greatest gap between production value and hazard exposure? | Gap analysis | Evaluate Climate Risks |
-| CA-08 | Show historical to 2050 change in hazard exposure for the most agriculturally productive regions | Change over time analysis | Climate Rationale |
-| CA-09 | What percentage of total African agricultural VOP is exposed to hazards under different scenarios? | Scenario comparison summary | Climate Rationale |
-| CA-10 | Compare the top 10 livestock-producing countries by their exposure to multiple hazard types | Multi-hazard comparison | Prioritize Livestock |
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| TS-01 | What is the agricultural profile of the Greater Horn of Africa? | Explore the Datasets |
+| TS-02 | Show all admin-2 districts in Ethiopia with their crop production values as a table | Explore the Datasets |
 
-### Geographic Queries
+### Geographic Queries - Admin 0 (Country-level)
 
-These prompts focus on spatial filtering and regional analysis.
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| GQ-01 | What is the agricultural profile of Kenya? | Explore the Datasets |
+| GQ-02 | What crops are grown in Ethiopia and what is their total value of production? | Explore the Datasets |
+| GQ-03 | Compare climate hazard exposure between Kenya and Tanzania | Evaluate Climate Risks |
+| GQ-04 | Which African countries have the highest livestock populations? | Explore the Datasets |
+| GQ-05 | Show the drought exposure for all crops in Nigeria | Evaluate Climate Risks |
+| GQ-06 | What is the breakdown of agricultural production by crop type in Uganda? | Explore the Datasets |
+| GQ-07 | Compare future climate risks between Ghana and Senegal under SSP5-8.5 | Climate Rationale |
+| GQ-08 | What are the main climate hazards affecting agriculture in Malawi? | Evaluate Climate Risks |
 
-| ID | Prompt | Expected Output | Source Notebook |
-|----|--------|-----------------|-----------------|
-| GQ-01 | What is the agricultural profile of the Greater Horn of Africa? | Regional summary | Explore the Datasets |
-| GQ-02 | Show all admin-2 districts in Ethiopia with their crop production values | Table or map-ready data | Explore the Datasets |
-| GQ-03 | Compare agricultural exposure between coastal and inland regions of Kenya | Regional comparison | Explore the Datasets |
-| GQ-04 | What are the top producing admin-1 regions across all of Southern Africa? | Ranked regional list | Explore the Datasets |
-| GQ-05 | Show climate hazard exposure for countries in the Congo Basin | Regional hazard summary | Evaluate Climate Risks |
+### Geographic Queries - Regional
+
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| GQ-09 | What is the agricultural profile of the Greater Horn of Africa? | Explore the Datasets |
+| GQ-10 | Compare agricultural exposure between coastal and inland regions of Kenya | Evaluate Climate Risks |
+| GQ-11 | What are the top producing admin-1 regions across all of Southern Africa? | Explore the Datasets |
+| GQ-12 | Show climate hazard exposure for countries in the Congo Basin | Evaluate Climate Risks |
+| GQ-13 | Compare crop production across East African Community member countries | Explore the Datasets |
+| GQ-14 | What is the livestock distribution across Sahel countries? | Explore the Datasets |
+| GQ-15 | Show all admin-2 districts in Ethiopia with their crop production values | Explore the Datasets |
+
+### Maps
+
+| ID | Prompt | Source Notebook |
+|----|--------|-----------------|
+| MAP-01 | Create a map showing agricultural production value across all African countries | Explore the Datasets |
+| MAP-02 | Create a map showing drought exposure by admin-1 region in Kenya | Evaluate Climate Risks |
+| MAP-03 | Create a map showing crop production distribution across admin-2 districts in Ethiopia | Explore the Datasets |
+| MAP-04 | Create a map showing livestock density across East African countries | Explore the Datasets |
+| MAP-05 | Create a map showing future heat stress exposure (2050) across the Sahel region | Climate Rationale |
+| MAP-06 | Create a map showing maize production value by admin-1 region in Tanzania | Explore the Datasets |
 
 ---
 
@@ -132,14 +144,17 @@ The following types of analyses from the Observable notebooks require datasets n
 
 ## Summary Statistics
 
-| Category | Total Prompts | Prompts Supported |
-|----------|---------------|-------------------|
-| Agricultural Exposure | 10 | 10 |
-| Historical Hazard Exposure | 10 | 10 |
-| Future Hazard Exposure | 10 | 10 |
-| Comparative Analysis | 10 | 10 |
-| Geographic Queries | 5 | 5 |
-| **Total** | **45** | **45** |
+| Chart Type | Count |
+|------------|-------|
+| Bar Charts | 8 |
+| Scatter Plots | 3 |
+| Heatmaps | 5 |
+| Dot Plots | 5 |
+| Beeswarm Plots | 3 |
+| Tables & Summaries | 2 |
+| Geographic Queries | 15 |
+| Maps | 6 |
+| **Total** | **47** |
 
 ## Observable Notebooks Analyzed
 
