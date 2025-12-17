@@ -43,7 +43,6 @@ jobs:
         run: |
           export CHAT_MODEL__TYPE=${{ secrets.CHAT_MODEL__TYPE }}
           export CHAT_MODEL__API_KEY=${{ secrets.CHAT_MODEL__API_KEY }}
-          export JWT_KEY=${{ secrets.TF_VAR_JWT_KEY }}
           uv sync
           uv run python scripts/embed_stac.py
 
