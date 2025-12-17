@@ -26,7 +26,7 @@ from .agent import Agent, Output, create_agent
 from .context import Context
 from .dataset import Dataset
 from .settings import Settings, get_settings
-from .state import BarChartMetadata, MapChartMetadata
+from .state import ChartMetadata, ChartType
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -138,25 +138,16 @@ class GenerateTableResponseMessage(ToolResponseMessage):
     """The sql query used to generate the data"""
 
 
-class GenerateBarChartMetadataResponseMessage(ToolResponseMessage):
-    """The response from generate_bar_chart_metadata"""
+class GenerateChartMetadataResponseMessage(ToolResponseMessage):
+    """The response from generate_chart_metadata"""
 
-    name: str = "generate_bar_chart_metadata"
+    name: str = "generate_chart_metadata"
 
-    bar_chart_metadata: BarChartMetadata | None
-    """The bar chart metadata"""
+    chart_type: ChartType | None
+    """The type of chart (bar, map, or area)"""
 
-    data: str | None
-    """The table data as a JSON string"""
-
-
-class GenerateMapChartMetadataResponseMessage(ToolResponseMessage):
-    """The response from generate_map_chart_metadata"""
-
-    name: str = "generate_map_chart_metadata"
-
-    map_chart_metadata: MapChartMetadata | None
-    """The map chart metadata"""
+    chart_metadata: ChartMetadata | None
+    """The chart metadata"""
 
     data: str | None
     """The table data as a JSON string"""
@@ -193,8 +184,7 @@ def health_check():
     response_model=ToolResponseMessage
     | SelectDatasetResponseMessage
     | GenerateTableResponseMessage
-    | GenerateBarChartMetadataResponseMessage
-    | GenerateMapChartMetadataResponseMessage
+    | GenerateChartMetadataResponseMessage
     | AiResponseMessage
     | OutputResponseMessage,
 )
@@ -296,26 +286,18 @@ def create_response_message(
                     data=artifact.get("data"),
                     sql_query=artifact.get("sql_query"),
                 )
-            case "generate_bar_chart_metadata":
+            case "generate_chart_metadata":
                 artifact = message.artifact or {}
-                return GenerateBarChartMetadataResponseMessage(
+                return GenerateChartMetadataResponseMessage(
                     content=message.content,
                     status=message.status,
                     thread_id=thread_id,
-                    bar_chart_metadata=artifact.get("bar_chart_metadata")
+                    chart_type=artifact.get("chart_type")
                     if isinstance(artifact, dict)
-                    else artifact,
-                    data=artifact.get("data") if isinstance(artifact, dict) else None,
-                )
-            case "generate_map_chart_metadata":
-                artifact = message.artifact or {}
-                return GenerateMapChartMetadataResponseMessage(
-                    content=message.content,
-                    status=message.status,
-                    thread_id=thread_id,
-                    map_chart_metadata=artifact.get("map_chart_metadata")
+                    else None,
+                    chart_metadata=artifact.get("chart_metadata")
                     if isinstance(artifact, dict)
-                    else artifact,
+                    else None,
                     data=artifact.get("data") if isinstance(artifact, dict) else None,
                 )
             case None:
@@ -342,12 +324,13 @@ def create_response_message(
 
 
 def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None:
-    """Mistrail fails when a tool message is followed by a user message.
+    """Models fail when a tool message is followed by a user message.
     Append a short assistant acknowledgement so the next user turn comes
     after an assistant role.
     """
     state = agent.get_state(config)
     messages = list(state.values.get("messages", []))
+
     if messages and isinstance(messages[-1], ToolMessage):
         last_tool = messages[-1]
         acknowledgement = (
@@ -355,5 +338,6 @@ def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None
             if getattr(last_tool, "name", None)
             else "Noted the previous tool result."
         )
-        messages.append(AIMessage(content=acknowledgement))
-        _ = agent.update_state(config, {"messages": messages})
+        _ = agent.update_state(
+            config, {"messages": [AIMessage(content=acknowledgement)]}
+        )

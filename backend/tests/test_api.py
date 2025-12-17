@@ -6,7 +6,7 @@ from pytest import FixtureRequest
 
 import atlas_assistant.api
 from atlas_assistant.dataset import Dataset
-from atlas_assistant.state import BarChartMetadata
+from atlas_assistant.state import BarChartMetadata, MapChartMetadata
 
 
 @pytest.mark.integration
@@ -36,13 +36,14 @@ def message(request: FixtureRequest, dataset: Dataset) -> BaseMessage:
                 name="generate_table",
                 tool_call_id="foo",
             )
-        case "generate_bar_chart_metadata":
+        case "generate_chart_metadata_bar":
             return ToolMessage(
-                name="generate_bar_chart_metadata",
+                name="generate_chart_metadata",
                 tool_call_id="foo",
                 artifact={
                     "data": "{}",
-                    "bar_chart_metadata": BarChartMetadata(
+                    "chart_type": "bar",
+                    "chart_metadata": BarChartMetadata(
                         title="A title",
                         x_column="foo",
                         y_column="bar",
@@ -50,9 +51,24 @@ def message(request: FixtureRequest, dataset: Dataset) -> BaseMessage:
                     ),
                 },
             )
-        case "generate_bar_chart_metadata_error":
+        case "generate_chart_metadata_map":
             return ToolMessage(
-                name="generate_bar_chart_metadata",
+                name="generate_chart_metadata",
+                tool_call_id="foo",
+                artifact={
+                    "data": "{}",
+                    "chart_type": "map",
+                    "chart_metadata": MapChartMetadata(
+                        title="A map title",
+                        id_column="iso3",
+                        value_column="value",
+                        color_scheme="Oranges",
+                    ),
+                },
+            )
+        case "generate_chart_metadata_error":
+            return ToolMessage(
+                name="generate_chart_metadata",
                 tool_call_id="foo",
             )
         case _:
@@ -65,8 +81,9 @@ def message(request: FixtureRequest, dataset: Dataset) -> BaseMessage:
         "select_dataset",
         "generate_table",
         "generate_table_error",
-        "generate_bar_chart_metadata",
-        "generate_bar_chart_metadata_error",
+        "generate_chart_metadata_bar",
+        "generate_chart_metadata_map",
+        "generate_chart_metadata_error",
     ],
     indirect=True,
 )

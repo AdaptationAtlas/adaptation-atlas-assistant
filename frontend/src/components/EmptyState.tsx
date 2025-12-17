@@ -3,13 +3,11 @@ import { ExamplePrompts } from './ExamplePrompts';
 import styles from './EmptyState.module.css';
 
 interface EmptyStateProps {
-    examplePrompts: string[];
     onExampleClick: (prompt: string) => void;
     className?: string;
 }
 
 export function EmptyState({
-    examplePrompts,
     onExampleClick,
     className,
 }: EmptyStateProps) {
@@ -20,10 +18,7 @@ export function EmptyState({
                 description="Discover how climate change will affect agriculture across Africa and explore data-driven solutions to support adaptation strategies."
             />
 
-            <ExamplePrompts
-                prompts={examplePrompts}
-                onExampleClick={onExampleClick}
-            />
+            <ExamplePrompts onExampleClick={onExampleClick} />
         </div>
     );
 }
