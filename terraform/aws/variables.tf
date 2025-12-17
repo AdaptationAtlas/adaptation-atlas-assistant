@@ -90,21 +90,6 @@ variable "api_image_tag" {
   EOT
 }
 
-variable "email_source_arn" {
-  type        = string
-  description = <<-EOT
-  Verified email or domain SES Identity to use for automated Cognito emails
-  EOT
-}
-
-variable "from_email_address" {
-  type        = string
-  default     = "no-reply@ds.io"
-  description = <<-EOT
-  Email From address to use for automated Cognito emails
-  EOT
-}
-
 variable "embeddings_directory" {
   type        = string
   default     = null

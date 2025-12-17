@@ -3,15 +3,12 @@ resource "aws_cognito_user_pool" "atlas_pool" {
 
   auto_verified_attributes = ["email"]
   deletion_protection      = "ACTIVE"
-  mfa_configuration        = "ON"
+  mfa_configuration        = "OPTIONAL"
   username_attributes      = ["email"]
 
-  email_configuration {
-    email_sending_account = "DEVELOPER"
-    source_arn            = var.email_source_arn
-    from_email_address    = var.from_email_address
+  software_token_mfa_configuration {
+    enabled = true
   }
-  email_mfa_configuration {}
 
   admin_create_user_config {
     allow_admin_create_user_only = true
