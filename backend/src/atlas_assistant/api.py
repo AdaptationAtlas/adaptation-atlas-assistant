@@ -8,7 +8,6 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Annotated, Any, Literal
 
-import httpx
 from fastapi import Depends, FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
@@ -215,9 +214,6 @@ async def query_agent(
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
     ensure_messages_ready_for_user(agent, config)
     try:
-        httpx.get(
-            "https://planetarycomputer.microsoft.com/api/stac/v1/search?foo=bar"
-        ).raise_for_status()
         async for update in agent.astream(
             {"messages": [HumanMessage(content=query)]},
             stream_mode="updates",
