@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'
-      - 'terraform/**'
-      - '.github/workflows/backend-deploy.yaml'
+      - "backend/**"
+      - "terraform/**"
+      - ".github/workflows/backend-deploy.yaml"
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
@@ -41,8 +41,8 @@ jobs:
       - name: Run embeddings script
         working-directory: backend
         run: |
-          export MISTRAL_API_KEY=${{ secrets.TF_VAR_MISTRAL_API_KEY }}
-          export JWT_KEY=${{ secrets.TF_VAR_JWT_KEY }}
+          export CHAT_MODEL__TYPE=${{ secrets.CHAT_MODEL__TYPE }}
+          export CHAT_MODEL__API_KEY=${{ secrets.CHAT_MODEL__API_KEY }}
           uv sync
           uv run python scripts/embed_stac.py
 
@@ -68,7 +68,7 @@ jobs:
       - name: Deployment to ECS
         run: |
           aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment > /dev/null
-            
+
       - name: Wait for Service to Stabilize
         run: |
           aws ecs wait services-stable --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} > /dev/null

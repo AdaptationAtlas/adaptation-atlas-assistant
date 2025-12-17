@@ -2,15 +2,14 @@ name: Terraform Workflow
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'terraform/**'
-      - '.github/workflows/terraform.yml'
+      - "terraform/**"
+      - ".github/workflows/terraform.yml"
   pull_request:
     paths:
-      - 'terraform/**'
-      - '.github/workflows/terraform.yml'
-
+      - "terraform/**"
+      - ".github/workflows/terraform.yml"
 
 jobs:
   terraform-plan:
@@ -25,9 +24,8 @@ jobs:
       TF_IN_AUTOMATION: 1
       TF_INPUT: 0
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
-      TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
-      TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
-      TF_VAR_email_source_arn: ${{ vars.TF_VAR_EMAIL_SOURCE_ARN }}
+      TF_VAR_chat_model__type: ${{ secrets.CHAT_MODEL__TYPE }}
+      TF_VAR_chat_model__api_key: ${{ secrets.CHAT_MODEL__API_KEY }}
     defaults:
       run:
         working-directory: terraform/aws
@@ -120,9 +118,8 @@ jobs:
       TF_IN_AUTOMATION: 1
       TF_INPUT: 0
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
-      TF_VAR_mistral_api_key: ${{ secrets.TF_VAR_MISTRAL_API_KEY }}
-      TF_VAR_jwt_key: ${{ secrets.TF_VAR_JWT_KEY }}
-      TF_VAR_email_source_arn: ${{ vars.TF_VAR_EMAIL_SOURCE_ARN }}
+      TF_VAR_chat_model__type: ${{ secrets.CHAT_MODEL__TYPE }}
+      TF_VAR_chat_model__api_key: ${{ secrets.CHAT_MODEL__API_KEY }}
     defaults:
       run:
         working-directory: terraform/aws
