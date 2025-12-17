@@ -122,8 +122,6 @@ jobs:
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
       TF_VAR_chat_model__type: ${{ secrets.CHAT_MODEL__TYPE }}
       TF_VAR_chat_model__api_key: ${{ secrets.CHAT_MODEL__API_KEY }}
-      TF_VAR_jwt_key: ${{ secrets.JWT_KEY }}
-      TF_VAR_email_source_arn: ${{ vars.EMAIL_SOURCE_ARN }}
     defaults:
       run:
         working-directory: terraform/aws
