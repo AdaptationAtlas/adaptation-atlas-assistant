@@ -26,7 +26,6 @@ class MistralConfig(BaseModel):
 
 class Settings(BaseSettings):
     chat_model: MistralConfig | None = Field(default=None, discriminator="type")
-    jwt_key: SecretStr
     embeddings_directory: Path = Path(__file__).parents[2] / "data" / "embeddings"
     stac_catalog_href: str = (
         "https://digital-atlas.s3.amazonaws.com/stac/AtlasV3/catalog.json"
