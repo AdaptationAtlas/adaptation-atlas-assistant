@@ -1,7 +1,7 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-  input: '../../adaptation-atlas-co-pilot/backend/openapi.json',
+  input: '../backend/openapi.json',
 
   output: {
     path: 'src/types/generated',

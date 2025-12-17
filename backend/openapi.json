@@ -85,6 +85,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/OutputResponseMessage"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponseMessage"
                     }
                   ],
                   "title": "Response Chat Chat Post"
@@ -379,6 +382,37 @@
         ],
         "title": "DotPlotMetadata",
         "description": "Data to create a dot plot (scatter plot)"
+      },
+      "ErrorResponseMessage": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "default": "error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "thread_id"
+        ],
+        "title": "ErrorResponseMessage",
+        "description": "An error response"
       },
       "GenerateChartMetadataResponseMessage": {
         "properties": {

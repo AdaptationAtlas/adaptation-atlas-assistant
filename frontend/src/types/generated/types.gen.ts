@@ -180,6 +180,26 @@ export type DotPlotMetadata = {
 };
 
 /**
+ * ErrorResponseMessage
+ *
+ * An error response
+ */
+export type ErrorResponseMessage = {
+    /**
+     * Content
+     */
+    content: string | null;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: string;
+};
+
+/**
  * GenerateChartMetadataResponseMessage
  *
  * The response from generate_chart_metadata
@@ -562,7 +582,7 @@ export type ChatChatPostResponses = {
      *
      * Successful Response
      */
-    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage;
+    200: ToolResponseMessage | SelectDatasetResponseMessage | GenerateTableResponseMessage | GenerateChartMetadataResponseMessage | AiResponseMessage | OutputResponseMessage | ErrorResponseMessage;
 };
 
 export type ChatChatPostResponse = ChatChatPostResponses[keyof ChatChatPostResponses];

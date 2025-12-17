@@ -8,19 +8,19 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Annotated, Any, Literal
 
+import httpx
 from fastapi import Depends, FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from fastapi.security import (
     OpenIdConnect,
 )
+from httpx import HTTPStatusError
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-from langgraph.errors import GraphRecursionError
 from langgraph.graph.message import BaseMessage
 from langgraph.graph.state import RunnableConfig
 from pydantic import BaseModel
-from starlette import status
 
 from .agent import Agent, Output, create_agent
 from .context import Context
@@ -163,14 +163,10 @@ class AiResponseMessage(ResponseMessage):
     """The reason why the agent stopped"""
 
 
-class Error(BaseModel):
+class ErrorResponseMessage(ResponseMessage):
     """An error response"""
 
-    type: str
-    """The type of the error"""
-
-    message: str
-    """The error message"""
+    type: str = "error"
 
 
 @app.get("/health")
@@ -186,7 +182,8 @@ def health_check():
     | GenerateTableResponseMessage
     | GenerateChartMetadataResponseMessage
     | AiResponseMessage
-    | OutputResponseMessage,
+    | OutputResponseMessage
+    | ErrorResponseMessage,
 )
 async def chat(
     request: Request,
@@ -204,16 +201,6 @@ async def chat(
     )
 
 
-@app.exception_handler(GraphRecursionError)
-async def graph_recursion_handler(
-    _request: Request, exc: GraphRecursionError
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content=Error(message=str(exc), type="graph recursion"),
-    )
-
-
 async def query_agent(
     agent: Agent,
     query: str,
@@ -227,21 +214,32 @@ async def query_agent(
     """
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
     ensure_messages_ready_for_user(agent, config)
-    async for update in agent.astream(
-        {"messages": [HumanMessage(content=query)]},
-        stream_mode="updates",
-        config=config,
-        context=Context(settings=settings),
-    ):
-        for value in update.values():
-            if messages := value.get("messages"):
-                for msg in messages:
-                    response_message = maybe_create_response_message(msg, thread_id)
-                    if response_message:
-                        if event_stream:
-                            yield response_message.to_event_stream() + "\n\n"
-                        else:
-                            yield response_message.model_dump_json() + "\n"
+    try:
+        httpx.get(
+            "https://planetarycomputer.microsoft.com/api/stac/v1/search?foo=bar"
+        ).raise_for_status()
+        async for update in agent.astream(
+            {"messages": [HumanMessage(content=query)]},
+            stream_mode="updates",
+            config=config,
+            context=Context(settings=settings),
+        ):
+            for value in update.values():
+                if messages := value.get("messages"):
+                    for msg in messages:
+                        response_message = maybe_create_response_message(msg, thread_id)
+                        if response_message:
+                            if event_stream:
+                                yield response_message.to_event_stream() + "\n\n"
+                            else:
+                                yield response_message.model_dump_json() + "\n"
+    except HTTPStatusError as e:
+        logging.error(f"HTTP error occurred: {e}")
+        response_message = ErrorResponseMessage(content=str(e), thread_id=thread_id)
+        if event_stream:
+            yield response_message.to_event_stream() + "\n\n"
+        else:
+            yield response_message.model_dump_json() + "\n"
 
 
 def maybe_create_response_message(
