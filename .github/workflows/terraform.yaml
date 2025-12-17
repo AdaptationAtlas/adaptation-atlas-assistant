@@ -25,6 +25,7 @@ jobs:
       TF_INPUT: 0
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
       TF_VAR_chat_model__type: ${{ vars.CHAT_MODEL__TYPE }}
+      TF_VAR_chat_model__size: ${{ vars.CHAT_MODEL__SIZE }}
       TF_VAR_chat_model__api_key: ${{ secrets.CHAT_MODEL__API_KEY }}
     defaults:
       run:
@@ -119,6 +120,7 @@ jobs:
       TF_INPUT: 0
       TFVARS_FILE: ${{ vars.TFVARS_FILE || 'tfvars/dev.tfvars' }}
       TF_VAR_chat_model__type: ${{ vars.CHAT_MODEL__TYPE }}
+      TF_VAR_chat_model__size: ${{ vars.CHAT_MODEL__SIZE }}
       TF_VAR_chat_model__api_key: ${{ secrets.CHAT_MODEL__API_KEY }}
     defaults:
       run:
