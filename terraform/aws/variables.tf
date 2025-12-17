@@ -63,16 +63,6 @@ variable "chat_model__size" {
   EOT
 }
 
-variable "jwt_key" {
-  type        = string
-  default     = ""
-  sensitive   = true
-  ephemeral   = true
-  description = <<-EOT
-  API key
-  EOT
-}
-
 variable "cors_origins" {
   type        = string
   default     = "[]"

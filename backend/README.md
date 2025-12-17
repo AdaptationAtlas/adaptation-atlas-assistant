@@ -6,7 +6,6 @@ Get [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 ```sh
 cp .env.example .env
 # Set your API key in .env
-echo JWT_KEY=$(openssl rand -hex 32) >> .env
 uv run python scripts/embed_stac.py
 uv run chainlit run chainlit/app.py -w
 ```
