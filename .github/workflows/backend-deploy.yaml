@@ -41,7 +41,7 @@ jobs:
       - name: Run embeddings script
         working-directory: backend
         run: |
-          export CHAT_MODEL__TYPE=${{ secrets.CHAT_MODEL__TYPE }}
+          export CHAT_MODEL__TYPE=${{ vars.CHAT_MODEL__TYPE }}
           export CHAT_MODEL__API_KEY=${{ secrets.CHAT_MODEL__API_KEY }}
           uv sync
           uv run python scripts/embed_stac.py
