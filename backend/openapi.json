@@ -402,6 +402,7 @@
           },
           "type": {
             "type": "string",
+            "const": "error",
             "title": "Type",
             "default": "error"
           }

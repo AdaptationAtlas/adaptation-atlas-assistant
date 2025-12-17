@@ -196,7 +196,7 @@ export type ErrorResponseMessage = {
     /**
      * Type
      */
-    type?: string;
+    type?: 'error';
 };
 
 /**

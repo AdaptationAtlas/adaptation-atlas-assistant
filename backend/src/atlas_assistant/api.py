@@ -165,7 +165,7 @@ class AiResponseMessage(ResponseMessage):
 class ErrorResponseMessage(ResponseMessage):
     """An error response"""
 
-    type: str = "error"
+    type: Literal["error"] = "error"
 
 
 @app.get("/health")
