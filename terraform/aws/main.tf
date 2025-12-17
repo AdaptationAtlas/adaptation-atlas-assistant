@@ -16,7 +16,6 @@ locals {
     CHAT_MODEL__TYPE     = var.chat_model__type
     CHAT_MODEL__API_KEY  = var.chat_model__api_key
     CHAT_MODEL__SIZE     = var.chat_model__size
-    JWT_KEY              = var.jwt_key
     CORS_ORIGINS         = var.cors_origins
     OIDC_URL             = aws_cognito_user_pool.atlas_pool.endpoint
     OAUTH_CLIENT_ID      = aws_cognito_user_pool_client.atlas_pool_client.id
