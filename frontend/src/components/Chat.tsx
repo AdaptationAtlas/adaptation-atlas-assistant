@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
-import { sendChatMessage, createStreamController } from '../api';
+import { sendChatMessage, createStreamController, getSuggestions } from '../api';
 import { useChatStore } from '../store/chatStore';
 import { contextTagsToText } from '../utils/tagFormatting';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
@@ -98,9 +98,12 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
 
 export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const { isAuthenticated, removeUser } = useAuth();
     const abortRef = useRef<(() => void) | null>(null);
     const isAbortingRef = useRef(false);
+    const suggestionsAbortRef = useRef<AbortController | null>(null);
 
     // Chat store - includes chat state and sidebar state
     const {
@@ -119,6 +122,49 @@ export function Chat() {
 
     // Convert sidebar state to context tags
     const contextTags = sidebarToContextTags(sidebar);
+    const contextText = contextTagsToText(contextTags);
+
+    const hasStartedChat = events.length > 0;
+
+    useEffect(() => {
+        if (hasStartedChat) {
+            return;
+        }
+
+        if (suggestionsAbortRef.current) {
+            suggestionsAbortRef.current.abort();
+        }
+
+        if (!contextText) {
+            setSuggestions([]);
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            setIsLoadingSuggestions(true);
+            const abortController = new AbortController();
+            suggestionsAbortRef.current = abortController;
+
+            try {
+                const result = await getSuggestions(contextText, abortController.signal);
+                if (!abortController.signal.aborted) {
+                    setSuggestions(result);
+                }
+            } catch (error) {
+                if (error instanceof Error && error.name !== 'AbortError') {
+                    console.error('Failed to fetch suggestions:', error);
+                }
+            } finally {
+                if (!abortController.signal.aborted) {
+                    setIsLoadingSuggestions(false);
+                }
+            }
+        }, 500);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [contextText, hasStartedChat]);
 
     const handlePromptSubmit = useCallback(async (value: string) => {
         if (!value.trim()) return;
@@ -232,11 +278,14 @@ export function Chat() {
             />
 
             <main className={styles.mainContent}>
-                <div className={styles.contentArea}>
-                    {status === 'idle' && (
-                        <EmptyState onExampleClick={handleExampleClick} />
-                    )}
-
+                {status === 'idle' && (
+                    <EmptyState
+                        onExampleClick={handleExampleClick}
+                        suggestions={suggestions.length > 0 ? suggestions : undefined}
+                        isLoadingSuggestions={isLoadingSuggestions}
+                    />
+                )}
+                <div>
                     {status !== 'idle' && (
                         <ChatResponse
                             events={events}
