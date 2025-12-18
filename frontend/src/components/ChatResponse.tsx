@@ -1155,6 +1155,8 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                     className={styles.reasoningDropdown}
                                     open={stepsOpen}
                                     onToggle={(e) => {
+                                        // Only handle toggle events from this element, not bubbled from nested details
+                                        if (e.target !== e.currentTarget) return;
                                         const next = new Set(openSteps);
                                         if ((e.target as HTMLDetailsElement).open) {
                                             next.add(turnIndex);
@@ -1174,6 +1176,8 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                                                     className={styles.moreSteps}
                                                     open={moreOpen}
                                                     onToggle={(e) => {
+                                                        // Only handle toggle events from this element, not bubbled from nested details
+                                                        if (e.target !== e.currentTarget) return;
                                                         const next = new Set(openMore);
                                                         if ((e.target as HTMLDetailsElement).open) {
                                                             next.add(turnIndex);
