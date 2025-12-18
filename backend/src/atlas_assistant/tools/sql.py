@@ -3,7 +3,6 @@ from typing import cast
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
 from langgraph.types import Command
-from mistralai import Mistral
 from pydantic import BaseModel
 
 from ..context import Context
@@ -66,16 +65,8 @@ def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[
         )
 
     settings = runtime.context.settings
-    assert settings.mistral_api_key
-    client = Mistral(
-        api_key=(
-            settings.mistral_api_key.get_secret_value()
-            if settings.mistral_api_key
-            else None
-        )
-    )
-    response = client.chat.parse(
-        model="codestral-latest",
+    client = settings.get_code_client()
+    sql_query_parts = client.chat(
         messages=[
             {
                 "role": "system",
@@ -85,9 +76,6 @@ def generate_table(query: str, runtime: ToolRuntime[Context, State]) -> Command[
         ],
         response_format=SqlQueryParts,
     )
-    assert response.choices and response.choices[0] and response.choices[0].message
-    sql_query_parts = response.choices[0].message.parsed
-    assert sql_query_parts
     sql_query = sql_query_parts.get_query(dataset.asset.href)
 
     import duckdb

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowUpIcon } from '../assets/icons';
+import { ArrowUpIcon, StopIcon } from '../assets/icons';
 import { Pill } from './Pill';
 import styles from './PromptBox.module.css';
 import type { PromptContextTag } from '../types/sidebar';
@@ -9,6 +9,8 @@ interface PromptBoxProps {
     onSubmit?: (value: string) => void;
     context?: PromptContextTag[];
     onRemoveTag?: (tagId: string) => void;
+    isStreaming?: boolean;
+    onAbort?: () => void;
 }
 
 export function PromptBox({
@@ -16,12 +18,14 @@ export function PromptBox({
     onSubmit,
     context,
     onRemoveTag,
+    isStreaming = false,
+    onAbort,
 }: PromptBoxProps) {
     const [value, setValue] = useState('');
     const [focused, setFocused] = useState(false);
 
     const handleSubmit = () => {
-        if (value.trim() && onSubmit) {
+        if (value.trim() && onSubmit && !isStreaming) {
             onSubmit(value);
             setValue('');
         }
@@ -66,14 +70,24 @@ export function PromptBox({
                         </div>
                     )}
 
-                    <button
-                        className={`${styles.submitBtn} ${!value.trim() ? styles.disabled : ''}`}
-                        onClick={handleSubmit}
-                        disabled={!value.trim()}
-                        aria-label="Submit prompt"
-                    >
-                        <ArrowUpIcon className={styles.submitIcon} />
-                    </button>
+                    {isStreaming ? (
+                        <button
+                            className={`${styles.submitBtn} ${styles.abortBtn}`}
+                            onClick={onAbort}
+                            aria-label="Stop generating"
+                        >
+                            <StopIcon className={styles.submitIcon} />
+                        </button>
+                    ) : (
+                        <button
+                            className={`${styles.submitBtn} ${!value.trim() ? styles.disabled : ''}`}
+                            onClick={handleSubmit}
+                            disabled={!value.trim()}
+                            aria-label="Submit prompt"
+                        >
+                            <ArrowUpIcon className={styles.submitIcon} />
+                        </button>
+                    )}
                 </div>
             </div>
 

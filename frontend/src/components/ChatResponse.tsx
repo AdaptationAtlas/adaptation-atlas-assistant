@@ -1049,6 +1049,9 @@ function BeeswarmArtifactWithControls({ data, metadata, rawData }: BeeswarmArtif
 }
 
 export function ChatResponse({ events, status, onSuggestionClick }: ChatResponseProps) {
+    const [openSteps, setOpenSteps] = useState<Set<number>>(() => new Set());
+    const [openMore, setOpenMore] = useState<Set<number>>(() => new Set());
+
     interface ConversationTurn {
         userMessages: typeof events;
         intermediateMessages: typeof events;
@@ -1122,14 +1125,6 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         }
     });
 
-    const getSummaryText = () => {
-        if (status === 'streaming') {
-            return `Working...`;
-        } else {
-            return 'View steps';
-        }
-    };
-
     return (
         <>
             {conversationTurns.map((turn, turnIndex) => (
@@ -1146,39 +1141,101 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
                     {/* Render intermediate messages (reasoning/tool calls) */}
                     {(() => {
+                        const isStreamingThisTurn = status === 'streaming' && turnIndex === conversationTurns.length - 1;
                         const toolCallMessages = turn.intermediateMessages.filter((event) => !isOutputToolEvent(event));
 
-                        if (toolCallMessages.length === 0) return null;
+                        if (!isStreamingThisTurn && toolCallMessages.length === 0) return null;
+
+                        const stepsOpen = isStreamingThisTurn || openSteps.has(turnIndex);
+                        const moreOpen = openMore.has(turnIndex);
 
                         return (
-                            <details className={styles.reasoningDropdown}>
-                                <summary className={styles.reasoningSummary}>
-                                    {getSummaryText()}
-                                </summary>
-                                <div className={styles.reasoningContent}>
-                                    {toolCallMessages.map((event, index) => {
-                                        const messageId = event.id || `intermediate-${turnIndex}-${index}`;
-
-                                        return (
-                                            <div key={messageId} className={styles.intermediateMessage}>
-                                                {'error' in event ? (
-                                                    <div>Error: {event.error}</div>
-                                                ) : (
-                                                    <details>
-                                                        <summary className={styles.toolSummary}>
-                                                            {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
-                                                        </summary>
-                                                        <div className={styles.toolContent}>
-                                                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
-                                                            <CopyButton content={event.content ?? ''} />
-                                                        </div>
-                                                    </details>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </details>
+                            <div className={styles.loadingBlock}>
+                                <details
+                                    className={styles.reasoningDropdown}
+                                    open={stepsOpen}
+                                    onToggle={(e) => {
+                                        const next = new Set(openSteps);
+                                        if ((e.target as HTMLDetailsElement).open) {
+                                            next.add(turnIndex);
+                                        } else {
+                                            next.delete(turnIndex);
+                                        }
+                                        setOpenSteps(next);
+                                    }}
+                                >
+                                    <summary className={styles.reasoningSummary}>
+                                        {isStreamingThisTurn ? <span className={styles.shimmer}>Working...</span> : stepsOpen ? 'Hide steps' : 'View steps'}
+                                    </summary>
+                                    {toolCallMessages.length > 0 && (
+                                        <div className={styles.reasoningContent}>
+                                            {toolCallMessages.length > 3 && (
+                                                <details
+                                                    className={styles.moreSteps}
+                                                    open={moreOpen}
+                                                    onToggle={(e) => {
+                                                        const next = new Set(openMore);
+                                                        if ((e.target as HTMLDetailsElement).open) {
+                                                            next.add(turnIndex);
+                                                        } else {
+                                                            next.delete(turnIndex);
+                                                        }
+                                                        setOpenMore(next);
+                                                    }}
+                                                >
+                                                    <summary className={styles.moreStepsSummary}>{moreOpen ? 'Hide additional steps' : 'Show more steps'}</summary>
+                                                    <div className={styles.moreStepsContent}>
+                                                        {toolCallMessages.slice(0, -3).map((event, index) => {
+                                                            const messageId = event.id || `intermediate-${turnIndex}-${index}`;
+                                                            return (
+                                                                <div key={messageId} className={styles.stepItem}>
+                                                                    {'error' in event ? (
+                                                                        <div>Error: {event.error}</div>
+                                                                    ) : (
+                                                                        <>
+                                                                        <details>
+                                                                            <summary className={styles.toolSummary}>
+                                                                                {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                                            </summary>
+                                                                            <div className={styles.toolContent}>
+                                                                                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
+                                                                                <CopyButton content={event.content ?? ''} />
+                                                                            </div>
+                                                                        </details>
+                                                                        <div className={styles.stepDivider} />
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </details>
+                                            )}
+                                            {toolCallMessages.slice(-3).map((event, index, arr) => {
+                                                const messageId = event.id || `intermediate-${turnIndex}-${toolCallMessages.length - 3 + index}`;
+                                                return (
+                                                    <div key={messageId} className={styles.stepItem}>
+                                                        {'error' in event ? (
+                                                            <div>Error: {event.error}</div>
+                                                        ) : (
+                                                            <details>
+                                                                <summary className={styles.toolSummary}>
+                                                                    {event.type === 'tool' ? `Tool: ${event.name}` : 'AI'}
+                                                                </summary>
+                                                                <div className={styles.toolContent}>
+                                                                    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{event.content ?? ''}</ReactMarkdown>
+                                                                    <CopyButton content={event.content ?? ''} />
+                                                                </div>
+                                                            </details>
+                                                        )}
+                                                        {index < arr.length - 1 && <div className={styles.stepDivider} />}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </details>
+                            </div>
                         );
                     })()}
 
@@ -1269,6 +1326,15 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
 
                         return null;
                     })}
+
+                    {/* Skeleton at bottom while streaming */}
+                    {status === 'streaming' && turnIndex === conversationTurns.length - 1 && (
+                        <div className={styles.skeletonGroup}>
+                            <div className={styles.skeleton} />
+                            <div className={styles.skeleton} />
+                            <div className={styles.skeleton} />
+                        </div>
+                    )}
 
                     {/* Render final message (AI or Output) */}
                     {(() => {

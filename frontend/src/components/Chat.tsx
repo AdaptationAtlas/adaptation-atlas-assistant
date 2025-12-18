@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { sendChatMessage, createStreamController } from '../api';
 import { useChatStore } from '../store/chatStore';
@@ -7,7 +7,11 @@ import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
 import { ChatResponse } from './ChatResponse';
-import { SIDEBAR_SECTIONS, EXPOSURE_UNITS, ADAPTIVE_CAPACITY_UNITS } from '../constants/sidebar';
+import {
+    SIDEBAR_SECTIONS,
+    EXPOSURE_UNITS,
+    ADAPTIVE_CAPACITY_UNITS,
+} from '../constants/sidebar';
 import type { SidebarState, PromptContextTag } from '../types/sidebar';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
@@ -51,7 +55,8 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     exposureTypes.forEach((type) => {
         const exposure = sidebar.exposure[type];
         if (exposure.name !== 'None') {
-            const hasRange = exposure.rangeMin !== null && exposure.rangeMax !== null;
+            const hasRange =
+                exposure.rangeMin !== null && exposure.rangeMax !== null;
             const unit = EXPOSURE_UNITS[type];
             const label = hasRange
                 ? `${exposure.name}: ${exposure.rangeMin}-${exposure.rangeMax} ${unit}`
@@ -71,13 +76,17 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     }
 
     if (sidebar.adaptiveCapacity.name !== 'None') {
-        const hasRange = sidebar.adaptiveCapacity.rangeMin !== null && sidebar.adaptiveCapacity.rangeMax !== null;
-        const unit = ADAPTIVE_CAPACITY_UNITS[sidebar.adaptiveCapacity.name] || '';
-        const label = hasRange && unit
-            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax} ${unit}`
-            : hasRange
-            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax}`
-            : sidebar.adaptiveCapacity.name;
+        const hasRange =
+            sidebar.adaptiveCapacity.rangeMin !== null &&
+            sidebar.adaptiveCapacity.rangeMax !== null;
+        const unit =
+            ADAPTIVE_CAPACITY_UNITS[sidebar.adaptiveCapacity.name] || '';
+        const label =
+            hasRange && unit
+                ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax} ${unit}`
+                : hasRange
+                  ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax}`
+                  : sidebar.adaptiveCapacity.name;
         tags.push({
             id: 'capacity-layer',
             label,
@@ -89,7 +98,9 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
 
 export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
-      const { isAuthenticated, removeUser } = useAuth();
+    const { isAuthenticated, removeUser } = useAuth();
+    const abortRef = useRef<(() => void) | null>(null);
+    const isAbortingRef = useRef(false);
 
     // Chat store - includes chat state and sidebar state
     const {
@@ -121,6 +132,8 @@ export function Chat() {
         startStreaming(value);
 
         const controller = createStreamController();
+        abortRef.current = controller.abort;
+        isAbortingRef.current = false;
 
         try {
             await sendChatMessage(queryWithContext, threadId, {
@@ -136,6 +149,10 @@ export function Chat() {
                     });
                 },
                 onError: (error) => {
+                    // Don't show error if user intentionally cancelled
+                    if (isAbortingRef.current) {
+                        return;
+                    }
                     setError(error.message);
                 },
                 onComplete: () => {
@@ -153,12 +170,28 @@ export function Chat() {
         handlePromptSubmit(prompt);
     };
 
+    const handleAbort = useCallback(() => {
+        if (abortRef.current) {
+            isAbortingRef.current = true;
+            abortRef.current();
+            abortRef.current = null;
+            addEvent({
+                type: 'ai',
+                content: '*Response stopped*',
+                thread_id: threadId || '',
+                finish_reason: 'cancelled',
+                id: `cancelled-${Date.now()}`,
+                timestamp: Date.now(),
+            });
+            finishStreaming();
+        }
+    }, [addEvent, finishStreaming, threadId]);
+
     const handleAvatarClick = () => {
         if (isAuthenticated) {
             removeUser();
         }
     };
-
 
     return (
         <div className="relative flex h-screen w-full overflow-hidden bg-white">
@@ -199,21 +232,27 @@ export function Chat() {
             />
 
             <main className={styles.mainContent}>
-                {status === 'idle' && (
-                    <EmptyState onExampleClick={handleExampleClick} />
-                )}
+                <div className={styles.contentArea}>
+                    {status === 'idle' && (
+                        <EmptyState onExampleClick={handleExampleClick} />
+                    )}
 
-                {status !== 'idle' && (
-                    <div className={styles.contentArea}>
-                        <ChatResponse events={events} status={status} onSuggestionClick={handlePromptSubmit} />
-                    </div>
-                )}
+                    {status !== 'idle' && (
+                        <ChatResponse
+                            events={events}
+                            status={status}
+                            onSuggestionClick={handlePromptSubmit}
+                        />
+                    )}
+                </div>
 
                 <div className={styles.promptContainer}>
                     <PromptBox
                         onSubmit={handlePromptSubmit}
                         context={contextTags}
                         onRemoveTag={removeTag}
+                        isStreaming={status === 'streaming'}
+                        onAbort={handleAbort}
                     />
                 </div>
             </main>
