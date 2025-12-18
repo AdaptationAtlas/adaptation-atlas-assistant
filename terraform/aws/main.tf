@@ -12,7 +12,7 @@ locals {
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   container_port = 8000
-  env = {
+  application_env = {
     CHAT_MODEL__TYPE     = var.chat_model__type
     CHAT_MODEL__API_KEY  = var.chat_model__api_key
     CHAT_MODEL__SIZE     = var.chat_model__size
