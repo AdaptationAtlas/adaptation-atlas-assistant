@@ -10,6 +10,7 @@ interface ExamplePromptsProps {
     className?: string;
     count?: number;
     showRefresh?: boolean;
+    isLoading?: boolean;
 }
 
 export function ExamplePrompts({
@@ -18,6 +19,7 @@ export function ExamplePrompts({
     className,
     count = 3,
     showRefresh = true,
+    isLoading = false,
 }: ExamplePromptsProps) {
     const [randomPrompts, setRandomPrompts] = useState<Prompt[]>(() =>
         providedPrompts ? [] : getRandomPrompts(count)
@@ -45,9 +47,9 @@ export function ExamplePrompts({
             <div className={styles.examplesDivider}>
                 <div className={styles.dividerLine} />
                 <span className={styles.dividerText}>
-                    {providedPrompts ? 'You might also ask...' : 'Try asking about...'}
+                    {isLoading ? 'Loading suggestions...' : providedPrompts ? 'You might also ask...' : 'Try asking about...'}
                 </span>
-                {shouldShowRefresh && (
+                {shouldShowRefresh && !isLoading && (
                     <button
                         className={styles.refreshButton}
                         onClick={handleRefresh}
@@ -61,18 +63,32 @@ export function ExamplePrompts({
             </div>
 
             <div className={styles.examplesList}>
-                {displayPrompts.map((prompt) => (
-                    <Button
-                        key={prompt.id}
-                        onClick={() => onExampleClick(getPromptDisplayText(prompt))}
-                        icon={<MagicWandIcon />}
-                        hoverSlide={true}
-                        italic={true}
-                        align="left"
-                    >
-                        {getPromptDisplayText(prompt)}
-                    </Button>
-                ))}
+                {isLoading ? (
+                    <>
+                        <Button icon={<MagicWandIcon />} italic={true} align="left">
+                            <span className={styles.skeletonText} style={{ width: '280px' }} />
+                        </Button>
+                        <Button icon={<MagicWandIcon />} italic={true} align="left">
+                            <span className={styles.skeletonText} style={{ width: '320px' }} />
+                        </Button>
+                        <Button icon={<MagicWandIcon />} italic={true} align="left">
+                            <span className={styles.skeletonText} style={{ width: '260px' }} />
+                        </Button>
+                    </>
+                ) : (
+                    displayPrompts.map((prompt) => (
+                        <Button
+                            key={prompt.id}
+                            onClick={() => onExampleClick(getPromptDisplayText(prompt))}
+                            icon={<MagicWandIcon />}
+                            hoverSlide={true}
+                            italic={true}
+                            align="left"
+                        >
+                            {getPromptDisplayText(prompt)}
+                        </Button>
+                    ))
+                )}
             </div>
         </div>
     );
