@@ -5,7 +5,6 @@
 import shutil
 from pathlib import Path
 
-import dotenv
 import pystac
 from langchain_chroma import Chroma
 from langchain_mistralai import MistralAIEmbeddings
@@ -15,11 +14,9 @@ from atlas_assistant.dataset import Dataset, Item
 from atlas_assistant.settings import get_settings
 
 settings = get_settings()
-_ = dotenv.load_dotenv()
 
 ROOT = Path(__file__).parents[1]
-DATA_DIRECTORY = ROOT / "data"
-EMBEDDINGS_DIRECTORY = DATA_DIRECTORY / "embeddings"
+EMBEDDINGS_DIRECTORY = ROOT / settings.embeddings_directory
 
 texts = []
 metadatas = []
@@ -42,8 +39,11 @@ print(f"Found {len(texts)} items")
 
 if EMBEDDINGS_DIRECTORY.exists():
     shutil.rmtree(EMBEDDINGS_DIRECTORY)
-
-embedding = MistralAIEmbeddings(model="mistral-embed")
+if settings.chat_model is None:
+    raise ValueError("Chat model is not configured")
+embedding = MistralAIEmbeddings(
+    model="mistral-embed", api_key=settings.chat_model.api_key
+)
 _ = Chroma.from_texts(
     texts=texts,
     metadatas=metadatas,
