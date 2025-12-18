@@ -13,6 +13,7 @@ import type {
     BarChartMetadata,
     BeeswarmChartMetadata,
     DotPlotMetadata,
+    ErrorResponseMessage,
     GenerateChartMetadataResponseMessage,
     HeatmapChartMetadata,
     LineChartMetadata,
@@ -38,6 +39,12 @@ function isAiMessage(event: StreamEvent | null): event is AiResponseMessage & { 
     if (!event) return false;
     if ('error' in event) return false;
     return event.type === 'ai';
+}
+
+function isErrorMessage(event: StreamEvent | null): event is ErrorResponseMessage & { id?: string; timestamp?: number } {
+    if (!event) return false;
+    if ('error' in event) return false;
+    return event.type === 'error';
 }
 
 function isGenerateChartMetadataMessage(event: StreamEvent): event is GenerateChartMetadataResponseMessage & { id?: string; timestamp?: number } {
@@ -1087,6 +1094,8 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
             currentTurn.intermediateMessages.push(event);
         } else if (!('error' in event) && event.type === 'tool') {
             currentTurn.intermediateMessages.push(event);
+        } else if (!('error' in event) && event.type === 'error') {
+            currentTurn.intermediateMessages.push(event);
         }
     });
 
@@ -1104,7 +1113,7 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
         let lastFinalMessageIdx = -1;
         for (let i = turn.intermediateMessages.length - 1; i >= 0; i--) {
             const msg = turn.intermediateMessages[i];
-            if (!('error' in msg) && (msg.type === 'ai' || msg.type === 'output')) {
+            if (!('error' in msg) && (msg.type === 'ai' || msg.type === 'output' || msg.type === 'error')) {
                 lastFinalMessageIdx = i;
                 break;
             }
@@ -1354,6 +1363,20 @@ export function ChatResponse({ events, status, onSuggestionClick }: ChatResponse
                             return (
                                 <div className={styles.aiMessage}>
                                     <div className={styles.aiContent}>
+                                        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+                                            {turn.finalAiMessage.content ?? ''}
+                                        </ReactMarkdown>
+                                    </div>
+                                    <div className={styles.copyRow}>
+                                        <CopyButton content={turn.finalAiMessage.content ?? ''} />
+                                    </div>
+                                </div>
+                            );
+                        }
+                        if (isErrorMessage(turn.finalAiMessage)) {
+                            return (
+                                <div className={styles.errorMessage}>
+                                    <div className={styles.errorContent}>
                                         <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                                             {turn.finalAiMessage.content ?? ''}
                                         </ReactMarkdown>

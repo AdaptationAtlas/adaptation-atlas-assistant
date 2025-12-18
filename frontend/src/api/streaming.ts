@@ -8,6 +8,7 @@ import type {
   SelectDatasetResponseMessage,
   GenerateTableResponseMessage,
   GenerateChartMetadataResponseMessage,
+  ErrorResponseMessage,
   OutputResponseMessage,
 } from '../types/generated';
 
@@ -17,6 +18,7 @@ export type ChatMessage =
   | SelectDatasetResponseMessage
   | GenerateTableResponseMessage
   | GenerateChartMetadataResponseMessage
+  | ErrorResponseMessage
   | OutputResponseMessage;
 
 export interface StreamOptions {
