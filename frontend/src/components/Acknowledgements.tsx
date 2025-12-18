@@ -17,7 +17,7 @@ export function Acknowledgements({ className }: AcknowledgementsProps) {
 
             <div className={styles.logoContainer}>
                 <img
-                    src="/data/image.png"
+                    src={`${import.meta.env.BASE_URL}data/image.png`}
                     alt="CGIAR Climate Action"
                     className={styles.logo}
                 />
