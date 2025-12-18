@@ -4,7 +4,6 @@ from collections.abc import Callable
 from langchain.tools import ToolRuntime, tool
 from langchain_core.messages import ToolMessage
 from langgraph.types import Command
-from mistralai import Mistral
 from pydantic import BaseModel
 
 from ..context import Context
@@ -298,15 +297,8 @@ def generate_chart_metadata(
     metadata_class, prompt_func = CHART_REGISTRY[chart_type]
 
     settings = runtime.context.settings
-    client = Mistral(
-        api_key=(
-            settings.mistral_api_key.get_secret_value()
-            if settings.mistral_api_key
-            else None
-        )
-    )
-    response = client.chat.parse(
-        model="codestral-latest",
+    client = settings.get_code_client()
+    chart_metadata = client.chat(
         messages=[
             {
                 "role": "system",
@@ -315,11 +307,6 @@ def generate_chart_metadata(
         ],
         response_format=metadata_class,
     )
-    assert response.choices and response.choices[0] and response.choices[0].message
-    parsed = response.choices[0].message.parsed
-    assert parsed
-    # Cast is safe because we pass the specific metadata_class to response_format
-    chart_metadata = parsed  # type: ignore[assignment]
 
     return Command(
         update={
