@@ -54,7 +54,7 @@ module "ecs" {
           ]
           readonlyRootFilesystem = false
           secrets = [
-            for k in keys(local.env) :
+            for k in keys(local.application_env) :
             {
               name      = k
               valueFrom = join(":", [aws_secretsmanager_secret.backend_secrets.arn, "${k}::"])

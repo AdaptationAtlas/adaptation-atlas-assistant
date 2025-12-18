@@ -5,7 +5,7 @@
 .examplesDivider {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 12px;
     margin-bottom: 32px;
 }
 
@@ -27,8 +27,56 @@
     white-space: nowrap;
 }
 
+.refreshButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #656e7b;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.15s ease, background-color 0.15s ease, transform 0.2s ease;
+}
+
+.refreshButton:hover {
+    color: #2e7636;
+    background-color: rgba(46, 118, 54, 0.08);
+}
+
+.refreshButton:active {
+    transform: rotate(180deg);
+}
+
+.refreshIcon {
+    width: 16px;
+    height: 16px;
+}
+
 .examplesList {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.skeletonText {
+    display: inline-block;
+    height: 1em;
+    background: linear-gradient(90deg, #e0e0e0 25%, #d0d0d0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }

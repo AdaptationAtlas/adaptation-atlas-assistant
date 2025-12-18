@@ -5,6 +5,7 @@
   border: 1px solid #2E7636;
   color: #2E7636;
   padding: 0px 5px 0px 5px;
+  text-wrap: auto;
 }
 
 .button:hover {

@@ -1,17 +1,20 @@
 import { HeroSection } from './HeroSection';
 import { ExamplePrompts } from './ExamplePrompts';
+import { Acknowledgements } from './Acknowledgements';
 import styles from './EmptyState.module.css';
 
 interface EmptyStateProps {
-    examplePrompts: string[];
     onExampleClick: (prompt: string) => void;
     className?: string;
+    suggestions?: string[];
+    isLoadingSuggestions?: boolean;
 }
 
 export function EmptyState({
-    examplePrompts,
     onExampleClick,
     className,
+    suggestions,
+    isLoadingSuggestions,
 }: EmptyStateProps) {
     return (
         <div className={`${styles.emptyState} ${className || ''}`}>
@@ -21,9 +24,14 @@ export function EmptyState({
             />
 
             <ExamplePrompts
-                prompts={examplePrompts}
                 onExampleClick={onExampleClick}
+                prompts={suggestions}
+                showRefresh={!suggestions}
+                isLoading={isLoadingSuggestions}
             />
+
+            <Acknowledgements />
+
         </div>
     );
 }

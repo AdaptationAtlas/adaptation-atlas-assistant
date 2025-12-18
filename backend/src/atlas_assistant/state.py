@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from langchain.agents import AgentState
 from pydantic import BaseModel
 
 from .dataset import Dataset
+
+# Chart type literals - add new chart types here
+ChartType = Literal["bar", "map", "area", "dot", "line", "beeswarm", "heatmap"]
 
 
 class State(AgentState[None]):
@@ -21,11 +26,11 @@ class State(AgentState[None]):
     data: str | None
     """The active data from a SQL query, as a json string."""
 
-    bar_chart_metadata: BarChartMetadata | None
-    """Bar chart metadata for the data."""
+    chart_type: ChartType | None
+    """The type of chart being generated."""
 
-    map_chart_metadata: MapChartMetadata | None
-    """Map chart metadata for the data."""
+    chart_metadata: ChartMetadata | None
+    """The chart metadata for the data."""
 
 
 class SqlQuery(BaseModel):
@@ -61,10 +66,114 @@ class MapChartMetadata(BaseModel):
     """The title of the map chart."""
 
     id_column: str
-    """The name of the data column containing ISO3 country codes (e.g., 'adm0_a3')"""
+    """The data column with the geographic identifier.
+    admin0: ISO3 code column (e.g., 'iso3').
+    admin1: Region name column (e.g., 'admin1_name').
+    admin2: District name column (e.g., 'admin2_name')."""
 
     value_column: str
     """The name of the numeric data column used for coloring"""
 
     color_scheme: str = "Oranges"
     """The Observable Plot color scheme to use"""
+
+    admin_level: Literal["admin0", "admin1", "admin2"] = "admin0"
+    """The boundary level: admin0 (countries), admin1 (states), admin2 (districts)"""
+
+
+class AreaChartMetadata(BaseModel):
+    """Data to create a stacked area chart"""
+
+    title: str
+    """The title of the area chart."""
+
+    x_column: str
+    """The name of the data column used for the x-axis (typically time or sequence)"""
+
+    y_column: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name for creating stacked areas (categories)"""
+
+
+class LineChartMetadata(BaseModel):
+    """Data to create a line chart"""
+
+    title: str
+    """The title of the line chart."""
+
+    x_column: str
+    """The name of the data column used for the x-axis (typically time or sequence)"""
+
+    y_column: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name for creating multiple series"""
+
+
+class BeeswarmChartMetadata(BaseModel):
+    """Data to create a beeswarm plot (1D scatter with jittered positioning)"""
+
+    title: str
+    """The title of the beeswarm plot."""
+
+    category_column: str
+    """The name of the categorical data column (groups along x-axis)"""
+
+    value_column: str
+    """The name of the numeric data column (values along y-axis)"""
+
+    color_column: str | None
+    """An optional column name for coloring points by category"""
+
+
+class DotPlotMetadata(BaseModel):
+    """Data to create a dot plot (scatter plot)"""
+
+    title: str
+    """The title of the dot plot."""
+
+    x_column: str
+    """The name of the data column used for the x-axis"""
+
+    y_column: str
+    """The name of the numeric data column used for the y-axis"""
+
+    grouping_column: str | None
+    """An optional column name for grouping/coloring dots by category"""
+
+    size_column: str | None
+    """An optional column name for sizing dots by value"""
+
+
+class HeatmapChartMetadata(BaseModel):
+    """Data to create a heatmap chart"""
+
+    title: str
+    """The title of the heatmap."""
+
+    x_column: str
+    """The name of the data column used for the x-axis (categories)"""
+
+    y_column: str
+    """The name of the data column used for the y-axis (categories)"""
+
+    value_column: str
+    """The name of the numeric data column used for cell color intensity"""
+
+    color_scheme: str = "YlOrRd"
+    """The Observable Plot color scheme to use"""
+
+
+# Union type for chart metadata - add new metadata types here
+ChartMetadata = (
+    BarChartMetadata
+    | MapChartMetadata
+    | AreaChartMetadata
+    | LineChartMetadata
+    | BeeswarmChartMetadata
+    | HeatmapChartMetadata
+    | DotPlotMetadata
+)

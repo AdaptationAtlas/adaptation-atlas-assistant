@@ -11,22 +11,21 @@ from typing import Annotated, Any, Literal
 from fastapi import Depends, FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from fastapi.security import (
     OpenIdConnect,
 )
+from httpx import HTTPStatusError
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-from langgraph.errors import GraphRecursionError
 from langgraph.graph.message import BaseMessage
 from langgraph.graph.state import RunnableConfig
 from pydantic import BaseModel
-from starlette import status
 
 from .agent import Agent, Output, create_agent
 from .context import Context
 from .dataset import Dataset
 from .settings import Settings, get_settings
-from .state import BarChartMetadata, MapChartMetadata
+from .state import ChartMetadata, ChartType
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -138,25 +137,16 @@ class GenerateTableResponseMessage(ToolResponseMessage):
     """The sql query used to generate the data"""
 
 
-class GenerateBarChartMetadataResponseMessage(ToolResponseMessage):
-    """The response from generate_bar_chart_metadata"""
+class GenerateChartMetadataResponseMessage(ToolResponseMessage):
+    """The response from generate_chart_metadata"""
 
-    name: str = "generate_bar_chart_metadata"
+    name: str = "generate_chart_metadata"
 
-    bar_chart_metadata: BarChartMetadata | None
-    """The bar chart metadata"""
+    chart_type: ChartType | None
+    """The type of chart (bar, map, or area)"""
 
-    data: str | None
-    """The table data as a JSON string"""
-
-
-class GenerateMapChartMetadataResponseMessage(ToolResponseMessage):
-    """The response from generate_map_chart_metadata"""
-
-    name: str = "generate_map_chart_metadata"
-
-    map_chart_metadata: MapChartMetadata | None
-    """The map chart metadata"""
+    chart_metadata: ChartMetadata | None
+    """The chart metadata"""
 
     data: str | None
     """The table data as a JSON string"""
@@ -172,14 +162,10 @@ class AiResponseMessage(ResponseMessage):
     """The reason why the agent stopped"""
 
 
-class Error(BaseModel):
+class ErrorResponseMessage(ResponseMessage):
     """An error response"""
 
-    type: str
-    """The type of the error"""
-
-    message: str
-    """The error message"""
+    type: Literal["error"] = "error"
 
 
 @app.get("/health")
@@ -193,10 +179,10 @@ def health_check():
     response_model=ToolResponseMessage
     | SelectDatasetResponseMessage
     | GenerateTableResponseMessage
-    | GenerateBarChartMetadataResponseMessage
-    | GenerateMapChartMetadataResponseMessage
+    | GenerateChartMetadataResponseMessage
     | AiResponseMessage
-    | OutputResponseMessage,
+    | OutputResponseMessage
+    | ErrorResponseMessage,
 )
 async def chat(
     request: Request,
@@ -215,16 +201,6 @@ async def chat(
     )
 
 
-@app.exception_handler(GraphRecursionError)
-async def graph_recursion_handler(
-    _request: Request, exc: GraphRecursionError
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content=Error(message=str(exc), type="graph recursion"),
-    )
-
-
 async def query_agent(
     agent: Agent,
     query: str,
@@ -238,21 +214,29 @@ async def query_agent(
     """
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
     ensure_messages_ready_for_user(agent, config)
-    async for update in agent.astream(
-        {"messages": [HumanMessage(content=query)]},
-        stream_mode="updates",
-        config=config,
-        context=Context(settings=settings),
-    ):
-        for value in update.values():
-            if messages := value.get("messages"):
-                for msg in messages:
-                    response_message = maybe_create_response_message(msg, thread_id)
-                    if response_message:
-                        if event_stream:
-                            yield response_message.to_event_stream() + "\n\n"
-                        else:
-                            yield response_message.model_dump_json() + "\n"
+    try:
+        async for update in agent.astream(
+            {"messages": [HumanMessage(content=query)]},
+            stream_mode="updates",
+            config=config,
+            context=Context(settings=settings),
+        ):
+            for value in update.values():
+                if messages := value.get("messages"):
+                    for msg in messages:
+                        response_message = maybe_create_response_message(msg, thread_id)
+                        if response_message:
+                            if event_stream:
+                                yield response_message.to_event_stream() + "\n\n"
+                            else:
+                                yield response_message.model_dump_json() + "\n"
+    except HTTPStatusError as e:
+        logging.error(f"HTTP error occurred: {e}")
+        response_message = ErrorResponseMessage(content=str(e), thread_id=thread_id)
+        if event_stream:
+            yield response_message.to_event_stream() + "\n\n"
+        else:
+            yield response_message.model_dump_json() + "\n"
 
 
 def maybe_create_response_message(
@@ -299,26 +283,18 @@ def create_response_message(
                     data=artifact.get("data"),
                     sql_query=artifact.get("sql_query"),
                 )
-            case "generate_bar_chart_metadata":
+            case "generate_chart_metadata":
                 artifact = message.artifact or {}
-                return GenerateBarChartMetadataResponseMessage(
+                return GenerateChartMetadataResponseMessage(
                     content=message.content,
                     status=message.status,
                     thread_id=thread_id,
-                    bar_chart_metadata=artifact.get("bar_chart_metadata")
+                    chart_type=artifact.get("chart_type")
                     if isinstance(artifact, dict)
-                    else artifact,
-                    data=artifact.get("data") if isinstance(artifact, dict) else None,
-                )
-            case "generate_map_chart_metadata":
-                artifact = message.artifact or {}
-                return GenerateMapChartMetadataResponseMessage(
-                    content=message.content,
-                    status=message.status,
-                    thread_id=thread_id,
-                    map_chart_metadata=artifact.get("map_chart_metadata")
+                    else None,
+                    chart_metadata=artifact.get("chart_metadata")
                     if isinstance(artifact, dict)
-                    else artifact,
+                    else None,
                     data=artifact.get("data") if isinstance(artifact, dict) else None,
                 )
             case None:
@@ -345,7 +321,7 @@ def create_response_message(
 
 
 def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None:
-    """Mistral fails when a tool message is followed by a user message.
+    """Models fail when a tool message is followed by a user message.
     Append a short assistant acknowledgement so the next user turn comes
     after an assistant role.
     """
@@ -359,5 +335,6 @@ def ensure_messages_ready_for_user(agent: Agent, config: RunnableConfig) -> None
             if getattr(last_tool, "name", None)
             else "Noted the previous tool result."
         )
-        messages.append(AIMessage(content=acknowledgement))
-        _ = agent.update_state(config, {"messages": messages})
+        _ = agent.update_state(
+            config, {"messages": [AIMessage(content=acknowledgement)]}
+        )

@@ -1,22 +1,20 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
-import { sendChatMessage, createStreamController } from '../api';
+import { sendChatMessage, createStreamController, getSuggestions } from '../api';
 import { useChatStore } from '../store/chatStore';
 import { contextTagsToText } from '../utils/tagFormatting';
 import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
 import { ChatResponse } from './ChatResponse';
-import { SIDEBAR_SECTIONS, EXPOSURE_UNITS, ADAPTIVE_CAPACITY_UNITS } from '../constants/sidebar';
+import {
+    SIDEBAR_SECTIONS,
+    EXPOSURE_UNITS,
+    ADAPTIVE_CAPACITY_UNITS,
+} from '../constants/sidebar';
 import type { SidebarState, PromptContextTag } from '../types/sidebar';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
-
-const examplePrompts = [
-    'How is maize production projected to change under future climate scenarios in Kenya?',
-    'Which regions in West Africa face the highest exposure to drought risk?',
-    'Compare adaptive capacity between smallholder farmers in Malawi and Zambia',
-];
 
 function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     const tags: PromptContextTag[] = [];
@@ -57,7 +55,8 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     exposureTypes.forEach((type) => {
         const exposure = sidebar.exposure[type];
         if (exposure.name !== 'None') {
-            const hasRange = exposure.rangeMin !== null && exposure.rangeMax !== null;
+            const hasRange =
+                exposure.rangeMin !== null && exposure.rangeMax !== null;
             const unit = EXPOSURE_UNITS[type];
             const label = hasRange
                 ? `${exposure.name}: ${exposure.rangeMin}-${exposure.rangeMax} ${unit}`
@@ -77,13 +76,17 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     }
 
     if (sidebar.adaptiveCapacity.name !== 'None') {
-        const hasRange = sidebar.adaptiveCapacity.rangeMin !== null && sidebar.adaptiveCapacity.rangeMax !== null;
-        const unit = ADAPTIVE_CAPACITY_UNITS[sidebar.adaptiveCapacity.name] || '';
-        const label = hasRange && unit
-            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax} ${unit}`
-            : hasRange
-            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax}`
-            : sidebar.adaptiveCapacity.name;
+        const hasRange =
+            sidebar.adaptiveCapacity.rangeMin !== null &&
+            sidebar.adaptiveCapacity.rangeMax !== null;
+        const unit =
+            ADAPTIVE_CAPACITY_UNITS[sidebar.adaptiveCapacity.name] || '';
+        const label =
+            hasRange && unit
+                ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax} ${unit}`
+                : hasRange
+                  ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax}`
+                  : sidebar.adaptiveCapacity.name;
         tags.push({
             id: 'capacity-layer',
             label,
@@ -95,7 +98,12 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
 
 export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
-      const { isAuthenticated, removeUser } = useAuth();
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+    const { isAuthenticated, removeUser } = useAuth();
+    const abortRef = useRef<(() => void) | null>(null);
+    const isAbortingRef = useRef(false);
+    const suggestionsAbortRef = useRef<AbortController | null>(null);
 
     // Chat store - includes chat state and sidebar state
     const {
@@ -114,6 +122,49 @@ export function Chat() {
 
     // Convert sidebar state to context tags
     const contextTags = sidebarToContextTags(sidebar);
+    const contextText = contextTagsToText(contextTags);
+
+    const hasStartedChat = events.length > 0;
+
+    useEffect(() => {
+        if (hasStartedChat) {
+            return;
+        }
+
+        if (suggestionsAbortRef.current) {
+            suggestionsAbortRef.current.abort();
+        }
+
+        if (!contextText) {
+            setSuggestions([]);
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            setIsLoadingSuggestions(true);
+            const abortController = new AbortController();
+            suggestionsAbortRef.current = abortController;
+
+            try {
+                const result = await getSuggestions(contextText, abortController.signal);
+                if (!abortController.signal.aborted) {
+                    setSuggestions(result);
+                }
+            } catch (error) {
+                if (error instanceof Error && error.name !== 'AbortError') {
+                    console.error('Failed to fetch suggestions:', error);
+                }
+            } finally {
+                if (!abortController.signal.aborted) {
+                    setIsLoadingSuggestions(false);
+                }
+            }
+        }, 500);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [contextText, hasStartedChat]);
 
     const handlePromptSubmit = useCallback(async (value: string) => {
         if (!value.trim()) return;
@@ -127,6 +178,8 @@ export function Chat() {
         startStreaming(value);
 
         const controller = createStreamController();
+        abortRef.current = controller.abort;
+        isAbortingRef.current = false;
 
         try {
             await sendChatMessage(queryWithContext, threadId, {
@@ -142,6 +195,10 @@ export function Chat() {
                     });
                 },
                 onError: (error) => {
+                    // Don't show error if user intentionally cancelled
+                    if (isAbortingRef.current) {
+                        return;
+                    }
                     setError(error.message);
                 },
                 onComplete: () => {
@@ -159,12 +216,28 @@ export function Chat() {
         handlePromptSubmit(prompt);
     };
 
+    const handleAbort = useCallback(() => {
+        if (abortRef.current) {
+            isAbortingRef.current = true;
+            abortRef.current();
+            abortRef.current = null;
+            addEvent({
+                type: 'ai',
+                content: '*Response stopped*',
+                thread_id: threadId || '',
+                finish_reason: 'cancelled',
+                id: `cancelled-${Date.now()}`,
+                timestamp: Date.now(),
+            });
+            finishStreaming();
+        }
+    }, [addEvent, finishStreaming, threadId]);
+
     const handleAvatarClick = () => {
         if (isAuthenticated) {
             removeUser();
         }
     };
-
 
     return (
         <div className="relative flex h-screen w-full overflow-hidden bg-white">
@@ -207,22 +280,28 @@ export function Chat() {
             <main className={styles.mainContent}>
                 {status === 'idle' && (
                     <EmptyState
-                        examplePrompts={examplePrompts}
                         onExampleClick={handleExampleClick}
+                        suggestions={suggestions.length > 0 ? suggestions : undefined}
+                        isLoadingSuggestions={isLoadingSuggestions}
                     />
                 )}
-
-                {status !== 'idle' && (
-                    <div className={styles.contentArea}>
-                        <ChatResponse events={events} status={status} onSuggestionClick={handlePromptSubmit} />
-                    </div>
-                )}
+                <div>
+                    {status !== 'idle' && (
+                        <ChatResponse
+                            events={events}
+                            status={status}
+                            onSuggestionClick={handlePromptSubmit}
+                        />
+                    )}
+                </div>
 
                 <div className={styles.promptContainer}>
                     <PromptBox
                         onSubmit={handlePromptSubmit}
                         context={contextTags}
                         onRemoveTag={removeTag}
+                        isStreaming={status === 'streaming'}
+                        onAbort={handleAbort}
                     />
                 </div>
             </main>

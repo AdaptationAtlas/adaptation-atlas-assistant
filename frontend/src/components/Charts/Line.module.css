@@ -1,0 +1,9 @@
+.chartWrapper {
+    width: 100%;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
