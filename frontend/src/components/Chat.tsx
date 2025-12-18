@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { sendChatMessage, createStreamController } from '../api';
 import { useChatStore } from '../store/chatStore';
@@ -99,6 +99,8 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
 export function Chat() {
     const [showTooltip, setShowTooltip] = useState(false);
     const { isAuthenticated, removeUser } = useAuth();
+    const abortRef = useRef<(() => void) | null>(null);
+    const isAbortingRef = useRef(false);
 
     // Chat store - includes chat state and sidebar state
     const {
@@ -118,67 +120,72 @@ export function Chat() {
     // Convert sidebar state to context tags
     const contextTags = sidebarToContextTags(sidebar);
 
-    const handlePromptSubmit = useCallback(
-        async (value: string) => {
-            if (!value.trim()) return;
+    const handlePromptSubmit = useCallback(async (value: string) => {
+        if (!value.trim()) return;
 
-            // Inject context tags as natural language into the query
-            const contextTagsAsText = contextTagsToText(contextTags);
-            const queryWithContext = contextTagsAsText
-                ? `${contextTagsAsText}\n\nQuestion: ${value}`
-                : value;
+        // Inject context tags as natural language into the query
+        const contextTagsAsText = contextTagsToText(contextTags);
+        const queryWithContext = contextTagsAsText
+            ? `${contextTagsAsText}\n\nQuestion: ${value}`
+            : value;
 
-            startStreaming(value);
+        startStreaming(value);
 
-            const controller = createStreamController();
+        const controller = createStreamController();
+        abortRef.current = controller.abort;
+        isAbortingRef.current = false;
 
-            try {
-                await sendChatMessage(queryWithContext, threadId, {
-                    onMessage: (message) => {
-                        if (
-                            !threadId &&
-                            'thread_id' in message &&
-                            typeof message.thread_id === 'string'
-                        ) {
-                            setThreadId(message.thread_id);
-                        }
+        try {
+            await sendChatMessage(queryWithContext, threadId, {
+                onMessage: (message) => {
+                    if (!threadId && 'thread_id' in message && typeof message.thread_id === 'string') {
+                        setThreadId(message.thread_id);
+                    }
 
-                        addEvent({
-                            ...message,
-                            id: `msg-${Date.now()}-${Math.random()}`,
-                            timestamp: Date.now(),
-                        });
-                    },
-                    onError: (error) => {
-                        setError(error.message);
-                    },
-                    onComplete: () => {
-                        finishStreaming();
-                    },
-                    signal: controller.signal,
-                });
-            } catch (error) {
-                const errorMessage =
-                    error instanceof Error
-                        ? error.message
-                        : 'Failed to send message';
-                setError(errorMessage);
-            }
-        },
-        [
-            contextTags,
-            startStreaming,
-            addEvent,
-            finishStreaming,
-            setError,
-            threadId,
-            setThreadId,
-        ]
-    );
+                    addEvent({
+                        ...message,
+                        id: `msg-${Date.now()}-${Math.random()}`,
+                        timestamp: Date.now(),
+                    });
+                },
+                onError: (error) => {
+                    // Don't show error if user intentionally cancelled
+                    if (isAbortingRef.current) {
+                        return;
+                    }
+                    setError(error.message);
+                },
+                onComplete: () => {
+                    finishStreaming();
+                },
+                signal: controller.signal,
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
+            setError(errorMessage);
+        }
+    }, [contextTags, startStreaming, addEvent, finishStreaming, setError, threadId, setThreadId]);
 
     const handleExampleClick = (prompt: string) => {
         handlePromptSubmit(prompt);
     };
+
+    const handleAbort = useCallback(() => {
+        if (abortRef.current) {
+            isAbortingRef.current = true;
+            abortRef.current();
+            abortRef.current = null;
+            addEvent({
+                type: 'ai',
+                content: '*Response stopped*',
+                thread_id: threadId || '',
+                finish_reason: 'cancelled',
+                id: `cancelled-${Date.now()}`,
+                timestamp: Date.now(),
+            });
+            finishStreaming();
+        }
+    }, [addEvent, finishStreaming, threadId]);
 
     const handleAvatarClick = () => {
         if (isAuthenticated) {
@@ -244,6 +251,8 @@ export function Chat() {
                         onSubmit={handlePromptSubmit}
                         context={contextTags}
                         onRemoveTag={removeTag}
+                        isStreaming={status === 'streaming'}
+                        onAbort={handleAbort}
                     />
                 </div>
             </main>

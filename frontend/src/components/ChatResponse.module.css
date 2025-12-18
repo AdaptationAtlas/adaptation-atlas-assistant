@@ -8,21 +8,57 @@
     color: #6b7280;
     margin-bottom: 0.5rem;
     user-select: none;
+    list-style: none;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
 }
 
+.reasoningSummary::-webkit-details-marker { display: none; }
+
 .reasoningSummary:hover {
-    color: #374151;
+    color: var(--primary);
 }
 
 .reasoningContent {
     background-color: #F4F5F6;
-    margin-left: 1rem;
     padding: 0.5rem;
-    border-radius: 4px
+    border-radius: 4px;
 }
 
-.intermediateMessage {
-    margin-bottom: 1rem;
+.stepItem {
+    margin-bottom: 0.75rem;
+}
+
+.stepDivider {
+    width: 1px;
+    height: 12px;
+    background: #d1d5db;
+    margin: 0.25rem 0 0.5rem 0.5rem;
+}
+
+.moreSteps {
+    margin-bottom: 0.5rem;
+    margin-left: 0rem;
+}
+
+.moreStepsSummary {
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #9ca3af;
+    user-select: none;
+    list-style: none;
+}
+
+.moreStepsSummary::-webkit-details-marker { display: none; }
+
+.moreStepsSummary:hover {
+    color: var(--primary);
+}
+
+.moreStepsContent {
+    margin-top: 0.5rem;
+    margin-left: 0rem;
 }
 
 .toolSummary {
@@ -32,7 +68,13 @@
     font-size: 0.9rem;
     color: #111927;
     user-select: none;
+    list-style: none;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
 }
+
+.toolSummary::-webkit-details-marker { display: none; }
 
 .toolSummary:hover {
     color: var(--primary);
@@ -41,15 +83,21 @@
 .toolContent {
     white-space: pre-wrap;
     word-wrap: break-word;
-    margin-left: 1.5rem;
+    margin-left: 0rem;
     font-size: 0.9rem;
     font-family: 'IBM Plex Mono', monospace;
     color: #374151;
     line-height: 1.5;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .aiMessage {
     margin-bottom: 1.5rem;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .aiLabel {
@@ -69,6 +117,7 @@
 
 .artifact {
     margin-bottom: 1.5rem;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .codeBlock {
@@ -202,4 +251,38 @@
     word-wrap: break-word;
     white-space: normal;
 }
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, #6b7280 25%, #9ca3af 50%, #6b7280 75%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 1.5s infinite;
+}
+
+.loadingBlock {
+    margin-bottom: 1.5rem;
+}
+
+.skeletonGroup {
+    margin-top: 0.75rem;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeletonGroup .skeleton:nth-child(2) { width: 85%; }
+.skeletonGroup .skeleton:nth-child(3) { width: 70%; }
 
