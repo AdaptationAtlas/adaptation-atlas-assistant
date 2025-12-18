@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # GitHub Actions dependencies
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -10,9 +9,8 @@ updates:
         patterns:
           - "*"
 
-  # Python dependencies (PyPI)
   - package-ecosystem: "pip"
-    directory: "/"
+    directory: "/backend"
     schedule:
       interval: "weekly"
     groups:
@@ -20,7 +18,6 @@ updates:
         patterns:
           - "*"
 
-  # NPM dependencies (frontend)
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
