@@ -27,6 +27,7 @@ Most development needs are covered by GitHub Actions workflows, which should be 
 ### Tools
 
 - [AWS CLI]
+    - [Systems Manager Plugin] (optional, enables connecting to containers from local machine)
 - [Terraform CLI]
 
 ### Setup
@@ -51,6 +52,8 @@ Terraform needs to connect with AWS for most operations. Specific setup guidance
 
 ### Usage
 
+#### Terraform
+
 ```sh
 ## Terraform commands look for configuration files relative to current directory
 ## Skip if using inline `-chdir` flag
@@ -59,10 +62,46 @@ cd terraform/aws
 ## Initialize Terraform with remote backend
 terraform init
 
-## Summarize differences between configuration and remote state with proposed changes, if needed
+## Summarize differences between configuration and remote state with proposed changes
 terraform plan -var-file=tfvars/dev.tfvars \
-  -var="mistral_api_key=your-api-key" \
-  -var="email_source_arn=arn:aws:ses:us-east-1:123456789012:identity/example.com"
+  -var="chat_model__type=<model_type>" \
+  -var="chat_model__api_key=<your-api-key>" \
+  -var="chat_model__size=<model_size>"
+```
+
+#### AWS / ECS / Connect to Containers
+
+Containers are set up with ECS Exec for remote connection
+
+```sh
+## Get ARN or ID for task container
+aws ecs list-tasks --cluster atlas-cluster --service atlas-backend
+
+## Connect to container from local machine (requires Systems Manager Plugin)
+aws ecs execute-command --region us-east-1 \
+  --cluster atlas-cluster \
+  --task <task_arn> \
+  --container api \
+  --interactive \
+  --command '/bin/sh'
+```
+
+#### AWS / ECR / Push to Registry
+
+Recommend pushing from local only for development images with non-production tagging (e.g. `:dev`). Production images should go through CI/CD.
+
+```sh
+## Authenticate to ECR
+aws ecr get-login-password --region us-east-1 | docker login \
+  --username AWS \
+  --password-stdin \
+  <account_id>.dkr.ecr.us-east-1.amazonaws.com
+
+## Tag built image
+docker tag <image> <account_id>.dkr.ecr.us-east-1.amazonaws.com/atlas:<image_tag>
+
+## Push to registry
+docker push <account_id>.dkr.ecr.us-east-1.amazonaws.com/atlas:<image_tag>
 ```
 
 ## Variables + Secrets
@@ -121,6 +160,8 @@ Note: a similar effect can be achieved using other solutions, such as manual sec
   https://registry.terraform.io/providers/hashicorp/aws/latest/docs
 [AWS CLI]:
   https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
+[Systems Manager Plugin]:
+  https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
 [Terraform CLI]:
   https://developer.hashicorp.com/terraform/install
 [configuration]:
