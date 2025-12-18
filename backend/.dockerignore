@@ -6,6 +6,7 @@
 !README.md
 !/data
 !/src
+!logging.yaml
 
 ## Exclude files in allowed subdirectories
 **/__pycache__/
