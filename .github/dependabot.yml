@@ -26,3 +26,12 @@ updates:
       npm-dependencies:
         patterns:
           - "*"
+
+  - package-ecosystem: terraform
+    directory: "/terraform/aws"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform-dependencies:
+        patterns:
+          - "*"
