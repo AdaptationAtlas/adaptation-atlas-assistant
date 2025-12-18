@@ -1,0 +1,31 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  default:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: default
+    stream: ext://sys.stdout
+
+loggers:
+  uvicorn:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+
+  atlas_assistant:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+
+root:
+  level: INFO
+  handlers:
+    - console

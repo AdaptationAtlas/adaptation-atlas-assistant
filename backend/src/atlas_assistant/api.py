@@ -194,6 +194,7 @@ async def chat(
     agent: Agent = request.state.agent
     thread_id = chat_request.thread_id or str(uuid.uuid4())
     event_stream = (accept and "text/event-stream" in accept) or False
+    logger.info(f"Query: {chat_request.query}")
     return StreamingResponse(
         query_agent(agent, chat_request.query, thread_id, settings, event_stream),
         media_type="text/event-stream" if event_stream else "application/x-ndjson",
@@ -246,8 +247,10 @@ def maybe_create_response_message(
         for tool_call in tool_calls:
             function = tool_call.get("function")
             if function.get("name") == "Output":
+                output = Output.model_validate_json(function.get("arguments"))
+                logger.info(f"Answer: {output.answer}")
                 return OutputResponseMessage(
-                    output=Output.model_validate_json(function.get("arguments")),
+                    output=output,
                     thread_id=thread_id,
                 )
     if message.content:
