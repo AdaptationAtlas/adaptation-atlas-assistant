@@ -286,14 +286,13 @@ export function Chat() {
                     />
                 )}
 
-                    {status !== 'idle' && (
-                        <ChatResponse
-                            events={events}
-                            status={status}
-                            onSuggestionClick={handlePromptSubmit}
-                        />
-                    )}
-                </div>
+                {status !== 'idle' && (
+                    <ChatResponse
+                        events={events}
+                        status={status}
+                        onSuggestionClick={handlePromptSubmit}
+                    />
+                )}
 
                 <div className={styles.promptContainer}>
                     <PromptBox
