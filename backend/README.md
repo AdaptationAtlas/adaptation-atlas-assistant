@@ -6,7 +6,6 @@ Get [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 ```sh
 cp .env.example .env
 # Set your API key in .env
-echo JWT_KEY=$(openssl rand -hex 32) >> .env
 uv run python scripts/embed_stac.py
 uv run chainlit run chainlit/app.py -w
 ```
@@ -26,7 +25,6 @@ We use the [Atlas's STAC Catalog](https://digital-atlas.s3.amazonaws.com/stac/pu
 To re-fetch all items that have parquet assets and rebuild the embeddings:
 
 ```sh
-uv run python scripts/fetch_stac.py
 uv run python scripts/embed_stac.py
 ```
 
