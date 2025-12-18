@@ -1,5 +1,6 @@
 import { HeroSection } from './HeroSection';
 import { ExamplePrompts } from './ExamplePrompts';
+import { Acknowledgements } from './Acknowledgements';
 import styles from './EmptyState.module.css';
 
 interface EmptyStateProps {
@@ -28,6 +29,9 @@ export function EmptyState({
                 showRefresh={!suggestions}
                 isLoading={isLoadingSuggestions}
             />
+
+            <Acknowledgements />
+
         </div>
     );
 }

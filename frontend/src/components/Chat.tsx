@@ -7,7 +7,11 @@ import { PromptBuilderSidebar } from './PromptBuilderSidebar';
 import { EmptyState } from './EmptyState';
 import { PromptBox } from './PromptBox';
 import { ChatResponse } from './ChatResponse';
-import { SIDEBAR_SECTIONS, EXPOSURE_UNITS, ADAPTIVE_CAPACITY_UNITS } from '../constants/sidebar';
+import {
+    SIDEBAR_SECTIONS,
+    EXPOSURE_UNITS,
+    ADAPTIVE_CAPACITY_UNITS,
+} from '../constants/sidebar';
 import type { SidebarState, PromptContextTag } from '../types/sidebar';
 import AtlasLogo from '../assets/atlas-a.svg';
 import styles from './Chat.module.css';
@@ -51,7 +55,8 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     exposureTypes.forEach((type) => {
         const exposure = sidebar.exposure[type];
         if (exposure.name !== 'None') {
-            const hasRange = exposure.rangeMin !== null && exposure.rangeMax !== null;
+            const hasRange =
+                exposure.rangeMin !== null && exposure.rangeMax !== null;
             const unit = EXPOSURE_UNITS[type];
             const label = hasRange
                 ? `${exposure.name}: ${exposure.rangeMin}-${exposure.rangeMax} ${unit}`
@@ -71,13 +76,17 @@ function sidebarToContextTags(sidebar: SidebarState): PromptContextTag[] {
     }
 
     if (sidebar.adaptiveCapacity.name !== 'None') {
-        const hasRange = sidebar.adaptiveCapacity.rangeMin !== null && sidebar.adaptiveCapacity.rangeMax !== null;
-        const unit = ADAPTIVE_CAPACITY_UNITS[sidebar.adaptiveCapacity.name] || '';
-        const label = hasRange && unit
-            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax} ${unit}`
-            : hasRange
-            ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax}`
-            : sidebar.adaptiveCapacity.name;
+        const hasRange =
+            sidebar.adaptiveCapacity.rangeMin !== null &&
+            sidebar.adaptiveCapacity.rangeMax !== null;
+        const unit =
+            ADAPTIVE_CAPACITY_UNITS[sidebar.adaptiveCapacity.name] || '';
+        const label =
+            hasRange && unit
+                ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax} ${unit}`
+                : hasRange
+                  ? `${sidebar.adaptiveCapacity.name}: ${sidebar.adaptiveCapacity.rangeMin}-${sidebar.adaptiveCapacity.rangeMax}`
+                  : sidebar.adaptiveCapacity.name;
         tags.push({
             id: 'capacity-layer',
             label,
@@ -230,7 +239,6 @@ export function Chat() {
         }
     };
 
-
     return (
         <div className="relative flex h-screen w-full overflow-hidden bg-white">
             {/* Left gradient sidebar */}
@@ -278,11 +286,14 @@ export function Chat() {
                     />
                 )}
 
-                {status !== 'idle' && (
-                    <div className={styles.contentArea}>
-                        <ChatResponse events={events} status={status} onSuggestionClick={handlePromptSubmit} />
-                    </div>
-                )}
+                    {status !== 'idle' && (
+                        <ChatResponse
+                            events={events}
+                            status={status}
+                            onSuggestionClick={handlePromptSubmit}
+                        />
+                    )}
+                </div>
 
                 <div className={styles.promptContainer}>
                     <PromptBox

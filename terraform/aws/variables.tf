@@ -37,31 +37,29 @@ variable "domain_name" {
   EOT
 }
 
-variable "mistral_api_key" {
+variable "chat_model__type" {
+  type        = string
+  default     = ""
+  description = <<-EOT
+  The type of chat model to use.
+  EOT
+}
+
+variable "chat_model__api_key" {
   type        = string
   default     = ""
   sensitive   = true
   ephemeral   = true
   description = <<-EOT
-  Key for Mistral agent
+  Key for the chat agent
   EOT
 }
 
-variable "chat_model_size" {
+variable "chat_model__size" {
   type        = string
   default     = ""
   description = <<-EOT
   ex: small, large
-  EOT
-}
-
-variable "jwt_key" {
-  type        = string
-  default     = ""
-  sensitive   = true
-  ephemeral   = true
-  description = <<-EOT
-  API key
   EOT
 }
 
@@ -87,21 +85,6 @@ variable "api_image_tag" {
   default     = "latest"
   description = <<-EOT
   Image tag to use in deployment
-  EOT
-}
-
-variable "email_source_arn" {
-  type        = string
-  description = <<-EOT
-  Verified email or domain SES Identity to use for automated Cognito emails
-  EOT
-}
-
-variable "from_email_address" {
-  type        = string
-  default     = "no-reply@ds.io"
-  description = <<-EOT
-  Email From address to use for automated Cognito emails
   EOT
 }
 
