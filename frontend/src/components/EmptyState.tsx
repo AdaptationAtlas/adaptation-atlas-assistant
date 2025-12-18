@@ -1,5 +1,6 @@
 import { HeroSection } from './HeroSection';
 import { ExamplePrompts } from './ExamplePrompts';
+import { Acknowledgements } from './Acknowledgements';
 import styles from './EmptyState.module.css';
 
 interface EmptyStateProps {
@@ -7,10 +8,7 @@ interface EmptyStateProps {
     className?: string;
 }
 
-export function EmptyState({
-    onExampleClick,
-    className,
-}: EmptyStateProps) {
+export function EmptyState({ onExampleClick, className }: EmptyStateProps) {
     return (
         <div className={`${styles.emptyState} ${className || ''}`}>
             <HeroSection
@@ -19,6 +17,8 @@ export function EmptyState({
             />
 
             <ExamplePrompts onExampleClick={onExampleClick} />
+
+            <Acknowledgements />
         </div>
     );
 }

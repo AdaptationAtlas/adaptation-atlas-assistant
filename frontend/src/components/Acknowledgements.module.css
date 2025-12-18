@@ -1,0 +1,55 @@
+.acknowledgements {
+    width: 100%;
+    margin-top: 48px;
+    padding: 24px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.text {
+    font-family:
+        'IBM Plex Sans',
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.logoContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 24px;
+}
+
+.logo {
+    height: 55px;
+    width: auto;
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .acknowledgements {
+        margin-top: 32px;
+        padding: 20px;
+    }
+
+    .text {
+        font-size: 12px;
+        margin: 0 0 16px 0;
+    }
+
+    .logoContainer {
+        padding: 12px 16px;
+    }
+
+    .logo {
+        height: 44px;
+    }
+}
