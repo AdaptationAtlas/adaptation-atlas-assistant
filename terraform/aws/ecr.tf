@@ -1,5 +1,6 @@
 module "ecr" {
-  source = "terraform-aws-modules/ecr/aws"
+  source  = "terraform-aws-modules/ecr/aws"
+  version = "~> 3.1.0"
 
   repository_name = "atlas"
 
@@ -29,10 +30,10 @@ module "ecr" {
         rulePriority = 2,
         description  = "Keep last 5 tagged images",
         selection = {
-          tagStatus   = "tagged",
+          tagStatus     = "tagged",
           tagPrefixList = ["sha-"],
-          countType   = "imageCountMoreThan",
-          countNumber = 5
+          countType     = "imageCountMoreThan",
+          countNumber   = 5
         },
         action = {
           type = "expire"

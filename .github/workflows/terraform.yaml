@@ -27,6 +27,7 @@ jobs:
       TF_VAR_chat_model__type: ${{ vars.CHAT_MODEL__TYPE }}
       TF_VAR_chat_model__size: ${{ vars.CHAT_MODEL__SIZE }}
       TF_VAR_chat_model__api_key: ${{ secrets.CHAT_MODEL__API_KEY }}
+      TF_VAR_dns_account_role_arn: ${{ vars.DNS_ACCOUNT_ROLE_ARN }}
     defaults:
       run:
         working-directory: terraform/aws

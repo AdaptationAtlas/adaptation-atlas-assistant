@@ -1,5 +1,6 @@
 module "ecs" {
-  source = "terraform-aws-modules/ecs/aws"
+  source  = "terraform-aws-modules/ecs/aws"
+  version = "~> 6.10.0"
 
   cluster_name = "atlas-cluster"
 
