@@ -1,5 +1,6 @@
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 6.5.0"
 
   name = "atlas-vpc"
   cidr = local.vpc_cidr

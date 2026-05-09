@@ -3,6 +3,14 @@ provider "aws" {
   default_tags { tags = var.tags }
 }
 
+provider "aws" {
+  # Provider reference for account that owns Route 53 records
+  alias = "dns"
+  assume_role {
+    role_arn = var.dns_account_role_arn
+  }
+}
+
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}

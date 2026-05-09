@@ -37,6 +37,22 @@ variable "domain_name" {
   EOT
 }
 
+variable "api_subdomain" {
+  type        = string
+  default     = ""
+  description = <<-EOT
+  Load balancer target for API backend
+  EOT
+}
+
+variable "dns_account_role_arn" {
+  type        = string
+  default     = ""
+  description = <<-EOT
+  Role to assume in DNS account to add certificate validation and load balancer reference on `domain_name` hosted zone.
+  EOT
+}
+
 variable "chat_model__type" {
   type        = string
   default     = ""

@@ -1,5 +1,6 @@
 module "alb" {
-  source = "terraform-aws-modules/alb/aws"
+  source  = "terraform-aws-modules/alb/aws"
+  version = "~> 10.3.0"
 
   name = "atlas-lb"
 
@@ -67,13 +68,17 @@ module "alb" {
     }
   }
 
-  route53_records = {
-    A = {
-      name    = "api"
-      type    = "A"
-      zone_id = data.aws_route53_zone.ecs_domain.id
-    }
-  }
-
   tags = var.tags
+}
+
+resource "aws_route53_record" "atlas_assistant_api" {
+  provider = aws.dns
+  zone_id  = data.aws_route53_zone.ecs_domain.zone_id
+  name     = var.api_subdomain
+  type     = "A"
+  alias {
+    name                   = module.alb.dns_name
+    zone_id                = module.alb.zone_id
+    evaluate_target_health = true
+  }
 }
